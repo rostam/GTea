@@ -610,39 +610,6 @@ function initializeSamplingsMenu(samplings) {
 }
 
 /**
- * If a database is selected, send request to the org.gradoop.demos.grouping.server, asking for the vertex and edge keys of
- * this database. If the request succeeds, initialize the other interface menus.
- */
-function sendKeyRequest(finish) {
-    changed = true;
-    var databaseName = getSelectedCategory()+"-"+getSelectedDatabase();
-    if (databaseName != 'Select a database') {
-        $.post('http://localhost:2342/keys/' + databaseName)
-            .done(function(keys) {initializeOtherMenus(keys);finish()})
-            .fail(function (jqXHR, textStatus, errorThrown) {
-                alert(errorThrown);
-            });
-    }
-}
-
-
-/**
- * If a database is selected, send request to the org.gradoop.demos.grouping.server, asking for the vertex and edge keys of
- * this database. If the request succeeds, initialize the other interface menus.
- */
-function sendSamplingRequest() {
-    changed = true;
-    var samplingName = getSelectedSampling();
-    if (samplingName != 'Select a sampling') {
-        $.post('http://localhost:2342/sampling/' + samplingName)
-        //.done(initializeOtherMenus)
-            .fail(function (jqXHR, textStatus, errorThrown) {
-                alert(errorThrown);
-            });
-    }
-}
-
-/**
  * Initialize the property key menus, the filter menus, the aggregate function selects and the
  * checkboxes.
  * @param keys vertex and edge property keys

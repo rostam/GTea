@@ -29,7 +29,6 @@
 	// Enable strict mode for EC5 compatible browsers
 	"use strict";
 
-	// Establish the root object, `window` in the browser, or `global` on the org.gradoop.demos.grouping.server.
 	var root = this;
 
 	// The top-level namespace. All public Springy classes and modules will

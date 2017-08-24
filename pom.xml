@@ -3,8 +3,8 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.gradoop</groupId>
-    <artifactId>gradoop-vis</artifactId>
+    <groupId>org.gtea</groupId>
+    <artifactId>GTea</artifactId>
     <version>1.0-SNAPSHOT</version>
     <build>
         <plugins>
@@ -34,7 +34,6 @@
     </build>
     <properties>
         <dep.flink.version>1.3.2</dep.flink.version>
-        <dep.gradoop.version>0.3.0-SNAPSHOT</dep.gradoop.version>
         <dep.jersey.version>1.19.3</dep.jersey.version>
     </properties>
     <repositories>
