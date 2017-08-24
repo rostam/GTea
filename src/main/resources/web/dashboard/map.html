@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Gradoop</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="qtip/jquery.qtip.css">
+
+    <!-- Custom styles for this template -->
+    <link href="css/sb-admin.css" rel="stylesheet">
+
+    <link href="css/index.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.1.0/dist/leaflet.css"
+          integrity="sha512-wcw6ts8Anuw10Mzh9Ytw4pylW8+NAD4ch3lqm9lzAsTxg0GFeJgoAtxuCLREZSC5lUXdVyo/7yfsqFjQ4S+aKw=="
+          crossorigin=""/>
+
+    <script src="https://unpkg.com/leaflet@1.1.0/dist/leaflet.js"
+            integrity="sha512-mNqn2Wg7tSToJhvHcqfzLMU6J4mkOImSPTxVZAdo+lcPlk+GhZmYgACEe0x35K7YzW1zJ7XyJV/TT1MrdXvMcA=="
+            crossorigin=""></script>
+
+</head>
+
+<body id="page-top">
+
+<!-- Navigation -->
+<nav id="mainNav" class="navbar static-top navbar-toggleable-md navbar-inverse bg-inverse">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+            data-target="#navbarExample" aria-controls="navbarExample" aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="#">Gradoop</a>
+    <div class="collapse navbar-collapse" id="navbarExample">
+        <ul class="sidebar-nav navbar-nav">
+            <!--<li class="nav-item active">-->
+            <!--<a class="nav-link" href="#"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>-->
+            <!--</li>-->
+            <!--<li class="nav-item">-->
+            <!--<a class="nav-link" href="#"><i class="fa fa-fw fa-area-chart"></i> Charts</a>-->
+            <!--</li>-->
+            <!--<li class="nav-item">-->
+            <!--<a class="nav-link" href="#"><i class="fa fa-fw fa-table"></i> Tables</a>-->
+            <!--</li>-->
+            <li class="nav-item">
+                <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseComponents">
+                    <i class="fa fa-fw fa-database"></i> Vertex labels</a>
+                <ul class="sidebar-second-level collapse" id="collapseComponents">
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseLayouts"><i
+                        class="fa fa-fw fa-star-o"></i> Edge Labels</a>
+                <ul class="sidebar-second-level collapse" id="collapseLayouts">
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link nav-link-collapse collapsed"
+                   data-toggle="collapse" href="#collapseMulti"><i class="fa fa-fw fa-eraser"></i> Vertex keys</a>
+                <ul class="sidebar-second-level collapse" id="collapseMulti">
+                    <!--<li>-->
+                    <!--<a href="#">Second Level Item</a>-->
+                    <!--</li>-->
+                    <!--<li>-->
+                    <!--<a href="#">Second Level Item</a>-->
+                    <!--</li>-->
+                    <!--<li>-->
+                    <!--<a class="nav-link-collapse collapsed" data-toggle="collapse" href="#collapseMulti2">Third Level</a>-->
+                    <!--<ul class="sidebar-third-level collapse" id="collapseMulti2">-->
+                    <!--<li>-->
+                    <!--<a href="#">Third Level Item</a>-->
+                    <!--</li>-->
+                    <!--<li>-->
+                    <!--<a href="#">Third Level Item</a>-->
+                    <!--</li>-->
+                    <!--</ul>-->
+                    <!--</li>-->
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#edgeKeys"><i
+                        class="fa fa-fw fa-star-o"></i> Edge Keys</a>
+                <ul class="sidebar-second-level collapse" id="edgeKeys">
+                </ul>
+            </li>
+            <!--<li class="nav-item">-->
+            <!--<a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseDraw"><i class="fa fa-fw fa-pencil-square-o"></i> Execution</a>-->
+            <!--<ul class="sidebar-second-level collapse" id="collapseDraw">-->
+            <!--<li>-->
+            <!--<a href="#" id="sampleGraph">Draw Graph</a>-->
+            <!--</li>-->
+            <!--<li>-->
+            <!--<a href="#" id="onlycompute">Compute</a>-->
+            <!--</li>-->
+            <!--</ul>-->
+            <!--</li>-->
+
+        </ul>
+
+        <!--<ul class="navbar-nav ml-auto">-->
+        <!--<li class="nav-item dropdown">-->
+        <!--<a class="nav-link dropdown-toggle mr-lg-2" href="#" id="messagesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+        <!--<i class="fa fa-fw fa-envelope"></i> <span class="hidden-lg-up">Messages <span class="badge badge-pill badge-primary">12 New</span></span>-->
+        <!--<span class="new-indicator text-primary hidden-md-down"><i class="fa fa-fw fa-circle"></i><span class="number">12</span></span>-->
+        <!--</a>-->
+        <!--<div class="dropdown-menu" aria-labelledby="messagesDropdown">-->
+        <!--<h6 class="dropdown-header">New Messages:</h6>-->
+        <!--<div class="dropdown-divider"></div>-->
+        <!--<a class="dropdown-item" href="#">-->
+        <!--<strong>David Miller</strong> <span class="small float-right text-muted">11:21 AM</span>-->
+        <!--<div class="dropdown-message small">Hey there! This new version of SB Admin is pretty awesome! These messages clip off when they reach the end of the box so they don't overflow over to the sides!</div>-->
+        <!--</a>-->
+        <!--<div class="dropdown-divider"></div>-->
+        <!--<a class="dropdown-item" href="#">-->
+        <!--<strong>Jane Smith</strong> <span class="small float-right text-muted">11:21 AM</span>-->
+        <!--<div class="dropdown-message small">I was wondering if you could meet for an appointment at 3:00 instead of 4:00. Thanks!</div>-->
+        <!--</a>-->
+        <!--<div class="dropdown-divider"></div>-->
+        <!--<a class="dropdown-item" href="#">-->
+        <!--<strong>John Doe</strong> <span class="small float-right text-muted">11:21 AM</span>-->
+        <!--<div class="dropdown-message small">I've sent the final files over to you for review. When you're able to sign off of them let me know and we can discuss distribution.</div>-->
+        <!--</a>-->
+        <!--<div class="dropdown-divider"></div>-->
+        <!--<a class="dropdown-item small" href="#">-->
+        <!--View all messages-->
+        <!--</a>-->
+        <!--</div>-->
+        <!--</li>-->
+        <!--<li class="nav-item dropdown">-->
+        <!--<a class="nav-link dropdown-toggle mr-lg-2" href="#" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+        <!--<i class="fa fa-fw fa-bell"></i> <span class="hidden-lg-up">Alerts <span class="badge badge-pill badge-warning">6 New</span></span>-->
+        <!--<span class="new-indicator text-warning hidden-md-down"><i class="fa fa-fw fa-circle"></i><span class="number">6</span></span>-->
+        <!--</a>-->
+        <!--<div class="dropdown-menu" aria-labelledby="alertsDropdown">-->
+        <!--<a class="dropdown-item" href="#">Action</a>-->
+        <!--<a class="dropdown-item" href="#">Another action</a>-->
+        <!--<a class="dropdown-item" href="#">Something else here</a>-->
+        <!--</div>-->
+        <!--</li>-->
+        <!--<li class="nav-item">-->
+        <!--<form class="form-inline my-2 my-lg-0 mr-lg-2">-->
+        <!--<div class="input-group">-->
+        <!--<input type="text" class="form-control" placeholder="Search for...">-->
+        <!--<span class="input-group-btn">-->
+        <!--<button class="btn btn-primary" type="button"><i class="fa fa-search"></i></button>-->
+        <!--</span>-->
+        <!--</div>-->
+        <!--</form>-->
+        <!--</li>-->
+        <!--<li class="nav-item">-->
+        <!--<a class="nav-link" href="#"><i class="fa fa-fw fa-sign-out"></i> Logout</a>-->
+        <!--</li>-->
+        <!--</ul>-->
+    </div>
+</nav>
+
+<div class="content-wrapper py-3">
+
+    <div class="container-fluid">
+        <!-- Breadcrumbs -->
+        <ol class="breadcrumb" style="font-size: 12px;">
+            <li class="breadcrumb-item" style="font-weight: bold">
+                Category: <select id="categories"><option>Select</option></select>
+            </li>
+            <li class="breadcrumb-item" style="font-weight: bold">
+                Database: <select id="databases"><option>Select</option></select>
+            </li>
+            <li class="breadcrumb-item" style="font-weight: bold">
+                Sampling: <select id="samplings"></select>
+                <!--Sampling: <span id="sampling-name">No Sampling</span>-->
+            </li>
+            <li class="breadcrumb-item" style="font-weight: bold">
+                Layout:
+                <select id="layouts">
+                    <option>FR layout</option>
+                    <option>FR layout on server</option>
+                    <option>Compound layout on server</option>
+                    <option>Random</option>
+                </select>
+                <!--<span id="layout-name">FR layout</span>-->
+            </li>
+        </ol>
+
+        <ol class="breadcrumb" style="font-size: 12px;">
+            <li class="breadcrumb-item" style="font-weight: bold">
+                <button class="btn btn-link" id="onlycompute">Compute only</button>
+                <button class="btn btn-link" id="sampleGraph">Draw graph</button>
+                <button class="btn btn-link" id="computeKeys" onclick="sendKeyRequest()">Compute labels and keys</button>
+                <button class="btn btn-link" id="onlymap">Get map</button>
+            </li>
+            <li><i class='fa fa-spinner fa-spin fa-2x' id="loading" style="visibility: hidden;"></i></li>
+        </ol>
+
+        <!-- Icon Cards -->
+        <div>
+            <div class="row">
+                <div class="col">
+                    <div id="canvas"></div>
+                </div>
+                <div class="col">
+                    <div id="mapid"></div>
+                </div>
+            </div>
+            <!--<table id="maintable"><tr><td></td>-->
+                <!--<td></td></tr></table>-->
+        </div>
+        <div class="row input-properties" style="margin-top: 5px;margin-bottom: 5px;">
+            <div class="col-sm-2">
+                <label for="sampling_threshold">Sampling threshold:</label>
+                <input id="sampling_threshold" placeholder="" value="0.2">
+            </div>
+            <div class="col-sm-2">
+                <label for="damping_factor">Damping factor:</label>
+                <input id="damping_factor" placeholder="" value="0.85">
+            </div>
+            <div class="col-sm-2">
+                <label for="iterations_layout">Iterations (Layout):</label>
+                <input id="iterations_layout" placeholder="" value="200">
+            </div>
+            <div class="col-sm-2">
+                <label for="cluster_size">Cluster sizes:</label>
+                <input id="cluster_size" placeholder="" value="4-10">
+            </div>
+            <div class="col-sm-2">
+                <label for="cluster_id">Cluster Id:</label>
+                <input id="cluster_id" placeholder="" value="1773">
+            </div>
+            <div class="col-sm-2">
+                <button onclick="showOnMap()" class="btn btn-link" style="font-size: 12px;">Show on map</button>
+                <br/>
+                <button onclick="removeNode()" class="btn btn-link" style="font-size: 12px;">Remove Selected Node</button>
+                <br/>
+                <button onclick="" class="btn btn-link" style="font-size: 12px;">Remove Selected Edge</button>
+            </div>
+            <br/>
+            <div style="margin: 20px;">
+                <label class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="showEdgeLabels">
+                    <span class="custom-control-indicator" style="border: solid;"></span>
+                    <span class="custom-control-description">Show edge labels</span>
+                </label>
+                <label class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="hideNullGroups">
+                    <span class="custom-control-indicator" style="border: solid;"></span>
+                    <span class="custom-control-description">Hide NULL groups</span>
+                </label>
+                <label class="custom-control custom-checkbox active">
+                    <input type="checkbox" class="custom-control-input" id="hideDisconnected" checked>
+                    <span class="custom-control-indicator" style="border: solid;"></span>
+                    <span class="custom-control-description">Hide disconnected vertices</span>
+                </label>
+                <label class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="hideEdges">
+                    <span class="custom-control-indicator" style="border: solid;"></span>
+                    <span class="custom-control-description">Hide all edges</span>
+                </label>
+                <label class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="FadeUnselected" onchange="fadeUnselected()">
+                    <span class="custom-control-indicator" style="border: solid;"></span>
+                    <span class="custom-control-description">Fade unselected vertices</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Area Chart Example -->
+        <!--<div class="card mb-3">-->
+        <!--<div class="card-header">-->
+        <!--<i class="fa fa-area-chart"></i> Area Chart Example-->
+        <!--</div>-->
+        <!--<div class="card-block">-->
+        <!--<canvas id="myAreaChart" width="100%" height="30"></canvas>-->
+        <!--</div>-->
+        <!--<div class="card-footer small text-muted">-->
+        <!--Updated yesterday at 11:59 PM-->
+        <!--</div>-->
+        <!--</div>-->
+
+        <!-- Example Tables Card -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fa fa-table"></i> Information
+            </div>
+            <div class="card-block">
+                <div class="table-responsive" id="table-responsive">
+                    <table class="table table-bordered" width="100%" id="dataTable" cellspacing="0">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Value</th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        <tr>
+                            <th>Name</th>
+                            <th>Value</th>
+                        </tr>
+                        </tfoot>
+                        <tbody id="infos">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!--<div class="card-footer small text-muted">-->
+            <!--Updated yesterday at 11:59 PM-->
+            <!--</div>-->
+        </div>
+
+    </div>
+    <!-- /.container-fluid -->
+
+</div>
+<!-- /.content-wrapper -->
+
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fa fa-chevron-up"></i>
+</a>
+
+<!-- Bootstrap core JavaScript -->
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/tether/tether.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+
+<!-- Plugin JavaScript -->
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<!--<script src="vendor/chart.js/Chart.min.js"></script>-->
+<script src="vendor/datatables/jquery.dataTables.js"></script>
+<script src="vendor/datatables/dataTables.bootstrap4.js"></script>
+
+<!-- Custom scripts for this template -->
+<!--<script src="js/sb-admin.min.js"></script>-->
+
+<!-- Cytoscape and Qtip -->
+<script src="cytoscape/cytoscape.min.js"></script>
+<script src="cytoscape/cytoscape-qtip.js"></script>
+<script src="qtip/jquery.qtip.min.js"></script>
+<script src="cytoscape/dagre.js"></script>
+<script src="cytoscape/cytoscape-dagre.js"></script>
+
+<script src="js/map.js"></script>
+
+</body>
+
+</html>

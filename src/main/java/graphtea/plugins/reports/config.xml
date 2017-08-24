@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		GraphTea Project: https://github.com/graphtheorysoftware/GraphTea Copyright (C) 2008
+		Mathematical Science Department of Sharif University of Technology
+		Distributed under the terms of the GNU General Public License (GPL):
+		http://www.gnu.org/licenses/
+	-->
+
+<root>
+	<ui>
+		<menues>
+			<submenu label="Reports" place="300">
+			</submenu>
+		</menues>
+	</ui>
+</root>
