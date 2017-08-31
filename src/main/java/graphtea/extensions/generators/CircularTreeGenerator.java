@@ -4,8 +4,7 @@
 // Distributed under the terms of the GNU General Public License (GPL): http://www.gnu.org/licenses/
 package graphtea.extensions.generators;
 
-import drawingAlgorithms.SyncBurst;
-import graphGenerator.RandomTree;
+import graphtea.extensions.RandomTree;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
@@ -63,13 +62,14 @@ public class CircularTreeGenerator implements GraphGeneratorExtension, Parametri
 
     public Point[] getVertexPositions() {
         edgeList = rt.getEdgeList();
-        SyncBurst graph = new SyncBurst(edgeList, n, false, 4, false);
-        double [][] pos = graph.Cir_Force_Free();
+//        SyncBurst graph = new SyncBurst(edgeList, n, false, 4, false);
+//        double [][] pos = graph.Cir_Force_Free();
         Point[] ps = new Point[n];
-        System.out.printf("");
-        System.out.printf("");
+//        System.out.printf("");
+//        System.out.printf("");
         for(int i=0;i<n;i++) {
-            ps[i] = new Point((int)pos[0][i],(int)pos[1][i]);
+            //ps[i] = new Point((int)pos[0][i],(int)pos[1][i]);
+            ps[i] = new Point(0,0);
         }
         return ps;
     }

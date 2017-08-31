@@ -1,8 +1,7 @@
 package graphtea.extensions.reports;
 
-import GraphVision.Centrality;
-import GraphVision.edgeCrossing;
-import graphGenerator.RandomTree;
+
+import graphtea.extensions.edgeCrossing;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.GraphModel;

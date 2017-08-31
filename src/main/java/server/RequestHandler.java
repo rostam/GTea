@@ -1,8 +1,7 @@
 package server;
 
-import GraphVision.Centrality;
-import drawingAlgorithms.SyncBurst;
-import graphGenerator.RandomTree;
+import graphtea.extensions.Centrality;
+import graphtea.extensions.RandomTree;
 import graphtea.graph.graph.GraphModel;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 import graphtea.plugins.reports.extension.GraphReportExtension;
@@ -233,8 +232,8 @@ public class RequestHandler {
 //        String json = CytoJSONBuilder.getJSON(ghead.get(0), lv, le, hm);
         RandomTree rt = new RandomTree(maxIter);
         int[][] edgeList = rt.getEdgeList();
-        SyncBurst graph = new SyncBurst(edgeList, maxIter, false, 4, false);
-        double [][] pos = graph.Cir_Force_Free();
+//        SyncBurst graph = new SyncBurst(edgeList, maxIter, false, 4, false);
+//        double [][] pos = graph.Cir_Force_Free();
         Centrality p = new Centrality(edgeList);  // for degree of centrality  Note: not necessary for drawing
         double [] res = p.Betweenness_Centrality(maxIter);
         Vector<Double> v = new Vector<>();
@@ -250,15 +249,15 @@ public class RequestHandler {
         newEdgeList[0][edgeList[0].length] = maxIter;
         newEdgeList[1][edgeList[0].length] = highBCVertex;
 
-        double [][] newPos = new double[2][pos[0].length+1];
-        for(int i=0;i<pos[0].length;i++) {
-            newPos[0][i] = pos[0][i];
-            newPos[1][i] = pos[1][i];
-        }
-        newPos[0][pos[0].length] = pos[0][highBCVertex] + 1;
-        newPos[1][pos[0].length] = pos[1][highBCVertex] + 1;
+//        double [][] newPos = new double[2][pos[0].length+1];
+//        for(int i=0;i<pos[0].length;i++) {
+//            newPos[0][i] = pos[0][i];
+//            newPos[1][i] = pos[1][i];
+//        }
+//        newPos[0][pos[0].length] = pos[0][highBCVertex] + 1;
+//        newPos[1][pos[0].length] = pos[1][highBCVertex] + 1;
 
-        String json = CytoJSONBuilder.getJSON(newEdgeList,newPos);
+        String json = "";//CytoJSONBuilder.getJSON(newEdgeList,newPos);
         return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
     }
 

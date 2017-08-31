@@ -1,6 +1,6 @@
 package graphtea.extensions.actions.art;
 
-import GraphVision.Centrality;
+import graphtea.extensions.Centrality;
 import graphtea.graph.graph.*;
 import graphtea.graph.old.GStroke;
 import graphtea.plugins.main.GraphData;

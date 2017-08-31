@@ -1,7 +1,7 @@
 package graphtea.extensions.reports;
 
-import GraphVision.Centrality;
-import graphGenerator.RandomTree;
+import graphtea.extensions.Centrality;
+import graphtea.extensions.RandomTree;
 import graphtea.extensions.reports.basicreports.Diameter;
 import graphtea.extensions.reports.zagreb.WienerIndex;
 import graphtea.graph.graph.Edge;
