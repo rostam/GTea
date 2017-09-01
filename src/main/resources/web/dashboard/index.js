@@ -56,8 +56,18 @@ function Report() {
     if (reportProps == "") {
         reportProps = "no";
     }
+    var graph = "";
+    var load = $('#loaders').find('option:selected').text();
+    console.log(load);
+    if(load == 'Generators') {
+        graph = $('#categories').find('option:selected').text();
+    } else if(load == 'Edge list') {
+        graph = "EdgeListFormat=" + $('#elstring').val().replace(/\n/g,"-");
+    } else if(load == 'G6 format') {
+        graph = "G6Format=" + $('#g6string').val();
+    }
     $.get(serverAddr + 'report/'
-        + $('#categories').find('option:selected').text() + "--"
+        + graph + "--"
         + $('#reports').find('option:selected').text() + "--"
         + ($('#props_keys').html() + ":" + $('#props_vals').val()) + "--"
         + ($('#reportPropsKeys').html() + ":" + $('#reportPropsVals').val()))
@@ -243,7 +253,7 @@ function loadG6() {
 }
 
 function loadEL() {
-    var str = $('#elstring').val().replace(/\n/g,"--");
+    var str = $('#elstring').val().replace(/\n/g,"-");
     $.get(serverAddr + 'el/'+str)
         .done(function (data) {
             cy = cytoscape({

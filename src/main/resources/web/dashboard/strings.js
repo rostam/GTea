@@ -9,8 +9,8 @@ var strings = {
     "here means the computed layout in GraphTea.",
     report: "Here, you can compute the different reports on graph. When a report selected from" +
     "        the list, the parameters, if any, appears near to it. " +
-    "        After the computation, the results would appear as strings at the botton. A styled version" +
-    "        can be also viewed in a styled way."
+    "        After the computation, the results would appear as strings at the botton. " +
+    "        A styled version can be also generated."
 };
 
 $('#strings-intro').html(strings.intro);

@@ -39,6 +39,13 @@
                 <td><select id="categories"><option>Select</option></select></td>
                 <td><div id="props"><span id="props_keys">n</span> : <input type="text" id="props_vals" value="Integer"></div></td>
             </tr></table>
+            <p id="strings-layout"></p>
+            <select id="layouts">
+                <option>Force Directed</option>
+                <option>Preset</option>
+                <option>Botanical Tree</option>
+            </select>
+            <button onclick="Draw()">Draw</button>
         </div>
         <div id="elformat">
             <p id="strings-elformat"></p>
@@ -50,13 +57,6 @@
             G6 Format: <input id="g6string" type="text">
             <button onclick="loadG6()">Load</button>
         </div>
-        <p id="strings-layout"></p>
-        <select id="layouts">
-            <option>Force Directed</option>
-            <option>Preset</option>
-            <option>Botanical Tree</option>
-        </select>
-        <button onclick="Draw()">Draw</button>
         <p id="strings-report"></p>
         <select id="reports"></select>
         <button onclick="Report()">Report</button>

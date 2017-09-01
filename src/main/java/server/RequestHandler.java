@@ -9,7 +9,6 @@ import graphtea.graph.graph.RenderTable;
 import graphtea.graph.graph.Vertex;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 import graphtea.plugins.reports.extension.GraphReportExtension;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -69,13 +68,18 @@ public class RequestHandler {
         String[] props = infos[2].replaceAll(" ","").split(":");
         String[] reportProps = infos[3].replaceAll(" ","").split(":");
 
-        for(String s : reportProps) {
-            System.out.println(s);
-        }
-
+//        for(String s : reportProps) {
+//            System.out.println(s);
+//        }
         try {
-            if(currentGraph.getVerticesCount() == 0)
-                currentGraph = generateGraph(props,graph);
+            if(graph.startsWith("G6Format=")) {
+                currentGraph = G6Format.stringToGraphModel(graph.substring(graph.indexOf("=")+1));
+            } else if(graph.startsWith("EdgeListFormat=")) {
+                currentGraph = getGraphFromEdgeList(graph.substring(graph.indexOf("=")+1));
+            } else {
+                if (currentGraph.getVerticesCount() == 0)
+                    currentGraph = generateGraph(props, graph);
+            }
             if(!report.contains("No ")) {
                 GraphReportExtension gre = ((GraphReportExtension) extensionNameToClass.get(report).newInstance());
                 Object o = gre.calculate(currentGraph);
@@ -117,7 +121,19 @@ public class RequestHandler {
     @Path("/el/{info}")
     @Produces("application/json;charset=utf-8")
     public Response edgeList(@PathParam("info") String info) {
-        String[] rows = info.split("--");
+        GraphModel g = getGraphFromEdgeList(info);
+
+        try {
+            String json = CytoJSONBuilder.getJSON(g);
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    private GraphModel getGraphFromEdgeList(String info) {
+        String[] rows = info.split("-");
         Vector<String> vs = new Vector<>();
         for(String row : rows) {
             String tmp[] = row.split(",");
@@ -141,14 +157,7 @@ public class RequestHandler {
             Edge e = new Edge(labelVertex.get(v1),labelVertex.get(v2));
             g.addEdge(e);
         }
-
-        try {
-            String json = CytoJSONBuilder.getJSON(g);
-            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return Response.ok("").header("Access-Control-Allow-Origin", "*").build();
+        return g;
     }
 
     @GET

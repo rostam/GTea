@@ -4,8 +4,7 @@ function drawBotanical() {
     if (res != "") {
         var arrBetweenness = JSON.parse(res);
         var max = Math.max(...arrBetweenness
-    )
-        ;
+    );
         maxBetweennessIndex = arrBetweenness.indexOf(max);
     } else {
         maxBetweennessIndex = 10;
