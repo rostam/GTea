@@ -30,10 +30,17 @@ public class RequestHandler {
         try {
             GraphGeneratorExtension gge =
                     ((GraphGeneratorExtension) extensionNameToClass.get(graph).newInstance());
-            for (String prop : props) {
-                String[] tmp = prop.split(":");
+            String[] propsNameSplitted = props[0].split(",");
+            String[] propsValueSplitted = props[1].split(",");
+            for(int i=0;i < propsNameSplitted.length;i++) {
                 try {
-                    gge.getClass().getField(tmp[0]).set(gge, Integer.parseInt(tmp[1]));
+                    if(propsValueSplitted.equals("true") || propsValueSplitted.equals("false")) {
+                        gge.getClass().getField(propsNameSplitted[i])
+                                .set(gge, Boolean.parseBoolean(propsValueSplitted[i]));
+                    } else {
+                        gge.getClass().getField(propsNameSplitted[i])
+                                .set(gge, Integer.parseInt(propsValueSplitted[i]));
+                    }
                 } catch (NoSuchFieldException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
@@ -53,12 +60,11 @@ public class RequestHandler {
     @Path("/report/{info}")
     @Produces("application/json;charset=utf-8")
     public Response report(@PathParam("info") String info) {
-        System.out.println(info);
-        String[] infos = info.split(",");
+        String[] infos = info.split("--");
         String graph = infos[0];
         String report = infos[1];
-        String[] props = infos[2].split("-");
-        String[] reportProps = infos[3].split("-");
+        String[] props = infos[2].replaceAll(" ","").split(":");
+        String[] reportProps = infos[3].replaceAll(" ","").split(":");
 
         for(String s : reportProps) {
             System.out.println(s);
@@ -94,10 +100,10 @@ public class RequestHandler {
     @Path("/draw/{info}")
     @Produces("application/json;charset=utf-8")
     public Response draw(@PathParam("info") String info) {
-        String[] infos = info.split(",");
+        String[] infos = info.split("--");
         String graph = infos[0];
         String report = infos[1];
-        String[] props = infos[2].split("-");
+        String[] props = infos[2].replaceAll(" ","").split(":");
         try {
             currentGraph = generateGraph(props,graph);
             String json = CytoJSONBuilder.getJSON(currentGraph);

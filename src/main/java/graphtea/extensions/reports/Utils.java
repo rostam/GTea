@@ -138,7 +138,7 @@ public class Utils {
      * @return Laplacian of the graph
      */
     public static Matrix getLaplacian(Matrix A) {
-        //double[][] res=new double[g.numOfVertices()][g.numOfVertices()];
+        //double[][] res=new double[g.n()][g.n()];
         int n = A.getArray().length;
         double[][] ATemp = A.getArray();
 

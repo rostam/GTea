@@ -24,9 +24,9 @@ import java.awt.*;
 public class RandomGenerator implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
     GraphModel g;
     @Parameter(name = "Vertices", description = "Num of Vertices")
-    public static Integer numOfVertices = 30;
+    public static Integer n = 30;
     @Parameter(name = "Edges", description = "Num of Edges")
-    private static Integer numOfEdges = 80;
+    private static Integer e = 80;
 
     public void setWorkingGraph(GraphModel g) {
         this.g = g;
@@ -43,16 +43,16 @@ public class RandomGenerator implements GraphGeneratorExtension, Parametrizable,
     Vertex v[];
 
     public Vertex[] getVertices() {
-        Vertex[] ret = new Vertex[numOfVertices];
-        for (int i = 0; i < numOfVertices; i++)
+        Vertex[] ret = new Vertex[n];
+        for (int i = 0; i < n; i++)
             ret[i] = new Vertex();
         v = ret;
         return ret;
     }
 
     public Edge[] getEdges() {
-        Edge[] ret = new Edge[numOfEdges];
-        for (int i = 0; i < numOfEdges; i++)
+        Edge[] ret = new Edge[e];
+        for (int i = 0; i < e; i++)
             ret[i] = randomEdge();
         return ret;
     }
@@ -67,15 +67,15 @@ public class RandomGenerator implements GraphGeneratorExtension, Parametrizable,
     }
 
     private Vertex randomVertex() {
-        return v[(int) (Math.random() * numOfVertices)];
+        return v[(int) (Math.random() * n)];
     }
 
     public Point[] getVertexPositions() {
-        return Utils.computeRandomPositions(numOfVertices);
+        return Utils.computeRandomPositions(n);
     }
 
     public String checkParameters() {
-    	if( numOfEdges<0 || numOfVertices<0) return "Both Edges & Vertices must be positive!";
+    	if( e <0 || n <0) return "Both Edges & Vertices must be positive!";
     	else
     		return null;
     }
@@ -88,8 +88,8 @@ public class RandomGenerator implements GraphGeneratorExtension, Parametrizable,
      * generates a Random Graph with given parameters
      */
     public static GraphModel generateRandomGraph(int numOfVertices, int numOfEdges) {
-        RandomGenerator.numOfVertices = numOfVertices;
-        RandomGenerator.numOfEdges = numOfEdges;
+        RandomGenerator.n = numOfVertices;
+        RandomGenerator.e = numOfEdges;
         return GraphGenerator.getGraph(false, new RandomGenerator());
     }
 

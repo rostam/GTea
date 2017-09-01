@@ -41,7 +41,7 @@ public class LaplacianOfGraph implements GraphReportExtension  {
 	 */
 	private Matrix getLaplacian(Matrix A)
 	{
-		//double[][] res=new double[g.numOfVertices()][g.numOfVertices()];
+		//double[][] res=new double[g.n()][g.n()];
 
 
 		int n=A.getArray().length;

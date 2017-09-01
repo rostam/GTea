@@ -15,6 +15,7 @@
     <script src="js/jquery-3.1.1.min.js"></script>
     <script src="js/tooltipster.bundle.min.js"></script>
     <script src="paper-full.min.js"></script>
+    <script src="drawBotanical.js"></script>
     <!--<script src="js/index.js"></script>-->
     <title>GraphTea</title>
 </head>
@@ -41,7 +42,7 @@
         </div>
         <div id="g6format">
             <p id="strings-g6format"></p>
-            G6 Format: <input type="text">
+            G6 Format: <input id="g6string" type="text">
             <button onclick="loadG6()">Load</button>
         </div>
         <p id="strings-layout"></p>
@@ -50,16 +51,17 @@
             <option>Preset</option>
             <option>Botanical Tree</option>
         </select>
-        <button onclick="DoActions()">Draw</button>
+        <button onclick="Draw()">Draw</button>
         <p id="strings-report"></p>
         <select id="reports"></select>
         <button onclick="Report()">Report</button>
         <div id="reportProps"></div>
-        <div style="font-weight: bold;margin-bottom: 5px;">Report Results:&nbsp;&nbsp;<button id="myBtn">View Styled
-        </button>
+        <div>Report Results:<br/>
+            <textarea name="Text1" cols="50" rows="6" id="reportResults"></textarea>
+            <button id="myBtn">View Styled</button>
         </div>
-        <br/>
-        <div id="reportResults"></div>
+
+        <!--<div id="reportResults"></div>-->
         <canvas id="paperCanvas"></canvas>
     </div>
 </div>
