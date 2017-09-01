@@ -3,6 +3,7 @@ package server;
 import graphtea.extensions.Centrality;
 import graphtea.extensions.RandomTree;
 import graphtea.graph.graph.GraphModel;
+import graphtea.graph.graph.RenderTable;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -70,6 +71,9 @@ public class RequestHandler {
                 GraphReportExtension gre = ((GraphReportExtension) extensionNameToClass.get(report).newInstance());
                 Object o = gre.calculate(currentGraph);
                 JSONObject jsonObject = new JSONObject();
+                if(o instanceof RenderTable) {
+                    jsonObject.put("titles",((RenderTable)o).getTitles().toString());
+                }
                 jsonObject.put("results",o.toString());
                 return Response.ok(jsonObject.toString()).header("Access-Control-Allow-Origin", "*").build();
             } else {
