@@ -1,9 +1,12 @@
 package server;
 
 import graphtea.extensions.Centrality;
+import graphtea.extensions.G6Format;
 import graphtea.extensions.RandomTree;
+import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.RenderTable;
+import graphtea.graph.graph.Vertex;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -94,6 +97,58 @@ public class RequestHandler {
         }
 
         return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
+    @Path("/g6/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response g6(@PathParam("info") String info) {
+        GraphModel g = G6Format.stringToGraphModel(info);
+        try {
+            String json = CytoJSONBuilder.getJSON(g);
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
+    @Path("/el/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response edgeList(@PathParam("info") String info) {
+        String[] rows = info.split("--");
+        Vector<String> vs = new Vector<>();
+        for(String row : rows) {
+            String tmp[] = row.split(",");
+            String v1 = tmp[0].trim();
+            String v2 = tmp[1].trim();
+            if(!vs.contains(v1)) vs.add(v1);
+            if(!vs.contains(v2)) vs.add(v2);
+        }
+        HashMap<String,Vertex> labelVertex = new HashMap<>();
+        GraphModel g = new GraphModel();
+        for(String v : vs) {
+            Vertex vertex = new Vertex();
+            vertex.setLabel(v);
+            labelVertex.put(v,vertex);
+            g.addVertex(vertex);
+        }
+        for(String row : rows) {
+            String tmp[] = row.split(",");
+            String v1 = tmp[0].trim();
+            String v2 = tmp[1].trim();
+            Edge e = new Edge(labelVertex.get(v1),labelVertex.get(v2));
+            g.addEdge(e);
+        }
+
+        try {
+            String json = CytoJSONBuilder.getJSON(g);
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("").header("Access-Control-Allow-Origin", "*").build();
     }
 
     @GET

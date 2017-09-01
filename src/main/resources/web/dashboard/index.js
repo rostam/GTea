@@ -188,17 +188,22 @@ function sizeOfIntersectionOfArrays(arr1, arr2) {
 
 $('#generators').show();
 $('#g6format').hide();
+$('#elformat').hide();
 function selectLoader() {
     var loader = $('#loaders ').find('option:selected').text();
+
+    $('#generators').hide();
+    $('#g6format').hide();
+    $('#elformat').hide();
     switch (loader) {
         case "Generators":
             $('#generators').show();
-            $('#g6format').hide();
             break;
         case "Edge list":
+            $('#elformat').show();
+            break;
         case "Adjacency matrix":
         case "G6 format":
-            $('#generators').hide();
             $('#g6format').show();
             break;
     }
@@ -207,7 +212,64 @@ function selectLoader() {
 function loadG6() {
     $.get(serverAddr + 'g6/'+$('#g6string').val())
         .done(function (data) {
+            cy = cytoscape({
+                container: document.getElementById('canvas'),
+                style: [ // the stylesheet for the graph
+                    {
+                        selector: 'node',
+                        style: {
+                            'background-color': 'lightgray',
+                            'label': 'data(id)',
+                            'text-valign': 'center'
+                        }
+                    }]
+            });
+            var nodes = data.nodes;
+            var edges = data.edges;
+            cy.elements().remove();
+            cy.add(nodes);
+            cy.add(edges);
 
+            var lay = $('#layouts').find('option:selected').text();
+            if (lay == "Preset") {
+                cy.layout({name: 'preset'}).run();
+            } else if (lay == "Force Directed") {
+                cy.layout({name: 'cose'}).run();
+            }
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        });
+}
+
+function loadEL() {
+    var str = $('#elstring').val().replace(/\n/g,"--");
+    $.get(serverAddr + 'el/'+str)
+        .done(function (data) {
+            cy = cytoscape({
+                container: document.getElementById('canvas'),
+                style: [ // the stylesheet for the graph
+                    {
+                        selector: 'node',
+                        style: {
+                            'background-color': 'lightgray',
+                            'label': 'data(id)',
+                            'text-valign': 'center'
+                        }
+                    }]
+            });
+            var nodes = data.nodes;
+            var edges = data.edges;
+            cy.elements().remove();
+            cy.add(nodes);
+            cy.add(edges);
+
+            var lay = $('#layouts').find('option:selected').text();
+            if (lay == "Preset") {
+                cy.layout({name: 'preset'}).run();
+            } else if (lay == "Force Directed") {
+                cy.layout({name: 'cose'}).run();
+            }
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
