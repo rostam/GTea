@@ -1,4 +1,9 @@
 var serverAddr = "http://localhost:2342/";
+var nodeId = 0;
+$( document ).ready(function() {
+    initCytoscape();
+});
+
 
 var original_data = {};
 $.get(serverAddr + 'graphs/')
@@ -90,7 +95,39 @@ function Report() {
         });
 }
 
-var cy;
+var cy; //cytoscape object
+
+function initCytoscape() {
+     cy = cytoscape({
+        container: document.getElementById('canvas'),
+        style: [ // the stylesheet for the graph
+            {
+                selector: 'node',
+                style: {
+                    'background-color': 'lightgray',
+                    'label': 'data(id)',
+                    'text-valign': 'center'
+                }
+            }]
+    });
+}
+
+function addSingleVertex() {
+    console.log("drawing single vertex");
+}
+
+function removeSingleVertex() {
+    console.log("drawing single vertex");
+}
+
+function addSingleEdge() {
+    console.log("drawing single vertex");
+}
+
+function deleteSingleEdge() {
+    console.log("drawing single vertex");
+}
+
 function Draw() {
     var lay = $('#layouts').find('option:selected').text();
     if (lay == "Botanical Tree") {
@@ -102,24 +139,11 @@ function Draw() {
         + $('#reports').find('option:selected').text() + "--" +
         ($('#props_keys').html() + ":" + $('#props_vals').val()))
         .done(function (data) {
-            cy = cytoscape({
-                container: document.getElementById('canvas'),
-                style: [ // the stylesheet for the graph
-                    {
-                        selector: 'node',
-                        style: {
-                            'background-color': 'lightgray',
-                            'label': 'data(id)',
-                            'text-valign': 'center'
-                        }
-                    }]
-            });
             var nodes = data.nodes;
             var edges = data.edges;
             cy.elements().remove();
             cy.add(nodes);
             cy.add(edges);
-
             if (lay == "Preset") {
                 cy.layout({name: 'preset'}).run();
             } else if (lay == "Force Directed") {
@@ -130,6 +154,12 @@ function Draw() {
             alert(errorThrown);
         });
 }
+$("#canvas").click(function(event) {
+    //document.write("canvas clicked");
+    cy.add({
+        data: {id: 'node' + nodeId++}
+    });
+});
 
 function getSelectedCategory() {
     return $('#categories').find('option:selected').text();
