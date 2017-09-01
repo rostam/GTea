@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-
 <html>
-
 <head>
     <link rel="stylesheet" href="css/normalize.css"/>
     <link rel="stylesheet" href="css/skeleton.css"/>
@@ -9,8 +7,7 @@
     <link rel="stylesheet" href="css/open-sans.css"/>
     <link rel="stylesheet" href="css/index2.css"/>
     <link rel="stylesheet" href="css/tooltipster.bundle.min.css"/>
-    -->
-
+    <link rel="stylesheet" href="modal.css"/>
     <script src="cytoscape321.js"></script>
     <script src="cytoscape-canvas.js"></script>
     <script src="js/cola.js"></script>
@@ -19,121 +16,49 @@
     <script src="js/tooltipster.bundle.min.js"></script>
     <script src="paper-full.min.js"></script>
     <!--<script src="js/index.js"></script>-->
-
     <title>GraphTea</title>
-
-    <style>
-        /* The Modal (background) */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgb(0,0,0); /* Fallback color */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-            -webkit-animation-name: fadeIn; /* Fade in the background */
-            -webkit-animation-duration: 0.4s;
-            animation-name: fadeIn;
-            animation-duration: 0.4s
-        }
-
-        /* Modal Content */
-        .modal-content {
-            position: fixed;
-            bottom: 0;
-            background-color: #fefefe;
-            width: 100%;
-            -webkit-animation-name: slideIn;
-            -webkit-animation-duration: 0.4s;
-            animation-name: slideIn;
-            animation-duration: 0.4s
-        }
-
-        /* The Close Button */
-        .close {
-            color: white;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .modal-header {
-            padding: 2px 2px;
-            background-color: #5cb85c;
-            color: white;
-            height: 35px;
-        }
-
-        .modal-body {
-            padding: 2px 16px;
-            font-size: 12px;
-            font-weight: normal;
-            height: 500px;
-            overflow: auto;
-        }
-
-        .modal-footer {
-            padding: 2px 2px;
-            background-color: #5cb85c;
-            color: white;
-            height: 35px;
-        }
-
-        /* Add Animation */
-        @-webkit-keyframes slideIn {
-            from {bottom: -300px; opacity: 0}
-            to {bottom: 0; opacity: 1}
-        }
-
-        @keyframes slideIn {
-            from {bottom: -300px; opacity: 0}
-            to {bottom: 0; opacity: 1}
-        }
-
-        @-webkit-keyframes fadeIn {
-            from {opacity: 0}
-            to {opacity: 1}
-        }
-
-        @keyframes fadeIn {
-            from {opacity: 0}
-            to {opacity: 1}
-        }
-    </style>
 </head>
-
 <body>
 <div id="canvas" class="main"></div>
 <div class="tools">
-    <img src="icon-big.PNG" width="180px">
-    <div style="font-size: 14px;margin: 15px;">
-        Graph: <select id="categories"><option>Select</option></select><br/>
-        Report: <select id="reports"><option>No Report</option></select><br/>
-        Layout:
+    <!--<img src="icon-big.PNG" width="100px">-->
+    <div style="font-size: 14px;margin: 10px;">
+        <h5>GraphTea</h5>
+        <p id="strings-intro"></p>
+        <select id="loaders">
+            <option>Generators</option>
+            <option>Edge list</option>
+            <option>Adjacency matrix</option>
+            <option>G6 format</option>
+        </select>
+        <button onclick="selectLoader()">Select</button>
+        <div id="generators">
+            <p id="strings-generator"></p>
+            <table><tr>
+                <td><select id="categories"><option>Select</option></select></td>
+                <td><div id="props"><span id="props_keys">n</span> : <input type="text" id="props_vals" value="Integer"></div></td>
+            </tr></table>
+        </div>
+        <div id="g6format">
+            <p id="strings-g6format"></p>
+            G6 Format: <input type="text">
+            <button onclick="loadG6()">Load</button>
+        </div>
+        <p id="strings-layout"></p>
         <select id="layouts">
             <option>Force Directed</option>
             <option>Preset</option>
             <option>Botanical Tree</option>
         </select>
-        <br/>
         <button onclick="DoActions()">Draw</button>
+        <p id="strings-report"></p>
+        <select id="reports"></select>
         <button onclick="Report()">Report</button>
-        <hr/><div style="font-weight: bold;margin-bottom: 5px;">Graph Properties:</div><br/>
-        <div id="props"></div>
-        <hr/><div style="font-weight: bold;margin-bottom: 5px;">Report Parameters:</div><br/>
         <div id="reportProps"></div>
-        <hr/><div style="font-weight: bold;margin-bottom: 5px;">Report Results:&nbsp;&nbsp;<button id="myBtn">View Styled</button></div><br/>
+        <div style="font-weight: bold;margin-bottom: 5px;">Report Results:&nbsp;&nbsp;<button id="myBtn">View Styled
+        </button>
+        </div>
+        <br/>
         <div id="reportResults"></div>
         <canvas id="paperCanvas"></canvas>
     </div>
@@ -155,375 +80,9 @@
         </div>
     </div>
 </div>
-<!--<script src="js/index.js"></script>-->
 <script src="js/helper.js"></script>
-<!--<script src="js/actions.js"></script>-->
-<!--<script src="cytoscape-hierarchical.js"></script>-->
-<!--<script src="vivagraph.min.js"></script>-->
-<!--<script src="js/forVivaCirclularNode.js"></script>-->
-<script>
-    var serverAddr = "http://localhost:2342/";
-
-    var original_data = {};
-    $.get(serverAddr + 'graphs/')
-         .done(function (data) {
-             original_data = data;
-             var categoriesSelect = $('#categories');
-             data.graphs.forEach(function (d) {
-                 categoriesSelect.append('<option>' + d.name + '</option>');
-                 original_data[d.name] = d.properties;
-             });
-             categoriesSelect.on('change', function () {
-                 var category = getSelectedCategory();
-                 var props = $('#props');
-                 props.empty();
-                 original_data[category].forEach(function (d) {
-                     var propNamesTypes = d.split(":");
-                     props.append(propNamesTypes[0]
-                         + ': <input type="text" ' + 'name="' + propNamesTypes[0] + '"'+
-                         'value="' + propNamesTypes[1] + '"><br/>');
-                 })
-             });
-
-             var reportsSelect = $('#reports');
-             data.reports.forEach(function (d) {
-                 reportsSelect.append('<option>' + d.name + '</option>');
-                 original_data[d.name] = d.properties;
-             });
-             reportsSelect.on('change', function () {
-                 var report = getSelectedReport();
-                 var props = $('#reportProps');
-                 props.empty();
-                 original_data[report].forEach(function (d) {
-                     var propNamesTypes = d.split(":");
-                     props.append(propNamesTypes[0]
-                         + ': <input ' + 'name="' + propNamesTypes[0] + '"'+ ' value="' + propNamesTypes[1] + '"><br/>');
-                 })
-             });
-         })
-         .fail(function (jqXHR, textStatus, errorThrown) {
-             alert(errorThrown);
-         });
-
-    function Report() {
-        var properties = "";
-        $('#props').children('input').each(function (i, item) {
-            properties += item.name + ":" + item.value + "-"
-        });
-        var reportProps = "";
-        $('#reportProps').children('input').each(function (i, item) {
-            reportProps += item.name + ":" + item.value + "-"
-        });
-        if(reportProps == "") {
-            reportProps = "no";
-        }
-        properties = properties.substr(0,properties.length-1);
-        $.get(serverAddr + 'report/'
-            + $('#categories').find('option:selected').text() + ","
-            + $('#reports').find('option:selected').text()+","+properties+","+reportProps)
-            .done(function (data) {
-                $('#reportResults').html(JSON.stringify(data));
-//                $('#results-body').html(JSON.stringify(data));
-                if(data.titles != undefined) {
-                    var titles = data.titles.substr(1, data.titles.indexOf("]")-1);
-                    var tts = titles.split(",");
-                    var builtHTML = "<table><tr>";
-                    tts.forEach(function (t) {
-                        builtHTML+="<th>"+t+"</th>";
-                    });
-                    var results = JSON.parse(data.results);
-                    builtHTML+="</tr>";
-                    results.forEach(function (row) {
-                        builtHTML+="<tr>";
-                        row.forEach(function (col) {
-                            builtHTML+="<td>"+col+"</td>";
-                        })
-                        builtHTML+="</tr>";
-                    });
-
-                    builtHTML+="</tr></table>";
-                    $('#results-body').html(builtHTML);
-                }
-
-            })
-            .fail(function (jqXHR, textStatus, errorThrown) {
-                alert(errorThrown);
-            });
-    }
-
-    var cy;
-    function DoActions() {
-        var lay = $('#layouts').find('option:selected').text();
-        if(lay == "Botanical Tree") {
-            var maxBetweennessIndex = 0;
-            var res = $('#reportResults').html();
-            if (res != "") {
-                var arrBetweenness = JSON.parse(res);
-                var max = Math.max(...arrBetweenness
-            )
-                ;
-                maxBetweennessIndex = arrBetweenness.indexOf(max);
-            } else {
-                maxBetweennessIndex = 10;
-            }
-//            cy.fit();
-            cy.nodes().forEach(function (n) {
-                n.style('width', '20');
-                n.style('height', '20');
-                n.style('opacity', '0.4');
-            });
-            cy.edges().forEach(function (e) {
-                e.style('opacity', '0.4');
-            });
-            //toundirected();
-            var parent = {};
-            selectedNode = cy.$('#' + maxBetweennessIndex);//cy.$(':selected');
-            BFSrun(selectedNode, function (v, p) {
-                parent[v.data('id')] = p;
-            });
-            var layer = cy.cyCanvas({
-                zIndex: 1,
-                pixelRatio: "auto"
-            });
-            var canvas = layer.getCanvas();
-            var ctx = canvas.getContext('2d');
-            cy.on("render cyCanvas.resize", function (evt) {
-                layer.resetTransform(ctx);
-                layer.clear(ctx);
-
-                // Draw fixed elements
-                // ctx.fillRect(0, 0, 100, 100); // Top left corner
-                layer.setTransform(ctx);
-
-                paper.setup(document.getElementById("paperCanvas"));
-//                var path = new paper.Path();
-//                console.log(path);
-//                path.strokeColor = 'black';
-//                var start = new paper.Point(100, 100);
-//                path.moveTo(start);
-//                path.lineTo(start.add([ 200, -50 ]));
-//                paper.view.draw();
-//                return;
-                var paths = [];
-                var startEnds = {};
-                cy.nodes().forEach(function (v) {
-                    v1 = parent[v.data('id')];
-                    if (v1 == undefined) return;
-                    v2 = parent[v1.data('id')];
-                    if (v2 == undefined) return;
-                    p1 = v.position();
-                    p2 = v1.position();
-                    p3 = v2.position();
-
-                    m1 = getMiddlePoint(p1, p2);
-                    m2 = getMiddlePoint(p2, p3);
-                    var cp = p2;
-
-                    teta1 = getAngle(p1, p2);
-                    teta2 = getAngle(p1, p3);
-                    teta3 = getAngle(p2, p3);
-
-                    startWidth = 1;
-                    middleWidth = 1;
-                    endWidth = 1;
-
-                    pp1 = {x: m1.x - startWidth * Math.sin(teta1), y: m1.y + startWidth * Math.cos(teta1)};
-                    pp2 = {x: cp.x - middleWidth * Math.sin(teta2), y: cp.y + middleWidth * Math.cos(teta2)};
-                    pp3 = {x: m2.x - endWidth * Math.sin(teta3), y: m2.y + endWidth * Math.cos(teta3)};
-
-                    var path = new paper.Path();
-                    var start = new paper.Point(pp1.x, pp1.y);
-                    var handle = new paper.Point(pp2.x, pp2.y);
-                    var to = new paper.Point(pp3.x, pp3.y);
-                    path.moveTo(start);
-                    path.quadraticCurveTo(handle, to);
-                    var vec = [];
-                    vec[0]=v.data('id');vec[1]=v1.data('id');vec[2]=v2.data('id');vec.sort();
-                    paths.push({path: path, vers: vec});
-                    startEnds[pp1.x+","+pp1.y] = 0;
-                    startEnds[pp3.x+","+pp3.y] = 0;
-//                    path.strokeColor = "green";
-//                    path.view.draw();
-
-                    ctx.beginPath();
-                    ctx.moveTo(pp1.x, pp1.y);
-                    ctx.quadraticCurveTo(pp2.x, pp2.y, pp3.x, pp3.y);
-                    ctx.strokeStyle = "green";
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                });
-//                paper.zoom(0.2);
-                var cnt = 0;
-                var uniqueIntersections = {};
-                for (var i = 0; i < paths.length; i++) {
-                    for (var j = i + 1; j < paths.length; j++) {
-//                        paths[i].getTangentAt(paths[i].getOffsetOf())
-//                        console.log(intersectionOfArrays(paths[i].vers,paths[j].vers));
-//                        if(sizeOfIntersectionOfArrays(paths[i].vers,paths[j].vers) < 2) {
-                            var intersections = paths[i].path.getIntersections(paths[j].path);
-                            cnt += intersections.length;
-                            for (var k = 0; k < intersections.length; k++) {
-                                var pp = intersections[k].point;
-                                if (pp != undefined) {
-                                    if (uniqueIntersections[pp.x + "," + pp.y] == undefined)
-                                        uniqueIntersections[pp.x + "," + pp.y] = 0;
-                                    uniqueIntersections[pp.x + "," + pp.y]++;
-                                    //ctx.strokeStyle = "red";
-                                    //ctx.stroke();
-                                }
-                            }
-//                        }
-                    }
-                }
-                console.log(cnt);
-                var cnt2 = 0;
-                Object.keys(uniqueIntersections).forEach(function (t) {
-                    if (uniqueIntersections[t] == 1) {
-                        var xy = t.split(",");
-                        var isStartEnd = false;
-                        Object.keys(startEnds).forEach(function (t2) {
-                           var xy2 = t2.split(",");
-                           var x2 = parseFloat(xy2[0]);var y2 = parseFloat(xy2[1]);
-                           var x1 = parseFloat(xy[0]);var y1 = parseFloat(xy[1]);
-                           var dist = Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
-                           if(dist < 1) isStartEnd = true;
-                        });
-                        if(!isStartEnd) {
-                            ctx.beginPath();
-                            ctx.arc(parseFloat(xy[0]), parseFloat(xy[1]), 2, 0, 2 * Math.PI);
-                            ctx.fill();
-                            cnt2++;
-                        }
-                    }
-                });
-                console.log(cnt2);
-                first = false;
-            });
-            return;
-        }
-        var properties = "";
-        $('#props').children('input').each(function (i, item) {
-            properties += item.name + ":" + item.value + "-"
-        });
-        properties = properties.substr(0,properties.length-1);
-        $.get(serverAddr + 'draw/'
-            + $('#categories').find('option:selected').text() + ","
-            + $('#reports').find('option:selected').text()+","+properties)
-            .done(function (data) {
-                cy = cytoscape({
-                    container: document.getElementById('canvas'),
-                    style: [ // the stylesheet for the graph
-                        {
-                            selector: 'node',
-                            style: {
-                                'background-color': 'lightgray',
-                                'label': 'data(id)',
-                                'text-valign': 'center'
-                            }
-                        }]
-                });
-                var nodes = data.nodes;
-                var edges = data.edges;
-                cy.elements().remove();
-                cy.add(nodes);
-                cy.add(edges);
-
-                if(lay=="Preset") {
-                    cy.layout({name: 'preset'}).run();
-                } else if(lay == "Force Directed") {
-                    cy.layout({name: 'cose'}).run();
-                }
-            })
-            .fail(function (jqXHR, textStatus, errorThrown) {
-                alert(errorThrown);
-            });
-    }
-
-    function getSelectedCategory() {
-        return $('#categories').find('option:selected').text();
-    }
-
-    function getSelectedReport() {
-        return $('#reports').find('option:selected').text();
-    }
-    /**
-     * runs a BFS on graph, starting the given vertex as the root
-     */
-    function BFSrun(treeRoot, f) {
-        var q = [], ret = [];
-        q.push(treeRoot);
-        ret.push(treeRoot);
-        treeRoot.setMark = true;
-        treeRoot.obj = 0;
-        while (q.length != 0) {
-            var v = q.splice(0, 1)[0];
-            v.neighborhood().forEach(function (vertex) {
-                if (vertex.setMark == undefined || vertex.setMark == false) {
-                    vertex.setMark = true;
-                    vertex.obj = v.obj + 1;
-                    q.push(vertex);
-                    ret.push(vertex);
-                    f(vertex, v);
-                }
-            });
-        }
-        return ret;
-    }
-
-    function getAngle(p1, p2) {
-        var angle = Math.atan2(p1.y - p2.y,
-            p1.x - p2.x);
-        if (angle < 0) {
-            // atan2 returns getAngle in phase -pi to pi, which means
-            // we have to convert the answer into 0 to 2pi range.
-            angle += 2 * Math.PI;
-        }
-        return angle;
-    }
-
-    function getMiddlePoint(p1, p2) {
-        return {x:(p1.x + p2.x) / 2, y:(p1.y + p2.y) / 2};
-    }
-
-    function sizeOfIntersectionOfArrays(arr1, arr2) {
-        var cnt = 0;
-        if(arr1.indexOf(arr2[0]) == -1) cnt++;
-        if(arr1.indexOf(arr2[1]) == -1) cnt++;
-        if(arr1.indexOf(arr2[2]) == -1) cnt++;
-        return cnt;
-    }
-
-</script>
-
-<script>
-    // Get the modal
-    var modal = document.getElementById('myModal');
-
-    // Get the button that opens the modal
-    var btn = document.getElementById("myBtn");
-
-    // Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("close")[0];
-
-    // When the user clicks the button, open the modal
-    btn.onclick = function() {
-//        var res = document.getElementById("reportResults").innerHTML;
-//        document.getElementById("results-body").innerHTML = res;
-        modal.style.display = "block";
-    }
-
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
-
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
-</script>
-
+<script src="index.js"></script>
+<script src="modal.js"></script>
+<script src="strings.js"></script>
 </body>
 </html>
