@@ -1,5 +1,7 @@
 var serverAddr = "http://localhost:2342/";
 var nodeId = 0;
+var cy; //cytoscape object
+
 $( document ).ready(function() {
     initCytoscape();
 });
@@ -95,7 +97,6 @@ function Report() {
         });
 }
 
-var cy; //cytoscape object
 
 function initCytoscape() {
      cy = cytoscape({
@@ -113,7 +114,19 @@ function initCytoscape() {
 }
 
 function addSingleVertex() {
-    console.log("drawing single vertex");
+    $.get(serverAddr + 'addVertex/'
+    + nodeId++)
+    .done(function (data) {
+        var offset = $('#canvas').offset();
+        cy.add({
+            data: {id: nodeId},
+            renderedPosition: {x: event.pageX - offset.left, y: event.pageY - offset.top}
+        });   console.log("drawing single vertex");
+    })
+    .fail(function (jqXHR, textStatus, errorThrown) {
+        alert(errorThrown);
+    });
+
 }
 
 function removeSingleVertex() {
@@ -139,11 +152,13 @@ function Draw() {
         + $('#reports').find('option:selected').text() + "--" +
         ($('#props_keys').html() + ":" + $('#props_vals').val()))
         .done(function (data) {
+            nodeId = 0; //resets counter for freehand vertices
             var nodes = data.nodes;
             var edges = data.edges;
             cy.elements().remove();
             cy.add(nodes);
             cy.add(edges);
+            nodeId += nodes.length; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
             if (lay == "Preset") {
                 cy.layout({name: 'preset'}).run();
             } else if (lay == "Force Directed") {
@@ -154,10 +169,16 @@ function Draw() {
             alert(errorThrown);
         });
 }
-$("#canvas").click(function(event) {
-    //document.write("canvas clicked");
-    cy.add({
-        data: {id: 'node' + nodeId++}
+
+$('#canvas').on('mousedown', function(event) {
+    $('#canvas').on('mouseup mousemove', function handler(event){
+        if (event.type == 'mouseup') {
+            // click
+            addSingleVertex(event);
+        } else {
+            // drag
+        }
+        $("#canvas").off('mouseup mousemove', handler);
     });
 });
 

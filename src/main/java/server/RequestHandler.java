@@ -4,6 +4,7 @@ import graphtea.extensions.Centrality;
 import graphtea.extensions.RandomTree;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.RenderTable;
+import graphtea.graph.graph.Vertex;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -54,6 +55,26 @@ public class RequestHandler {
             e.printStackTrace();
         }
         return new GraphModel();
+    }
+
+    @GET
+    @Path("/addVertex/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response addVertex(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String vertexId = infos[0];
+        Vertex vertex = new Vertex();
+        vertex.setLabel(vertexId);
+        currentGraph.insertVertex(vertex);
+
+        try {
+            String json = CytoJSONBuilder.getJSON(currentGraph);
+            System.out.println("adding vertex");
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
     }
 
     @GET
