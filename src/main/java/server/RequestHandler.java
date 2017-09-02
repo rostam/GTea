@@ -59,6 +59,21 @@ public class RequestHandler {
     }
 
     @GET
+    @Path("/moveVertex")
+    public Response moveVertex(@PathParam("info") String info){
+        String[] infos = info.split("--");
+        Double xPos = Double.parseDouble(infos[0]);
+        Double yPos = Double.parseDouble(infos[1]);
+        int vertexID = Integer.parseInt(infos[2]);
+        String sessionID = infos[3];
+        handleSession(sessionID);
+
+        sessionToGraph.get(sessionID).getVertex(vertexID).setLocation(new GPoint(xPos, yPos));
+
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
     @Path("/addVertex/{info}")
     @Produces("application/json;charset=utf-8")
     public Response addVertex(@PathParam("info") String info) {
@@ -66,7 +81,6 @@ public class RequestHandler {
         String vertexId = infos[0];
         Double xPos = Double.parseDouble(infos[1]);
         Double yPos = Double.parseDouble(infos[2]);
-
         String sessionID = infos[3];
         handleSession(sessionID);
 

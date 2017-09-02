@@ -200,6 +200,17 @@ function Draw() {
         });
 }
 
+cy.on('mouseup', 'node', function(event) {
+    console.log("MOVED");
+    var evtTarget = event.target;
+
+    $.get(serverAddr + 'moveVertex'
+    + "--" + this.position('x')
+    + "--" + this.position('y')
+    + "--" + this.id()
+    + "--" + uuid)
+});
+
 cy.on('tap', function(event) {
     var evtTarget = event.target;
 
@@ -209,7 +220,6 @@ cy.on('tap', function(event) {
     else if (evtTarget.isNode()) {
         if (selectedNode == null) {
             selectedNode = evtTarget;
-            //selectedNode.data('id').classes();
             cy.$('#'+selectedNode.data('id')).classes('selected');
         }
         else {
