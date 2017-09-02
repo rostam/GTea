@@ -112,6 +112,14 @@ function initCytoscape() {
                     'label': 'data(id)',
                     'text-valign': 'center'
                 }
+            },
+            {
+                selector: '.selected',
+                style: {
+                    'background-color': 'blue',
+                    'label': 'data(id)',
+                    'text-valign': 'center'
+                }
             }]
     });
 }
@@ -196,11 +204,14 @@ cy.on('tap', function(event) {
     else if (evtTarget.isNode()) {
         if (selectedNode == null) {
             selectedNode = evtTarget;
+            //selectedNode.data('id').classes();
+            cy.$('#'+selectedNode.data('id')).classes('selected');
         }
         else {
             console.log(selectedNode.data('id'), evtTarget.data('id'));
             addSingleEdge(selectedNode.data('id'), evtTarget.data('id'));
             selectedNode = null;
+            cy.$('#'+selectedNode.data('id')).classes('node');
         }
         console.log("Clicked a node");
     }
