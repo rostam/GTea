@@ -114,13 +114,15 @@ function initCytoscape() {
 }
 
 function addSingleVertex() {
+    var offset = $('#canvas').offset();
+    var xPos = event.pageX - offset.left;
+    var yPos = event.pageY - offset.top;
     $.get(serverAddr + 'addVertex/'
-    + nodeId++)
+    + nodeId++ + "--" + xPos + "--" + yPos)
     .done(function (data) {
-        var offset = $('#canvas').offset();
         cy.add({
             data: {id: nodeId},
-            renderedPosition: {x: event.pageX - offset.left, y: event.pageY - offset.top}
+            renderedPosition: {x: xPos, y: yPos}
         });   console.log("drawing single vertex");
     })
     .fail(function (jqXHR, textStatus, errorThrown) {

@@ -2,6 +2,7 @@ package server;
 
 import graphtea.extensions.Centrality;
 import graphtea.extensions.RandomTree;
+import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.RenderTable;
 import graphtea.graph.graph.Vertex;
@@ -15,6 +16,7 @@ import org.reflections.Reflections;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.awt.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -63,11 +65,14 @@ public class RequestHandler {
     public Response addVertex(@PathParam("info") String info) {
         String[] infos = info.split("--");
         String vertexId = infos[0];
+        Double xPos = Double.parseDouble(infos[1]);
+        Double yPos = Double.parseDouble(infos[2]);
+
         Vertex vertex = new Vertex();
         vertex.setLabel(vertexId);
-        currentGraph.insertVertex(vertex);
-
+        vertex.setLocation(new GPoint(xPos, yPos));
         try {
+            currentGraph.insertVertex(vertex);
             String json = CytoJSONBuilder.getJSON(currentGraph);
             System.out.println("adding vertex");
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
