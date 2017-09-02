@@ -24,7 +24,9 @@ import java.util.*;
 @Path("")
 public class RequestHandler {
     private static HashMap<String,Class> extensionNameToClass = new HashMap<>();
-    private static GraphModel currentGraph = new GraphModel();
+    //private static GraphModel currentGraph = new GraphModel();
+    private static HashMap<String, GraphModel> sessionToGraph = new HashMap<>();
+
 
     public GraphModel generateGraph(String[] props, String graph) {
         try {
@@ -65,12 +67,17 @@ public class RequestHandler {
         Double xPos = Double.parseDouble(infos[1]);
         Double yPos = Double.parseDouble(infos[2]);
 
+        String sessionID = infos[3];
+        handleSession(sessionID);
+
         Vertex vertex = new Vertex();
         vertex.setLabel(vertexId);
         vertex.setLocation(new GPoint(xPos, yPos));
         try {
-            currentGraph.insertVertex(vertex);
-            String json = CytoJSONBuilder.getJSON(currentGraph);
+            //System.out.println("xPos:" + xPos + " yPos" + yPos);
+
+            sessionToGraph.get(sessionID).insertVertex(vertex);
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
             System.out.println("adding vertex");
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
@@ -86,16 +93,16 @@ public class RequestHandler {
         String[] infos = info.split("--");
         String sourceID = infos[0];
         String targetID = infos[1];
+
+        String sessionID = infos[2];
+        handleSession(sessionID);
+
         try {
-            Vertex v = currentGraph.getAVertex();
-            System.out.println(v.getId());
-            System.out.println("casted: " + Integer.parseInt(sourceID));
-            System.out.println(targetID);
-            Vertex source = currentGraph.getVertex(Integer.parseInt(sourceID));
-            Vertex target = currentGraph.getVertex(Integer.parseInt(targetID));
+            Vertex source = sessionToGraph.get(sessionID).getVertex(Integer.parseInt(sourceID));
+            Vertex target = sessionToGraph.get(sessionID).getVertex(Integer.parseInt(targetID));
             Edge edge = new Edge(source, target);
-            currentGraph.insertEdge(edge);
-            String json = CytoJSONBuilder.getJSON(currentGraph);
+            sessionToGraph.get(sessionID).insertEdge(edge);
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
             System.out.println("adding edge");
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
@@ -114,16 +121,20 @@ public class RequestHandler {
         String[] props = infos[2].replaceAll(" ","").split(":");
         String[] reportProps = infos[3].replaceAll(" ","").split(":");
 
+        String sessionID = infos[4];
+        handleSession(sessionID);
+
         for(String s : reportProps) {
             System.out.println(s);
         }
 
         try {
-            if(currentGraph.getVerticesCount() == 0)
-                currentGraph = generateGraph(props,graph);
+            if(sessionToGraph.get(sessionID).getVerticesCount() == 0)
+                sessionToGraph.put(sessionID, generateGraph(props, graph));
+                        //= generateGraph(props,graph);
             if(!report.contains("No ")) {
                 GraphReportExtension gre = ((GraphReportExtension) extensionNameToClass.get(report).newInstance());
-                Object o = gre.calculate(currentGraph);
+                Object o = gre.calculate(sessionToGraph.get(sessionID));
                 JSONObject jsonObject = new JSONObject();
                 if(o instanceof RenderTable) {
                     jsonObject.put("titles",((RenderTable)o).getTitles().toString());
@@ -152,9 +163,13 @@ public class RequestHandler {
         String graph = infos[0];
         String report = infos[1];
         String[] props = infos[2].replaceAll(" ","").split(":");
+
+        String sessionID = infos[3];
+        handleSession(sessionID);
+
         try {
-            currentGraph = generateGraph(props,graph);
-            String json = CytoJSONBuilder.getJSON(currentGraph);
+            sessionToGraph.put(sessionID, generateGraph(props, graph));
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -317,6 +332,13 @@ public class RequestHandler {
 
         String json = "";//CytoJSONBuilder.getJSON(newEdgeList,newPos);
         return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    private void handleSession(String sessionID) {
+        System.out.println(sessionID);
+        if(!sessionToGraph.containsKey(sessionID)){
+            sessionToGraph.put(sessionID, new GraphModel());
+        }
     }
 
 }

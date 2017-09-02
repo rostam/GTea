@@ -3,6 +3,7 @@ var nodeId = -1;
 var edgeId = -1;
 var cy; //cytoscape object
 var selectedNode;
+var uuid = guid();
 
 initCytoscape();
 $( document ).ready(function() {
@@ -70,7 +71,8 @@ function Report() {
         + $('#categories').find('option:selected').text() + "--"
         + $('#reports').find('option:selected').text() + "--"
         + ($('#props_keys').html() + ":" + $('#props_vals').val()) + "--"
-        + ($('#reportPropsKeys').html() + ":" + $('#reportPropsVals').val()))
+        + ($('#reportPropsKeys').html() + ":" + $('#reportPropsVals').val())
+        + "--" + uuid)
         .done(function (data) {
             $('#reportResults').html(JSON.stringify(data));
 //                $('#results-body').html(JSON.stringify(data));
@@ -129,7 +131,8 @@ function addSingleVertex() {
     var xPos = event.pageX - offset.left;
     var yPos = event.pageY - offset.top;
     $.get(serverAddr + 'addVertex/'
-    + nodeId++ + "--" + xPos + "--" + yPos)
+    + nodeId++ + "--" + xPos + "--" + yPos
+    + "--" + uuid)
     .done(function (data) {
         cy.add({
             data: {id: nodeId},
@@ -148,7 +151,8 @@ function removeSingleVertex() {
 
 function addSingleEdge(source, target) {
     $.get(serverAddr + 'addEdge/'
-        + source + "--" + target)
+        + source + "--" + target
+        + "--" + uuid)
         .done(function (data) {
             var edges = data.edges;
             var nodes = data.nodes;
@@ -175,7 +179,8 @@ function Draw() {
     $.get(serverAddr + 'draw/'
         + $('#categories').find('option:selected').text() + "--"
         + $('#reports').find('option:selected').text() + "--" +
-        ($('#props_keys').html() + ":" + $('#props_vals').val()))
+        ($('#props_keys').html() + ":" + $('#props_vals').val())
+        + "--" + uuid)
         .done(function (data) {
             nodeId = 0; //resets counter for freehand vertices
             var nodes = data.nodes;
@@ -210,8 +215,8 @@ cy.on('tap', function(event) {
         else {
             console.log(selectedNode.data('id'), evtTarget.data('id'));
             addSingleEdge(selectedNode.data('id'), evtTarget.data('id'));
-            selectedNode = null;
             cy.$('#'+selectedNode.data('id')).classes('node');
+            selectedNode = null;
         }
         console.log("Clicked a node");
     }
@@ -221,18 +226,6 @@ cy.on('tap', function(event) {
 
 
 });
-
-/*$('#canvas').on('mousedown', function(event) {
-    $('#canvas').on('mouseup mousemove', function handler(event){
-        if (event.type == 'mouseup') {
-            // click
-            addSingleVertex(event);
-        } else {
-            // drag
-        }
-        $("#canvas").off('mouseup mousemove', handler);
-    });
-});*/
 
 function getSelectedCategory() {
     return $('#categories').find('option:selected').text();
@@ -315,4 +308,15 @@ function loadG6() {
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
         });
+}
+
+
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
 }
