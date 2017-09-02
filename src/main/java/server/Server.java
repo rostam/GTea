@@ -24,7 +24,8 @@ public class Server {
   /**
    * Default port
    */
-  private static final int PORT = 2342;
+//  private static final int PORT = 2342;
+  private static final int PORT = 8008;
   /**
    * Path to demo application
    */

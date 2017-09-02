@@ -1,4 +1,5 @@
-var serverAddr = "http://localhost:2342/";
+var serverAddr = "http://localhost:8008/";
+// var serverAddr = "http://homer.dh.uni-leipzig.de:8008/";
 
 var original_data = {};
 $.get(serverAddr + 'graphs/')
@@ -73,7 +74,7 @@ function Report() {
         + ($('#reportPropsKeys').html() + ":" + $('#reportPropsVals').val()))
         .done(function (data) {
             $('#reportResults').html(JSON.stringify(data));
-//                $('#results-body').html(JSON.stringify(data));
+            $('#results-body').html(JSON.stringify(data));
             if (data.titles != undefined) {
                 var titles = data.titles.substr(1, data.titles.indexOf("]") - 1);
                 var tts = titles.split(",");
