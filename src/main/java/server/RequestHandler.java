@@ -2,10 +2,7 @@ package server;
 
 import graphtea.extensions.Centrality;
 import graphtea.extensions.RandomTree;
-import graphtea.graph.graph.GPoint;
-import graphtea.graph.graph.GraphModel;
-import graphtea.graph.graph.RenderTable;
-import graphtea.graph.graph.Vertex;
+import graphtea.graph.graph.*;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -75,6 +72,31 @@ public class RequestHandler {
             currentGraph.insertVertex(vertex);
             String json = CytoJSONBuilder.getJSON(currentGraph);
             System.out.println("adding vertex");
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
+    @Path("/addEdge/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response addEdge(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String sourceID = infos[0];
+        String targetID = infos[1];
+        try {
+            Vertex v = currentGraph.getAVertex();
+            System.out.println(v.getId());
+            System.out.println("casted: " + Integer.parseInt(sourceID));
+            System.out.println(targetID);
+            Vertex source = currentGraph.getVertex(Integer.parseInt(sourceID));
+            Vertex target = currentGraph.getVertex(Integer.parseInt(targetID));
+            Edge edge = new Edge(source, target);
+            currentGraph.insertEdge(edge);
+            String json = CytoJSONBuilder.getJSON(currentGraph);
+            System.out.println("adding edge");
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();

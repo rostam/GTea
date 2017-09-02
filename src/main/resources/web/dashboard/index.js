@@ -1,9 +1,12 @@
 var serverAddr = "http://localhost:2342/";
-var nodeId = 0;
+var nodeId = -1;
+var edgeId = -1;
 var cy; //cytoscape object
+var selectedNode;
 
+initCytoscape();
 $( document ).ready(function() {
-    initCytoscape();
+    //initCytoscape();
 });
 
 
@@ -123,7 +126,7 @@ function addSingleVertex() {
         cy.add({
             data: {id: nodeId},
             renderedPosition: {x: xPos, y: yPos}
-        });   console.log("drawing single vertex");
+        });
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
         alert(errorThrown);
@@ -135,8 +138,20 @@ function removeSingleVertex() {
     console.log("drawing single vertex");
 }
 
-function addSingleEdge() {
-    console.log("drawing single vertex");
+function addSingleEdge(source, target) {
+    $.get(serverAddr + 'addEdge/'
+        + source + "--" + target)
+        .done(function (data) {
+            var edges = data.edges;
+            var nodes = data.nodes;
+            cy.elements().remove();
+            cy.add(nodes);
+            cy.add(edges);
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        });
+    console.log("drawing single edge");
 }
 
 function deleteSingleEdge() {
@@ -160,7 +175,7 @@ function Draw() {
             cy.elements().remove();
             cy.add(nodes);
             cy.add(edges);
-            nodeId += nodes.length; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
+            nodeId += nodes.length-1; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
             if (lay == "Preset") {
                 cy.layout({name: 'preset'}).run();
             } else if (lay == "Force Directed") {
@@ -172,7 +187,31 @@ function Draw() {
         });
 }
 
-$('#canvas').on('mousedown', function(event) {
+cy.on('tap', function(event) {
+    var evtTarget = event.target;
+
+    if (evtTarget === cy) {
+        addSingleVertex(event);
+    }
+    else if (evtTarget.isNode()) {
+        if (selectedNode == null) {
+            selectedNode = evtTarget;
+        }
+        else {
+            console.log(selectedNode.data('id'), evtTarget.data('id'));
+            addSingleEdge(selectedNode.data('id'), evtTarget.data('id'));
+            selectedNode = null;
+        }
+        console.log("Clicked a node");
+    }
+    else if (evtTarget.isEdge()) {
+
+    }
+
+
+});
+
+/*$('#canvas').on('mousedown', function(event) {
     $('#canvas').on('mouseup mousemove', function handler(event){
         if (event.type == 'mouseup') {
             // click
@@ -182,7 +221,7 @@ $('#canvas').on('mousedown', function(event) {
         }
         $("#canvas").off('mouseup mousemove', handler);
     });
-});
+});*/
 
 function getSelectedCategory() {
     return $('#categories').find('option:selected').text();
