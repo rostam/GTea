@@ -6,9 +6,6 @@ var selectedNode;
 var uuid = guid();
 
 initCytoscape();
-$( document ).ready(function() {
-    //initCytoscape();
-});
 
 
 var original_data = {};
@@ -149,6 +146,7 @@ function removeSingleVertex() {
     console.log("drawing single vertex");
 }
 
+
 function addSingleEdge(source, target) {
     $.get(serverAddr + 'addEdge/'
         + source + "--" + target
@@ -157,8 +155,17 @@ function addSingleEdge(source, target) {
             var edges = data.edges;
             var nodes = data.nodes;
             cy.elements().remove();
+
             cy.add(nodes);
             cy.add(edges);
+
+            var lay = $('#layouts').find('option:selected').text();
+            if (lay == "Preset") {
+                cy.layout({name: 'preset'}).run();
+            } else if (lay == "Force Directed") {
+                cy.layout({name: 'cose'}).run();
+            }
+
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -199,17 +206,6 @@ function Draw() {
             alert(errorThrown);
         });
 }
-
-cy.on('mouseup', 'node', function(event) {
-    console.log("MOVED");
-    var evtTarget = event.target;
-
-    $.get(serverAddr + 'moveVertex'
-    + "--" + this.position('x')
-    + "--" + this.position('y')
-    + "--" + this.id()
-    + "--" + uuid)
-});
 
 cy.on('tap', function(event) {
     var evtTarget = event.target;
@@ -330,3 +326,4 @@ function guid() {
   return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
     s4() + '-' + s4() + s4() + s4();
 }
+
