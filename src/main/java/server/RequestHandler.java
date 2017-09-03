@@ -101,6 +101,23 @@ public class RequestHandler {
     }
 
     @GET
+    @Path("/clear/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response clear(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String sessionID = infos[0];
+        System.out.println("removing: " + sessionID);
+        try {
+            sessionToGraph.put(sessionID, new GraphModel());
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
     @Path("/addEdge/{info}")
     @Produces("application/json;charset=utf-8")
     public Response addEdge(@PathParam("info") String info) {

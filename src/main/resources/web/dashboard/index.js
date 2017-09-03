@@ -123,6 +123,22 @@ function initCytoscape() {
     });
 }
 
+function clearCanvas() {
+    $.get(serverAddr + 'clear/'
+        + uuid)
+        .done(function(data) {
+            var edges = data.edges;
+            var nodes = data.nodes;
+            cy.elements().remove();
+            cy.add(nodes);
+            cy.add(edges);
+            nodeId = -1;
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        });
+}
+
 function addSingleVertex() {
     var offset = $('#canvas').offset();
     var xPos = event.pageX - offset.left;
@@ -160,11 +176,6 @@ function addSingleEdge(source, target) {
             cy.add(edges);
 
             var lay = $('#layouts').find('option:selected').text();
-            if (lay == "Preset") {
-                cy.layout({name: 'preset'}).run();
-            } else if (lay == "Force Directed") {
-                cy.layout({name: 'cose'}).run();
-            }
 
         })
         .fail(function (jqXHR, textStatus, errorThrown) {

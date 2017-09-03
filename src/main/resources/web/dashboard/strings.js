@@ -5,7 +5,6 @@ var strings = {
     generator : "Here, a graph generator can be selected. The required parameters and their types appeared next to it." +
     "                All parameters should be filled separated with commas.",
     g6format  : "Here, you can paste your G6-formatted string to load that graph.",
-    freehand : "You can draw a graph by manually adding vertices and edges",
     layout : "Now, you can draw the graph in a layout which can be selected here. The preset layout " +
     "here means the computed layout in GraphTea.",
     report: "Here, you can compute the different reports on graph. When a report selected from" +

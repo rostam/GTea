@@ -46,10 +46,6 @@
             G6 Format: <input id="g6string" type="text">
             <button onclick="loadG6()">Load</button>
         </div>
-        <div id="freehand">
-            <p id="strings-freehand"></p>
-            Freehand drawing
-        </div>
         <p id="strings-layout"></p>
         <select id="layouts">
             <option>Force Directed</option>
@@ -65,6 +61,7 @@
             <textarea name="Text1" cols="50" rows="6" id="reportResults"></textarea>
             <button id="myBtn">View Styled</button>
         </div>
+        <button onclick="clearCanvas()">Clear</button>
 
         <!--<div id="reportResults"></div>-->
         <canvas id="paperCanvas"></canvas>
