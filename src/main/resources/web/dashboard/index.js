@@ -139,6 +139,7 @@ function clearCanvas() {
         });
 }
 
+
 function addSingleVertex() {
     var offset = $('#canvas').offset();
     var xPos = event.pageX - offset.left;
@@ -181,9 +182,7 @@ function addSingleEdge(source, target) {
                 //cy.layout({name: 'preset'}).run();
                 cy.layout(preset).run();
             } else if (lay == "Force Directed") {
-                //cy.layout({name: 'cose'}).run();
-                cy.layout(cose).run();
-
+                cy.layout({name: 'cose'}).run();
             }
 
 
@@ -250,8 +249,12 @@ cy.on('tap', function(event) {
     else if (evtTarget.isEdge()) {
 
     }
+});
 
-
+cy.on('layoutstop', function() {
+    cy.maxZoom(2.5);
+    cy.fit();
+    cy.maxZoom(100);
 });
 
 function getSelectedCategory() {
@@ -365,7 +368,7 @@ var preset = {
   transform: function (node, position ){ return position; } // transform a given node position. Useful for changing flow direction in discrete layouts
 };
 
-var cose = {
+/*var cose = {
   name: 'cose',
 
   // Called on `layoutready`
@@ -376,7 +379,7 @@ var cose = {
   // true : Animate continuously as the layout is running
   // false : Just show the end result
   // 'end' : Animate with the end result, from the initial positions to the end positions
-  animate: 'end',
+  animate: false,
   // Easing of the animation for animate:'end'
   animationEasing: undefined,
   // The duration of the animation for animate:'end'
@@ -387,7 +390,7 @@ var cose = {
   animateFilter: function ( node, i ){ return true; },
   // The layout animates only after this many milliseconds for animate:true
   // (prevents flashing on fast runs)
-  animationThreshold: 250,
+  animationThreshold: 500,
   // Number of iterations between consecutive screen positions update
   // (0 -> only updated on the end)
   refresh: 20,
@@ -410,7 +413,7 @@ var cose = {
   // Ideal edge (non nested) length
   idealEdgeLength: function( edge ){ return 32; },
   // Divisor to compute edge forces
-  edgeElasticity: function( edge ){ return 32; },
+  edgeElasticity: function( edge ){ return 5; },
   // Nesting factor (multiplier) to compute ideal edge length for nested edges
   nestingFactor: 1.2,
   // Gravity force (constant)
@@ -425,4 +428,4 @@ var cose = {
   minTemp: 1.0,
   // Pass a reference to weaver to use threads for calculations
   weaver: false
-};
+};*/
