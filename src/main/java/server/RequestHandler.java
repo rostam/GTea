@@ -108,7 +108,7 @@ public class RequestHandler {
         String sessionID = infos[0];
         System.out.println("removing: " + sessionID);
         try {
-            sessionToGraph.put(sessionID, new GraphModel());
+            sessionToGraph.get(sessionID).clear();
             String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
@@ -171,6 +171,7 @@ public class RequestHandler {
                     jsonObject.put("titles",((RenderTable)o).getTitles().toString());
                 }
                 jsonObject.put("results",o.toString());
+                System.out.println(jsonObject);
                 return Response.ok(jsonObject.toString()).header("Access-Control-Allow-Origin", "*").build();
             } else {
                 return Response.ok("").header("Access-Control-Allow-Origin", "*").build();
