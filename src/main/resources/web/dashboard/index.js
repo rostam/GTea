@@ -1,5 +1,5 @@
 var serverAddr = "http://localhost:2342/";
-var nodeId = -1;
+var nodeId = 0;
 var edgeId = -1;
 var cy; //cytoscape object
 var selectedNode;
@@ -139,7 +139,7 @@ function clearCanvas() {
             cy.elements().remove();
             cy.add(nodes);
             cy.add(edges);
-            nodeId = -1;
+            nodeId = 0;
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -152,13 +152,15 @@ function addSingleVertex() {
     var xPos = event.pageX - offset.left;
     var yPos = event.pageY - offset.top;
     $.get(serverAddr + 'addVertex/'
-        + nodeId++ + "--" + xPos + "--" + yPos
+        + nodeId + "--" + xPos + "--" + yPos
         + "--" + uuid)
         .done(function (data) {
+
             cy.add({
                 data: {id: nodeId},
                 renderedPosition: {x: xPos, y: yPos}
             });
+            nodeId++;
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -166,8 +168,17 @@ function addSingleVertex() {
 
 }
 
-function removeSingleVertex() {
-    console.log("drawing single vertex");
+function removeSingleVertex(node) {
+    $.get(serverAddr + 'remove/'
+        + node.data('id')
+        + "--" + uuid)
+        .done(function (data) {
+
+            cy.remove(node);
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        });
 }
 
 
@@ -276,6 +287,15 @@ cy.on('tap', function(event) {
 
     }
 });
+
+cy.on('cxttapend', 'node', function(event) {
+    var evtTarget = event.target;
+    if(evtTarget.isNode){
+        removeSingleVertex(evtTarget);
+    }
+
+});
+
 
 cy.on('layoutstop', function() {
     cy.maxZoom(2.5);
@@ -409,7 +429,6 @@ function applyLayout(){
         cy.layout({name: 'cose'}).run();
     }
 }
-
 
 
 

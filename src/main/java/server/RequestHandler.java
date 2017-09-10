@@ -114,8 +114,6 @@ public class RequestHandler {
         vertex.setLabel(vertexId);
         vertex.setLocation(new GPoint(xPos, yPos));
         try {
-            //System.out.println("xPos:" + xPos + " yPos" + yPos);
-
             sessionToGraph.get(sessionID).insertVertex(vertex);
             String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
             System.out.println("adding vertex");
@@ -124,6 +122,31 @@ public class RequestHandler {
             e.printStackTrace();
         }
         return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
+    @Path("/remove/{info}")
+    public Response deleteVertex(@PathParam("info") String info){
+        String[] infos = info.split("--");
+        String vertexId = infos[0];
+        String sessionID = infos[1];
+        handleSession(sessionID);
+        try {
+            Vertex v = sessionToGraph.get(sessionID).getVertex(Integer.parseInt(vertexId));
+            sessionToGraph.get(sessionID).deleteVertex(v);
+
+            Iterable<Vertex> vi = sessionToGraph.get(sessionID).vertices();
+            for (Vertex i : vi) {
+                System.out.println(i);
+            }
+
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+
     }
 
     @GET
@@ -212,6 +235,7 @@ public class RequestHandler {
 
         return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
     }
+
 
     @GET
     @Path("/draw/{info}")
