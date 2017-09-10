@@ -38,7 +38,7 @@
             <p id="strings-generator"></p>
             <table><tr>
                 <td><select id="categories"><option>Select</option></select></td>
-                <td><div id="props"><span id="props_keys">n</span> : <input type="text" id="props_vals" value="Integer"></div></td>
+                <td><div id="props"><span id="props_keys">n</span> : <input type="text" id="props_vals" placeholder="Integer"></div></td>
             </tr></table>
         </div>
         <div id="g6format">
@@ -46,6 +46,13 @@
             G6 Format: <input id="g6string" type="text">
             <button onclick="loadG6()">Load</button>
         </div>
+
+        <select id="graphType">
+            <option selected="selected">directed</option>
+            <option>undirected</option>
+        </select>
+        <button onclick="SelectType()">Select</button>
+
         <p id="strings-layout"></p>
         <select id="layouts">
             <option>Force Directed</option>

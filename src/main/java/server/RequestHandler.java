@@ -59,7 +59,33 @@ public class RequestHandler {
     }
 
     @GET
-    @Path("/moveVertex")
+    @Path("/selectType/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response selectType(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String type = infos[0];
+        String sessionID = infos[1];
+        handleSession(sessionID);
+        try {
+            if ((type == "directed") != sessionToGraph.get(sessionID).isDirected()) {//Only change if they differ
+
+                if (type.equals("directed")) {
+                    sessionToGraph.get(sessionID).setDirected(true);
+                } else if (type.equals("undirected")) {
+                    sessionToGraph.get(sessionID).setDirected(false);
+                }
+
+            }
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
+    @Path("/moveVertex/{info}")
     public Response moveVertex(@PathParam("info") String info){
         String[] infos = info.split("--");
         Double xPos = Double.parseDouble(infos[0]);
