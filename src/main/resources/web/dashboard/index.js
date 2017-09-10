@@ -6,7 +6,7 @@ var selectedNode;
 var uuid = guid();
 var directed = 'triangle', undirected = 'none';
 
-initCytoscape('none'); // initialise with no direction until arrows render properly
+initCytoscape(directed);
 
 var original_data = {};
 $.get(serverAddr + 'graphs/')
@@ -200,7 +200,6 @@ function addSingleEdge(source, target) {
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
         });
-    console.log("drawing single edge");
 }
 
 function deleteSingleEdge() {
@@ -210,22 +209,31 @@ function deleteSingleEdge() {
 /**
  * Updates the graph type to either directed or undirected
  * */
-function SelectType() {
+function selectType() {
     var type = $('#graphType').find('option:selected').text();
 
-    /*if(type == 'directed') {
-        initCytoscape(directed);
-    } else {
-        initCytoscape(undirected);
-    }*/
+    if(type == 'directed') {
+        cy.style()
+            .selector('edge')
+            .css({
+                'curve-style': 'bezier',
+                'target-arrow-shape': directed
+            })
+    } else if(type == "undirected") {
+        cy.style()
+            .selector('edge')
+            .css({
+                'target-arrow-shape': undirected
+            })
+    }
 
     $.get(serverAddr + 'selectType/'
         + type
         + "--" + uuid)
         .done(function (data) {
-
             var nodes = data.nodes;
             var edges = data.edges;
+
             cy.elements().remove();
             cy.add(nodes);
             cy.add(edges);
