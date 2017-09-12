@@ -126,7 +126,7 @@ public class RequestHandler {
 
     @GET
     @Path("/remove/{info}")
-    public Response deleteVertex(@PathParam("info") String info){
+    public Response deleteVertex(@PathParam("info") String info) {
         String[] infos = info.split("--");
         String vertexId = infos[0];
         String sessionID = infos[1];

@@ -108,7 +108,7 @@ function initCytoscape(arrow) {
                 selector: 'node',
                 style: {
                     'background-color': 'lightgray',
-                    'label': 'data(id)',
+                    'label': 'data(label)',
                     'text-valign': 'center'
                 }
             },
@@ -116,7 +116,7 @@ function initCytoscape(arrow) {
                 selector: '.selected',
                 style: {
                     'background-color': 'blue',
-                    'label': 'data(id)',
+                    'label': 'data(label)',
                     'text-valign': 'center'
                 }
             },
@@ -139,13 +139,28 @@ function clearCanvas() {
             cy.elements().remove();
             cy.add(nodes);
             cy.add(edges);
-            nodeId = 0;
+            //nodeId = 0;
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
         });
 }
 
+function setVertexIds() {
+    /*
+    This function is for resetting the labels of the vertices, since we
+    use the labels as ids to send to the backend, and the backend flattens the
+    ids of the vertices when one of them is removed.
+     */
+    var lowestId = 0;
+    var len = cy.nodes().length;
+    for (var i = 0; i < nodeId; i++) {
+        if (cy.$('#' + i).length > 0) {
+            cy.$('#' + i).data('label', lowestId);
+            lowestId++;
+        }
+    }
+}
 
 function addSingleVertex() {
     var offset = $('#canvas').offset();
@@ -157,10 +172,11 @@ function addSingleVertex() {
         .done(function (data) {
 
             cy.add({
-                data: {id: nodeId},
+                data: {id: nodeId, label: nodeId},
                 renderedPosition: {x: xPos, y: yPos}
             });
             nodeId++;
+            setVertexIds();
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -170,11 +186,12 @@ function addSingleVertex() {
 
 function removeSingleVertex(node) {
     $.get(serverAddr + 'remove/'
-        + node.data('id')
+        + node.data('label')
         + "--" + uuid)
         .done(function (data) {
-
             cy.remove(node);
+            setVertexIds();
+            applyLayout();
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -194,6 +211,7 @@ function addSingleEdge(source, target) {
             cy.add(nodes);
             cy.add(edges);
 
+            //console.log(nodes);
             applyLayout();
 
         })
@@ -264,7 +282,8 @@ function Draw() {
             cy.elements().remove();
             cy.add(nodes);
             cy.add(edges);
-            nodeId += nodes.length-1; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
+            nodeId += nodes.length; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
+            setVertexIds();
             applyLayout();
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
@@ -281,12 +300,12 @@ cy.on('tap', function(event) {
     else if (evtTarget.isNode()) {
         if (selectedNode == null) {
             selectedNode = evtTarget;
-            cy.$('#'+selectedNode.data('id')).classes('selected');
+            cy.$('#'+selectedNode.data('label')).classes('selected');
         }
         else {
-            console.log(selectedNode.data('id'), evtTarget.data('id'));
-            addSingleEdge(selectedNode.data('id'), evtTarget.data('id'));
-            cy.$('#'+selectedNode.data('id')).classes('node');
+            console.log(selectedNode.data('label'), evtTarget.data('label'));
+            addSingleEdge(selectedNode.data('label'), evtTarget.data('label'));
+            cy.$('#'+selectedNode.data('label')).classes('node');
             selectedNode = null;
         }
         console.log("Clicked a node");
