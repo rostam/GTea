@@ -67,19 +67,7 @@ public class RequestHandler {
         String report = infos[1];
         String[] props = infos[2].replaceAll(" ","").split(":");
         String[] reportProps = infos[3].replaceAll(" ","").split(":");
-
-//        for(String s : reportProps) {
-//            System.out.println(s);
-//        }
         try {
-            if(graph.startsWith("G6Format=")) {
-                currentGraph = G6Format.stringToGraphModel(graph.substring(graph.indexOf("=")+1));
-            } else if(graph.startsWith("EdgeListFormat=")) {
-                currentGraph = getGraphFromEdgeList(graph.substring(graph.indexOf("=")+1));
-            } else {
-                if (currentGraph.getVerticesCount() == 0)
-                    currentGraph = generateGraph(props, graph);
-            }
             if(!report.contains("No ")) {
                 GraphReportExtension gre = ((GraphReportExtension) extensionNameToClass.get(report).newInstance());
                 Object o = gre.calculate(currentGraph);
@@ -124,10 +112,33 @@ public class RequestHandler {
     @Path("/el/{info}")
     @Produces("application/json;charset=utf-8")
     public Response edgeList(@PathParam("info") String info) {
-        GraphModel g = getGraphFromEdgeList(info);
-
+        currentGraph = getGraphFromEdgeList(info);
         try {
-            String json = CytoJSONBuilder.getJSON(g);
+            String json = CytoJSONBuilder.getJSON(currentGraph);
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
+    @Path("/adj/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response adjMat(@PathParam("info") String info) {
+        currentGraph = new GraphModel();
+        String[] rows = info.split("-");
+        for(int i=0;i<rows.length;i++) currentGraph.addVertex(new Vertex());
+        for(int i=0;i<rows.length;i++) {
+            String tmp[] = rows[i].split(",");
+            for(int j=0;j<tmp.length;j++) {
+                if(tmp[j].equals("1")) {
+                    currentGraph.addEdge(new Edge(currentGraph.getVertex(i),currentGraph.getVertex(j)));
+                }
+            }
+        }
+        try {
+            String json = CytoJSONBuilder.getJSON(currentGraph);
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -146,21 +157,21 @@ public class RequestHandler {
             if(!vs.contains(v2)) vs.add(v2);
         }
         HashMap<String,Vertex> labelVertex = new HashMap<>();
-        GraphModel g = new GraphModel();
+        currentGraph = new GraphModel();
         for(String v : vs) {
             Vertex vertex = new Vertex();
             vertex.setLabel(v);
             labelVertex.put(v,vertex);
-            g.addVertex(vertex);
+            currentGraph.addVertex(vertex);
         }
         for(String row : rows) {
             String tmp[] = row.split(",");
             String v1 = tmp[0].trim();
             String v2 = tmp[1].trim();
             Edge e = new Edge(labelVertex.get(v1),labelVertex.get(v2));
-            g.addEdge(e);
+            currentGraph.addEdge(e);
         }
-        return g;
+        return currentGraph;
     }
 
     @GET

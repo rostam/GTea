@@ -51,12 +51,20 @@
         <div id="elformat">
             <p id="strings-elformat"></p>
             Edge list in csv format: <br/><textarea id="elstring" name="Text1" cols="20" rows="5"></textarea>
-            <br/><button onclick="loadEL()">Load</button>
+            <br/><button onclick="load_graph('el',false)">Load Only</button>
+                 <button onclick="load_graph('el',true)">Load and Draw</button>
+        </div>
+        <div id="adjMatformat">
+            <p id="strings-adjMatformat"></p>
+            <br/><textarea id="adjstring" name="Text1" cols="20" rows="5"></textarea>
+            <br/><button onclick="load_graph('adj',false)">Load Only</button>
+            <button onclick="load_graph('adj',true)">Load and Draw</button>
         </div>
         <div id="g6format">
             <p id="strings-g6format"></p>
             G6 Format: <input id="g6string" type="text">
-            <button onclick="loadG6()">Load</button>
+            <br/><button onclick="load_graph('g6',false)">Load Only</button>
+            <button onclick="load_graph('g6',true)">Load and Draw</button>
         </div>
         <p id="strings-report"></p>
         <select id="reports"></select>

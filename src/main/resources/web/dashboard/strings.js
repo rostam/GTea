@@ -10,7 +10,10 @@ var strings = {
     report: "Here, you can compute the different reports on graph. When a report selected from" +
     "        the list, the parameters, if any, appears near to it. " +
     "        After the computation, the results would appear as strings at the botton. " +
-    "        A styled version can be also generated."
+    "        A styled version can be also generated.",
+    adjMat: "The adjacency matrix should be written in the following format." +
+    "        The elements in a row are separated with a comma." +
+    "        Each row comes in a new line. "
 };
 
 $('#strings-intro').html(strings.intro);
@@ -18,3 +21,4 @@ $('#strings-generator').html(strings.generator);
 $('#strings-g6format').html(strings.g6format);
 $("#strings-layout").html(strings.layout);
 $("#strings-report").html(strings.report);
+$("#strings-adjMatformat").html(strings.adjMat);

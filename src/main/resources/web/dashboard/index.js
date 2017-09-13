@@ -60,15 +60,6 @@ function Report() {
         reportProps = "no";
     }
     var graph = "";
-    var load = $('#loaders').find('option:selected').text();
-    console.log(load);
-    if(load == 'Generators') {
-        graph = $('#categories').find('option:selected').text();
-    } else if(load == 'Edge list') {
-        graph = "EdgeListFormat=" + $('#elstring').val().replace(/\n/g,"-");
-    } else if(load == 'G6 format') {
-        graph = "G6Format=" + $('#g6string').val();
-    }
     $.get(serverAddr + 'report/'
         + graph + "--"
         + $('#reports').find('option:selected').text() + "--"
@@ -208,12 +199,14 @@ function sizeOfIntersectionOfArrays(arr1, arr2) {
 $('#generators').show();
 $('#g6format').hide();
 $('#elformat').hide();
+$('#adjMatformat').hide();
 function selectLoader() {
     var loader = $('#loaders ').find('option:selected').text();
 
     $('#generators').hide();
     $('#g6format').hide();
     $('#elformat').hide();
+    $('#adjMatformat').hide();
     switch (loader) {
         case "Generators":
             $('#generators').show();
@@ -222,67 +215,38 @@ function selectLoader() {
             $('#elformat').show();
             break;
         case "Adjacency matrix":
+            $('#adjMatformat').show();
+            break;
         case "G6 format":
             $('#g6format').show();
             break;
     }
 }
 
-function loadG6() {
-    $.get(serverAddr + 'g6/'+$('#g6string').val())
+function load_graph(type,isDraw) {
+    var str = $('#'+type+'string').val().replace(/\n/g,"-");
+    $.get(serverAddr + type + '/'+str)
         .done(function (data) {
-            cy = cytoscape({
-                container: document.getElementById('canvas'),
-                style: [ // the stylesheet for the graph
-                    {
-                        selector: 'node',
-                        style: {
-                            'background-color': 'lightgray',
-                            'label': 'data(id)',
-                            'text-valign': 'center'
-                        }
-                    }]
-            });
-            var nodes = data.nodes;
-            var edges = data.edges;
-            cy.elements().remove();
-            cy.add(nodes);
-            cy.add(edges);
-
-            var lay = $('#layouts').find('option:selected').text();
-            if (lay == "Preset") {
-                cy.layout({name: 'preset'}).run();
-            } else if (lay == "Force Directed") {
+            if(isDraw) {
+                cy = cytoscape({
+                    container: document.getElementById('canvas'),
+                    style: [ // the stylesheet for the graph
+                        {
+                            selector: 'node',
+                            style: {
+                                'background-color': 'lightgray',
+                                'label': 'data(id)',
+                                'text-valign': 'center'
+                            }
+                        }]
+                });
+                var nodes = data.nodes;
+                var edges = data.edges;
+                cy.elements().remove();
+                cy.add(nodes);
+                cy.add(edges);
                 cy.layout({name: 'cose'}).run();
             }
-        })
-        .fail(function (jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
-        });
-}
-
-function loadEL() {
-    var str = $('#elstring').val().replace(/\n/g,"-");
-    $.get(serverAddr + 'el/'+str)
-        .done(function (data) {
-            cy = cytoscape({
-                container: document.getElementById('canvas'),
-                style: [ // the stylesheet for the graph
-                    {
-                        selector: 'node',
-                        style: {
-                            'background-color': 'lightgray',
-                            'label': 'data(id)',
-                            'text-valign': 'center'
-                        }
-                    }]
-            });
-            var nodes = data.nodes;
-            var edges = data.edges;
-            cy.elements().remove();
-            cy.add(nodes);
-            cy.add(edges);
-            cy.layout({name: 'cose'}).run();
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
