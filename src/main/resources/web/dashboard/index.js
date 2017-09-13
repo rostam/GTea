@@ -160,12 +160,14 @@ function setVertexIds() {
             lowestId++;
         }
     }
+
 }
 
 function addSingleVertex() {
     var offset = $('#canvas').offset();
     var xPos = event.pageX - offset.left;
     var yPos = event.pageY - offset.top;
+
     $.get(serverAddr + 'addVertex/'
         + nodeId + "--" + xPos + "--" + yPos
         + "--" + uuid)
@@ -175,8 +177,10 @@ function addSingleVertex() {
                 data: {id: nodeId, label: nodeId},
                 renderedPosition: {x: xPos, y: yPos}
             });
+
             nodeId++;
             setVertexIds();
+
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -189,9 +193,12 @@ function removeSingleVertex(node) {
         + node.data('label')
         + "--" + uuid)
         .done(function (data) {
+
             cy.remove(node);
+            //nodeId--;
             setVertexIds();
-            applyLayout();
+            applyLayout(); // TODO: Don't apply layout if no vertices left (apply conditional)
+
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -329,7 +336,14 @@ cy.on('tap', function(event) {
     else if (evtTarget.isNode()) {
         if (selectedNode == null) {
             selectedNode = evtTarget;
-            cy.$('#'+selectedNode.data('label')).classes('selected');
+
+            /*var label = selectedNode.data('label');
+            var id = selectedNode.data('id');
+            console.log("label: ", label);
+            console.log("id: ", id);*/
+
+            cy.$('#'+selectedNode.data('id')).classes('selected');
+            //cy.$('#'+selectedNode.data('label')).classes('selected');
         }
         else {
             console.log(selectedNode.data('label'), evtTarget.data('label'));

@@ -112,7 +112,7 @@ public class RequestHandler {
                 Vertex opposingVertex = sessionToGraph.get(sessionID).getVertex(_target);
 
                 Edge parallelEdge = sessionToGraph.get(sessionID).getEdge(vertex, opposingVertex);
-                System.out.println("condenseParallelEdges Removing: " + parallelEdge);
+                //System.out.println("condenseParallelEdges Removing: " + parallelEdge);
                 sessionToGraph.get(sessionID).removeEdge(parallelEdge);
 
             }
