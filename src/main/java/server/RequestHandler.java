@@ -83,6 +83,9 @@ public class RequestHandler {
             if(!report.contains("No ")) {
                 GraphReportExtension gre = ((GraphReportExtension) extensionNameToClass.get(report).newInstance());
                 Object o = gre.calculate(currentGraph);
+                if(o instanceof JSONObject) {
+                    return Response.ok(o.toString()).header("Access-Control-Allow-Origin", "*").build();
+                }
                 JSONObject jsonObject = new JSONObject();
                 if(o instanceof RenderTable) {
                     jsonObject.put("titles",((RenderTable)o).getTitles().toString());

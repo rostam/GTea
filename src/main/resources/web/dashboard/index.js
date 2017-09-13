@@ -2,6 +2,8 @@ var serverAddr = "http://localhost:8008/";
 // var serverAddr = "http://homer.dh.uni-leipzig.de:8008/";
 
 var original_data = {};
+
+var report_results = "";
 $.get(serverAddr + 'graphs/')
     .done(function (data) {
         original_data = data;
@@ -73,9 +75,9 @@ function Report() {
         + ($('#props_keys').html() + ":" + $('#props_vals').val()) + "--"
         + ($('#reportPropsKeys').html() + ":" + $('#reportPropsVals').val()))
         .done(function (data) {
-            $('#reportResults').html(data.results);
-            $('#results-body').html(data.results);
+            report_results = data;
             if (data.titles != undefined) {
+                $('#reportResults').html(JSON.stringify(data));
                 var titles = data.titles.substr(1, data.titles.indexOf("]") - 1);
                 var tts = titles.split(",");
                 var builtHTML = "<table><tr>";
@@ -88,11 +90,19 @@ function Report() {
                     builtHTML += "<tr>";
                     row.forEach(function (col) {
                         builtHTML += "<td>" + col + "</td>";
-                    })
+                    });
                     builtHTML += "</tr>";
                 });
                 builtHTML += "</tr></table>";
                 $('#results-body').html(builtHTML);
+            } else {
+                var res = "";
+                Object.keys(data).forEach(function (t) {
+                    res+= t + ":" + JSON.stringify(data[t]) + ",";
+                });
+                res = res.substr(0,res.length-1);
+                $('#reportResults').html(res);
+                $('#results-body').html(res);
             }
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
@@ -277,4 +287,15 @@ function loadEL() {
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
         });
+}
+
+function showOnGraph() {
+    if(report_results.colors != undefined) {
+        var colors = report_results.colors;
+        cy.nodes().forEach(function (n) {
+            var color = colors[parseInt(n.id())];
+            var actualColor = distinctColors[Object.keys(distinctColors)[color]];
+           n.style('background-color',actualColor);
+        });
+    }
 }

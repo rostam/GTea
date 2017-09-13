@@ -9,6 +9,9 @@ import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.RenderTable;
 import graphtea.graph.graph.Vertex;
 import graphtea.plugins.reports.extension.GraphReportExtension;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.Iterator;
 import java.util.Vector;
@@ -68,8 +71,19 @@ public class GreedyColoring implements GraphReportExtension {
         for(int i : result) {
             if(max < i) max = i;
         }
+        max++;
 
-        return max + 1;
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("num_of_colors",max);
+            JSONArray jsonArray = new JSONArray();
+            for(int i =0; i < result.length;i++) jsonArray.put(result[i]);
+            jsonObject.put("colors",jsonArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return jsonObject;
     }
 
     @Override
