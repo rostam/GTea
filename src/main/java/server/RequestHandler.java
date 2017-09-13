@@ -103,14 +103,16 @@ public class RequestHandler {
         try {
 
             for(String id : ids) {
-                int _source = Character.getNumericValue(id.charAt(0));
-                int _target = Character.getNumericValue(id.charAt(2));
+                String[] sId = id.split(",");
+                int _source = Integer.parseInt(sId[0]);
+                int _target = Integer.parseInt(sId[1]);
+
 
                 Vertex vertex = sessionToGraph.get(sessionID).getVertex(_source);
                 Vertex opposingVertex = sessionToGraph.get(sessionID).getVertex(_target);
 
                 Edge parallelEdge = sessionToGraph.get(sessionID).getEdge(vertex, opposingVertex);
-                System.out.println("Removing: " + parallelEdge);
+                System.out.println("condenseParallelEdges Removing: " + parallelEdge);
                 sessionToGraph.get(sessionID).removeEdge(parallelEdge);
 
             }
