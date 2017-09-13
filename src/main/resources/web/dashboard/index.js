@@ -102,42 +102,42 @@ function Report() {
 }
 
 var cy;
-function Draw() {
+function load_generator(isDraw) {
     var lay = $('#layouts').find('option:selected').text();
     if (lay == "Botanical Tree") {
         drawBotanical();
         return;
     }
-    $.get(serverAddr + 'draw/'
+    server(serverAddr + 'draw/'
         + $('#categories').find('option:selected').text() + "--"
         + $('#reports').find('option:selected').text() + "--" +
-        ($('#props_keys').html() + ":" + $('#props_vals').val()))
-        .done(function (data) {
-            cy = cytoscape({
-                container: document.getElementById('canvas'),
-                style: [ // the stylesheet for the graph
-                    {
-                        selector: 'node',
-                        style: {
-                            'background-color': 'lightgray',
-                            'label': 'data(id)',
-                            'text-valign': 'center'
-                        }
-                    }]
-            });
-            var nodes = data.nodes;
-            var edges = data.edges;
-            cy.elements().remove();
-            cy.add(nodes);
-            cy.add(edges);
-            if (lay == "Preset") {
-                cy.layout({name: 'preset'}).run();
-            } else if (lay == "Force Directed") {
-                cy.layout({name: 'cose'}).run();
+        ($('#props_keys').html() + ":" + $('#props_vals').val()),
+        function (data) {
+            console.log(isDraw + ",  " + data);
+            if (isDraw) {
+                cy = cytoscape({
+                    container: document.getElementById('canvas'),
+                    style: [ // the stylesheet for the graph
+                        {
+                            selector: 'node',
+                            style: {
+                                'background-color': 'lightgray',
+                                'label': 'data(id)',
+                                'text-valign': 'center'
+                            }
+                        }]
+                });
+                var nodes = data.nodes;
+                var edges = data.edges;
+                cy.elements().remove();
+                cy.add(nodes);
+                cy.add(edges);
+                if (lay == "Preset") {
+                    cy.layout({name: 'preset'}).run();
+                } else if (lay == "Force Directed") {
+                    cy.layout({name: 'cose'}).run();
+                }
             }
-        })
-        .fail(function (jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
         });
 }
 
@@ -225,8 +225,7 @@ function selectLoader() {
 
 function load_graph(type,isDraw) {
     var str = $('#'+type+'string').val().replace(/\n/g,"-");
-    $.get(serverAddr + type + '/'+str)
-        .done(function (data) {
+    server(serverAddr + type + '/'+str,function (data) {
             if(isDraw) {
                 cy = cytoscape({
                     container: document.getElementById('canvas'),
@@ -247,9 +246,6 @@ function load_graph(type,isDraw) {
                 cy.add(edges);
                 cy.layout({name: 'cose'}).run();
             }
-        })
-        .fail(function (jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
         });
 }
 
@@ -262,4 +258,12 @@ function showOnGraph() {
            n.style('background-color',actualColor);
         });
     }
+}
+
+function server(url,response) {
+    $.get(url).done(function (data) {
+        response(data);
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        });
 }
