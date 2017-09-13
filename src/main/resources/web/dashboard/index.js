@@ -73,8 +73,8 @@ function Report() {
         + ($('#props_keys').html() + ":" + $('#props_vals').val()) + "--"
         + ($('#reportPropsKeys').html() + ":" + $('#reportPropsVals').val()))
         .done(function (data) {
-            $('#reportResults').html(JSON.stringify(data));
-            $('#results-body').html(JSON.stringify(data));
+            $('#reportResults').html(data.results);
+            $('#results-body').html(data.results);
             if (data.titles != undefined) {
                 var titles = data.titles.substr(1, data.titles.indexOf("]") - 1);
                 var tts = titles.split(",");
@@ -94,7 +94,6 @@ function Report() {
                 builtHTML += "</tr></table>";
                 $('#results-body').html(builtHTML);
             }
-
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -130,7 +129,6 @@ function Draw() {
             cy.elements().remove();
             cy.add(nodes);
             cy.add(edges);
-
             if (lay == "Preset") {
                 cy.layout({name: 'preset'}).run();
             } else if (lay == "Force Directed") {
@@ -274,13 +272,7 @@ function loadEL() {
             cy.elements().remove();
             cy.add(nodes);
             cy.add(edges);
-
-            var lay = $('#layouts').find('option:selected').text();
-            if (lay == "Preset") {
-                cy.layout({name: 'preset'}).run();
-            } else if (lay == "Force Directed") {
-                cy.layout({name: 'cose'}).run();
-            }
+            cy.layout({name: 'cose'}).run();
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
