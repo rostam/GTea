@@ -67,13 +67,19 @@ public class RequestHandler {
         String sessionID = infos[1];
         handleSession(sessionID);
         try {
-            if ((type == "directed") != sessionToGraph.get(sessionID).isDirected()) {//Only change if they differ
+            if ((type.equals("directed")) != sessionToGraph.get(sessionID).isDirected()) {
 
                 if (type.equals("directed")) {
                     sessionToGraph.get(sessionID).setDirected(true);
                 } else if (type.equals("undirected")) {
                     sessionToGraph.get(sessionID).setDirected(false);
                 }
+
+            } else {
+                //Only change if they differ
+                System.out.println("type is not changed ... ");
+                //String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+                return Response.noContent().header("Access-Control-Allow-Origin", "*").build();
 
             }
             String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
@@ -82,6 +88,68 @@ public class RequestHandler {
             e.printStackTrace();
         }
         return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+
+    @GET
+    @Path("/condenseParallelEdges/{info}")
+    public Response condenseParallelEdges(@PathParam("info") String info){
+        System.out.println("condenseParallelEdges");
+        String[] infos = info.split("--");
+        String[] ids = infos[0].split("~~");
+        String sessionID = infos[1];
+        handleSession(sessionID);
+
+        try {
+
+            for(String id : ids) {
+                int _source = Character.getNumericValue(id.charAt(0));
+                int _target = Character.getNumericValue(id.charAt(2));
+
+                Vertex vertex = sessionToGraph.get(sessionID).getVertex(_source);
+                Vertex opposingVertex = sessionToGraph.get(sessionID).getVertex(_target);
+
+                Edge parallelEdge = sessionToGraph.get(sessionID).getEdge(vertex, opposingVertex);
+                System.out.println("Removing: " + parallelEdge);
+                sessionToGraph.get(sessionID).removeEdge(parallelEdge);
+
+            }
+
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+
+
+    }
+
+    @GET
+    @Path("/removeEdge/{info}")
+    public Response removeEdge(@PathParam("info") String info){
+        System.out.println("removeEdge called");
+
+        String[] infos = info.split("--");
+        int sourceID = Integer.parseInt(infos[0]);
+        int targetID = Integer.parseInt(infos[1]);
+        String edgeType = infos[2];
+        String sessionID = infos[3];
+        handleSession(sessionID);
+
+        Vertex _source = sessionToGraph.get(sessionID).getVertex(sourceID);
+        Vertex _target = sessionToGraph.get(sessionID).getVertex(targetID);
+
+        try {
+            Edge _edge = sessionToGraph.get(sessionID).getEdge(_source, _target);
+            sessionToGraph.get(sessionID).removeEdge(_edge);
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+
     }
 
     @GET
@@ -246,11 +314,21 @@ public class RequestHandler {
         String report = infos[1];
         String[] props = infos[2].replaceAll(" ","").split(":");
 
-        String sessionID = infos[3];
+        String type = infos[3];
+        String sessionID = infos[4];
         handleSession(sessionID);
 
         try {
             sessionToGraph.put(sessionID, generateGraph(props, graph));
+
+            if(type.equals("directed")){
+                System.out.println("Directed!!");
+                sessionToGraph.get(sessionID).setDirected(true);
+            } else if (type.equals("undirected")){
+                System.out.println("Undirected!!");
+                sessionToGraph.get(sessionID).setDirected(false);
+            }
+
             String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {

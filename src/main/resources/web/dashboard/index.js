@@ -139,6 +139,7 @@ function clearCanvas() {
             cy.elements().remove();
             cy.add(nodes);
             cy.add(edges);
+
             nodeId = 0;
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
@@ -202,24 +203,42 @@ function addSingleEdge(source, target) {
         });
 }
 
-function deleteSingleEdge() {
+function removeSingleEdge(edge) {
     console.log("drawing single vertex");
+    //console.log(edge);
+
+    var sourceID = edge.source().id();
+    var targetID = edge.target().id();
+
+    $.get(serverAddr + 'removeEdge/'
+        + sourceID + "--"
+        + targetID + "--"
+        + "none" + "--"
+        + uuid
+    ).done(function (data) {
+        console.log("Removed edge");
+        cy.remove(edge);
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        alert(errorThrown);
+    });
 }
 
 /**
  * Updates the graph type to either directed or undirected
  * */
+var test = 0;
 function selectType() {
+
     var type = $('#graphType').find('option:selected').text();
 
-    if(type == 'directed') {
+    if (type === 'directed') {
         cy.style()
             .selector('edge')
             .css({
                 'curve-style': 'bezier',
                 'target-arrow-shape': directed
             })
-    } else if(type == "undirected") {
+    } else if (type === "undirected") {
         cy.style()
             .selector('edge')
             .css({
@@ -231,13 +250,22 @@ function selectType() {
         + type
         + "--" + uuid)
         .done(function (data) {
+            if(data == null){
+                // The type was not different, so ignore.
+                console.log("type was not changed");
+                return;
+            }
+
             var nodes = data.nodes;
             var edges = data.edges;
+
+            smoothParallelEdges(edges);
 
             cy.elements().remove();
             cy.add(nodes);
             cy.add(edges);
             applyLayout();
+
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -248,6 +276,7 @@ function selectType() {
 
 function Draw() {
     var lay = $('#layouts').find('option:selected').text();
+    var type = $('#graphType').find('option:selected').text();
     if (lay == "Botanical Tree") {
         drawBotanical();
         return;
@@ -256,6 +285,7 @@ function Draw() {
         + $('#categories').find('option:selected').text() + "--"
         + $('#reports').find('option:selected').text() + "--" +
         ($('#props_keys').html() + ":" + $('#props_vals').val())
+        + "--" + type
         + "--" + uuid)
         .done(function (data) {
             nodeId = 0; //resets counter for freehand vertices
@@ -291,9 +321,6 @@ cy.on('tap', function(event) {
         }
         console.log("Clicked a node");
     }
-    else if (evtTarget.isEdge()) {
-
-    }
 });
 
 cy.on('cxttapend', 'node', function(event) {
@@ -301,9 +328,15 @@ cy.on('cxttapend', 'node', function(event) {
     if(evtTarget.isNode){
         removeSingleVertex(evtTarget);
     }
-
 });
 
+cy.on('cxttapend', 'edge', function(event) {
+    var evtTarget = event.target;
+    if(evtTarget.isEdge){
+        console.log("clicked edge!");
+        removeSingleEdge(evtTarget);
+    }
+});
 
 cy.on('layoutstop', function() {
     cy.maxZoom(2.5);
@@ -436,6 +469,69 @@ function applyLayout(){
     } else if (lay == "Force Directed") {
         cy.layout({name: 'cose'}).run();
     }
+}
+
+function findParallels(element, v){
+
+    if(element.isEdge()) {
+        var trg = cy.$("#" + element.data().target);
+
+        if(v.edgesWith(trg).length >= 2){
+
+            var pEdge = cy.$("#" + trg.id()).edgesTo(v).id();
+            var iEdge = element.data().id;
+
+            if(parallels.includes(iEdge) || parallels.includes(pEdge)){
+                return;
+            }
+            parallels.push(iEdge);
+
+        }
+    }
+
+}
+
+var parallels = [];
+function smoothParallelEdges(edges){
+    parallels = [];
+
+    var _root = cy.$('#0');
+    BFSrun(_root, findParallels);
+
+    if(parallels.length > 0) {
+
+        var str = "", sArr = [];
+        var len = parallels.length
+        for (var i = len; i > 0; i--) {
+            var edge = parallels.pop();
+            sArr[i] = edge + "~~";
+        }
+        str = sArr.join("");
+        console.log(str);
+
+        $.get(serverAddr + 'condenseParallelEdges/'
+            + str + "--"
+            + uuid
+        ).done(function (_data) {
+            // TODO: Fix so JSON is returned from handler
+            var data = JSON.parse(_data)
+
+            var nodes = data.nodes;
+            var curEdges = data.edges;
+
+            // TODO: Below is also run when this function returns, it would be best to only be called once.
+            cy.elements().remove();
+            cy.add(nodes);
+            cy.add(curEdges);
+            applyLayout();
+            //
+
+            return curEdges;
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        });
+    }
+
 }
 
 
