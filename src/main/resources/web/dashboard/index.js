@@ -203,7 +203,7 @@ function removeSingleVertex(node) {
             cy.remove(node);
             //nodeId--;
             setVertexIds();
-            applyLayout(); // TODO: Don't apply layout if no vertices left (apply conditional)
+            applyLayout();
 
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
@@ -277,7 +277,7 @@ function selectType() {
         + type
         + "--" + uuid)
         .done(function (data) {
-            if(data === null){
+            if(data == null){
                 // The type was not different, so ignore.
                 console.log("type was not changed");
                 return;
