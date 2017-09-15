@@ -152,13 +152,13 @@ function clearCanvas() {
         });
 }
 
+/*
+ * This function is for resetting the labels of the vertices, since we
+ * use the labels as ids to send to the backend, and the backend flattens the
+ * ids of the vertices when one of them is removed.
+ */
 function setVertexIds() {
-    /*
-    This function is for resetting the labels of the vertices, since we
-    use the labels as ids to send to the backend, and the backend flattens the
-    ids of the vertices when one of them is removed.
-     */
-    var lowestId = 0;
+   var lowestId = 0;
     var len = cy.nodes().length;
     for (var i = 0; i < nodeId; i++) {
         if (cy.$('#' + i).length > 0) {
@@ -218,9 +218,6 @@ function removeSingleVertex(node) {
 
 
 function addSingleEdge(source, target) {
-    // TODO: Break out if edge already exists
-
-
     $.get(serverAddr + 'addEdge/'
         + source + "--" + target
         + "--" + uuid)
@@ -239,8 +236,6 @@ function addSingleEdge(source, target) {
 /**
  * */
 function removeSingleEdge(edge) {
-    console.log("drawing single vertex");
-
     var sourceID = edge.source().id();
     var targetID = edge.target().id();
 
@@ -250,7 +245,6 @@ function removeSingleEdge(edge) {
         + "none" + "--"
         + uuid
     ).done(function (data) {
-        console.log("Removed edge");
         cy.remove(edge);
     }).fail(function (jqXHR, textStatus, errorThrown) {
         alert(errorThrown);
@@ -285,7 +279,6 @@ function selectType() {
         .done(function (data) {
             if(data == null){
                 // The type was not different, so ignore.
-                console.log("type was not changed");
                 return;
             }
 
@@ -362,12 +355,10 @@ cy.on('tap', function(event) {
 
             selectedNode = null;
         }
-        console.log("Clicked a node");
     }
 });
 
 cy.on('cxttapend', 'node', function(event) {
-    console.log("Remove vertex clicked");
     var evtTarget = event.target;
     //if(evtTarget.isNode){
         removeSingleVertex(evtTarget);
@@ -378,7 +369,6 @@ cy.on('cxttapend', 'node', function(event) {
 cy.on('cxttapend', 'edge', function(event) {
     var evtTarget = event.target;
     if(evtTarget.isEdge){
-        console.log("clicked edge!");
         removeSingleEdge(evtTarget);
     }
 });
@@ -472,6 +462,10 @@ function loadG6() {
         });
 }
 
+
+/*
+ * Generates a random string used for client identification.
+ */
 function guid() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -529,16 +523,14 @@ function smoothParallelEdges(){
     var _root = cy.$('#0');
     var rt = BFSrun(_root, findParallels);
 
-    // Run the BFS on all components.  This could be refactored to be more efficient.
-    for(var i=0; i<rt.length-1 ;i++) {
-        for (var j = 0; j < cy.elements().length-1; j++) {
-            if (rt[i].id() === cy.$('#' + j).id()) {
-                // Do nothing
-            } else {
-                // run BFS on non-connected component
+    // Runs BFS on all components, this could be refactored to run quicker.
+    for(var j =0; j < cy.elements().length-1; j++) {
+        if (rt[j] != null) {
+            if (rt[j].id() !== cy.$('#' + j).id()) {
                 BFSrun(cy.$('#' + j), findParallels);
-                break;
             }
+        } else {
+            BFSrun(cy.$('#' + j), findParallels);
         }
     }
 
@@ -552,7 +544,6 @@ function smoothParallelEdges(){
             sArr[i] = edge + "~~";
         }
         str = sArr.join("");
-        console.log(str);
 
         $.get(serverAddr + 'condenseParallelEdges/'
             + str + "--"
