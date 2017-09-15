@@ -90,7 +90,15 @@ public class RequestHandler {
         return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
     }
 
-
+    /**
+     *  Condenses all parallell edges into a singular edge,
+     *  ids contains all of the edges that have a parallel edge.
+     *  Those edges are then deleted and the remaining edges become undirected.
+     *
+     * @param info string containing the vertex ID and the session ID string name
+     * @return Response containing the graph as a JSON, in cytoscape conform format.
+     * @throws JSONException if JSON creation fails
+     */
     @GET
     @Path("/condenseParallelEdges/{info}")
     public Response condenseParallelEdges(@PathParam("info") String info){
@@ -127,6 +135,13 @@ public class RequestHandler {
 
     }
 
+    /**
+     * Deletes a particular edge by the source vertex ID and target vertex ID
+     *
+     * @param info string containing the source vertex ID, target vertex ID and the session ID string name
+     * @return Response containing the graph as a JSON, in cytoscape conform format.
+     * @throws JSONException if JSON creation fails
+     */
     @GET
     @Path("/removeEdge/{info}")
     public Response removeEdge(@PathParam("info") String info){
@@ -154,21 +169,13 @@ public class RequestHandler {
 
     }
 
-    @GET
-    @Path("/moveVertex/{info}")
-    public Response moveVertex(@PathParam("info") String info){
-        String[] infos = info.split("--");
-        Double xPos = Double.parseDouble(infos[0]);
-        Double yPos = Double.parseDouble(infos[1]);
-        int vertexID = Integer.parseInt(infos[2]);
-        String sessionID = infos[3];
-        handleSession(sessionID);
-
-        sessionToGraph.get(sessionID).getVertex(vertexID).setLocation(new GPoint(xPos, yPos));
-
-        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
-    }
-
+    /**
+     * Adds a vertex into the graph
+     *
+     * @param info string containing the ID of the new vertex, position on the x-axis, y-axis and the session ID string name
+     * @return Response containing the graph as a JSON, in cytoscape conform format.
+     * @throws JSONException if JSON creation fails
+     */
     @GET
     @Path("/addVertex/{info}")
     @Produces("application/json;charset=utf-8")
@@ -194,6 +201,13 @@ public class RequestHandler {
         return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
     }
 
+    /**
+     * Deletes a particular vertex (and subsequently all of its edges) by ID
+     *
+     * @param info string containing the vertex ID and the session ID string name
+     * @return Response containing the graph as a JSON, in cytoscape conform format.
+     * @throws JSONException if JSON creation fails
+     */
     @GET
     @Path("/remove/{info}")
     public Response deleteVertex(@PathParam("info") String info) {
@@ -219,6 +233,13 @@ public class RequestHandler {
 
     }
 
+    /**
+     * Deletes all edges and vertices of the current graph
+     *
+     * @param info string containing the session ID string name
+     * @return Response containing the graph as a JSON, in cytoscape conform format.
+     * @throws JSONException if JSON creation fails
+     */
     @GET
     @Path("/clear/{info}")
     @Produces("application/json;charset=utf-8")
@@ -236,6 +257,13 @@ public class RequestHandler {
         return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
     }
 
+    /**
+     * Adds a single edge between two given vertices
+     *
+     * @param info string containing the ID of the source vertex, target vertex and the session ID string name
+     * @return Response containing the graph as a JSON, in cytoscape conform format.
+     * @throws JSONException if JSON creation fails
+     */
     @GET
     @Path("/addEdge/{info}")
     @Produces("application/json;charset=utf-8")
