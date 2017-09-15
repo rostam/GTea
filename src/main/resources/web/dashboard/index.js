@@ -152,13 +152,13 @@ function clearCanvas() {
         });
 }
 
+/*
+ * This function is for resetting the labels of the vertices, since we
+ * use the labels as ids to send to the backend, and the backend flattens the
+ * ids of the vertices when one of them is removed.
+ */
 function setVertexIds() {
-    /*
-    This function is for resetting the labels of the vertices, since we
-    use the labels as ids to send to the backend, and the backend flattens the
-    ids of the vertices when one of them is removed.
-     */
-    var lowestId = 0;
+   var lowestId = 0;
     var len = cy.nodes().length;
     for (var i = 0; i < nodeId; i++) {
         if (cy.$('#' + i).length > 0) {
@@ -218,9 +218,6 @@ function removeSingleVertex(node) {
 
 
 function addSingleEdge(source, target) {
-    // TODO: Break out if edge already exists
-
-
     $.get(serverAddr + 'addEdge/'
         + source + "--" + target
         + "--" + uuid)
@@ -463,7 +460,9 @@ function loadG6() {
         });
 }
 
-
+/*
+ * Generates a random string used for client identification.
+ */
 function guid() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -509,6 +508,7 @@ function findParallels(element, v){
     }
 
 }
+
 
 function smoothParallelEdges(){
     parallels = [];
