@@ -1,6 +1,6 @@
 var serverAddr = "http://localhost:2342/";
 var nodeId = 0;
-var edgeId = -1;
+//var edgeId = -1;
 var cy; //cytoscape object
 var selectedNode;
 var uuid = guid();
@@ -207,19 +207,17 @@ function removeSingleVertex(node) {
 
 
 function addSingleEdge(source, target) {
+    // TODO: Break out if edge already exists
+
+
     $.get(serverAddr + 'addEdge/'
         + source + "--" + target
         + "--" + uuid)
         .done(function (data) {
             var edges = data.edges;
             var nodes = data.nodes;
-            cy.elements().remove();
 
-            cy.add(nodes);
-            cy.add(edges);
-
-            //console.log(nodes);
-            applyLayout();
+            reload(nodes, edges);
 
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
@@ -250,7 +248,6 @@ function removeSingleEdge(edge) {
 /**
  * Updates the graph type to either directed or undirected
  * */
-var test = 0;
 function selectType() {
 
     var type = $('#graphType').find('option:selected').text();
@@ -274,7 +271,7 @@ function selectType() {
         + type
         + "--" + uuid)
         .done(function (data) {
-            if(data == null){
+            if(data === null){
                 // The type was not different, so ignore.
                 console.log("type was not changed");
                 return;
@@ -285,10 +282,8 @@ function selectType() {
 
             smoothParallelEdges(edges);
 
-            cy.elements().remove();
-            cy.add(nodes);
-            cy.add(edges);
-            applyLayout();
+            reload(nodes, edges);
+
 
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
@@ -337,13 +332,7 @@ cy.on('tap', function(event) {
         if (selectedNode == null) {
             selectedNode = evtTarget;
 
-            /*var label = selectedNode.data('label');
-            var id = selectedNode.data('id');
-            console.log("label: ", label);
-            console.log("id: ", id);*/
-
             cy.$('#'+selectedNode.data('id')).classes('selected');
-            //cy.$('#'+selectedNode.data('label')).classes('selected');
         }
         else {
             console.log(selectedNode.data('label'), evtTarget.data('label'));
@@ -476,7 +465,7 @@ function guid() {
     var y = n.data("y");
  });
 
-var preset = {
+/*var preset = {
   name: 'preset',
 
   positions: undefined, // map of (node id) => (position obj); or function(node){ return somPos; }
@@ -491,7 +480,7 @@ var preset = {
   ready: undefined, // callback on layoutready
   stop: undefined, // callback on layoutstop
   transform: function (node, position ){ return position; } // transform a given node position. Useful for changing flow direction in discrete layouts
-};
+};*/
 
 function applyLayout(){
     var lay = $('#layouts').find('option:selected').text();
@@ -552,11 +541,7 @@ function smoothParallelEdges(edges){
             var curEdges = data.edges;
 
             // TODO: Below is also run when this function returns, it would be best to only be called once.
-            cy.elements().remove();
-            cy.add(nodes);
-            cy.add(curEdges);
-            applyLayout();
-            //
+            reload(nodes, curEdges);
 
             return curEdges;
         }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -565,6 +550,23 @@ function smoothParallelEdges(edges){
     }
 
 }
+
+var reload = function(nodes, edges){
+    //console.log("nodes: ", nodes, "edges: ", edges);
+    if(nodes === null || edges == null){
+        return;
+    }
+
+    cy.batch(function(){
+        cy.elements().remove();
+        cy.add(nodes);
+        cy.add(edges);
+        applyLayout();
+    });
+    setTimeout(reload, 1000);
+
+};
+
 
 
 
