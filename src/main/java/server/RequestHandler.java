@@ -58,6 +58,13 @@ public class RequestHandler {
         return new GraphModel();
     }
 
+    /**
+     * Switches the type of graph to directed or undirected,
+     * @param info string containing the vertex ID and the session ID string name
+     * @return Response containing the graph as a JSON, in cytoscape conform format,
+     *  or noContent if type shouldn't be changed
+     * @throws JSONException if JSON creation fails
+     * */
     @GET
     @Path("/selectType/{info}")
     @Produces("application/json;charset=utf-8")
@@ -76,9 +83,7 @@ public class RequestHandler {
                 }
 
             } else {
-                //Only change if they differ
-                System.out.println("type is not changed ... ");
-                //String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+                // Only change if types differ
                 return Response.noContent().header("Access-Control-Allow-Origin", "*").build();
 
             }
@@ -91,7 +96,7 @@ public class RequestHandler {
     }
 
     /**
-     *  Condenses all parallell edges into a singular edge,
+     *  Condenses all parallel edges into a singular edge,
      *  ids contains all of the edges that have a parallel edge.
      *  Those edges are then deleted and the remaining edges become undirected.
      *
@@ -120,7 +125,6 @@ public class RequestHandler {
                 Vertex opposingVertex = sessionToGraph.get(sessionID).getVertex(_target);
 
                 Edge parallelEdge = sessionToGraph.get(sessionID).getEdge(vertex, opposingVertex);
-                //System.out.println("condenseParallelEdges Removing: " + parallelEdge);
                 sessionToGraph.get(sessionID).removeEdge(parallelEdge);
 
             }
