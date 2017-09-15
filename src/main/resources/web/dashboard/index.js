@@ -237,9 +237,6 @@ function addSingleEdge(source, target) {
 }
 
 function removeSingleEdge(edge) {
-    console.log("drawing single vertex");
-    //console.log(edge);
-
     var sourceID = edge.source().id();
     var targetID = edge.target().id();
 
@@ -249,7 +246,6 @@ function removeSingleEdge(edge) {
         + "none" + "--"
         + uuid
     ).done(function (data) {
-        console.log("Removed edge");
         cy.remove(edge);
     }).fail(function (jqXHR, textStatus, errorThrown) {
         alert(errorThrown);
@@ -284,7 +280,6 @@ function selectType() {
         .done(function (data) {
             if(data == null){
                 // The type was not different, so ignore.
-                console.log("type was not changed");
                 return;
             }
 
@@ -361,12 +356,10 @@ cy.on('tap', function(event) {
 
             selectedNode = null;
         }
-        console.log("Clicked a node");
     }
 });
 
 cy.on('cxttapend', 'node', function(event) {
-    console.log("Remove vertex clicked");
     var evtTarget = event.target;
     //if(evtTarget.isNode){
         removeSingleVertex(evtTarget);
@@ -377,7 +370,6 @@ cy.on('cxttapend', 'node', function(event) {
 cy.on('cxttapend', 'edge', function(event) {
     var evtTarget = event.target;
     if(evtTarget.isEdge){
-        console.log("clicked edge!");
         removeSingleEdge(evtTarget);
     }
 });
@@ -533,7 +525,6 @@ function smoothParallelEdges(){
             sArr[i] = edge + "~~";
         }
         str = sArr.join("");
-        console.log(str);
 
         $.get(serverAddr + 'condenseParallelEdges/'
             + str + "--"
