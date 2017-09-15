@@ -75,7 +75,7 @@ public class RequestHandler {
         handleSession(sessionID);
         try {
             if ((type.equals("directed")) != sessionToGraph.get(sessionID).isDirected()) {
-
+                sessionToGraph.get(sessionID).clear();
                 if (type.equals("directed")) {
                     sessionToGraph.get(sessionID).setDirected(true);
                 } else if (type.equals("undirected")) {
@@ -107,7 +107,6 @@ public class RequestHandler {
     @GET
     @Path("/condenseParallelEdges/{info}")
     public Response condenseParallelEdges(@PathParam("info") String info){
-        System.out.println("condenseParallelEdges");
         String[] infos = info.split("--");
         String[] ids = infos[0].split("~~");
         String sessionID = infos[1];
@@ -149,8 +148,6 @@ public class RequestHandler {
     @GET
     @Path("/removeEdge/{info}")
     public Response removeEdge(@PathParam("info") String info){
-        System.out.println("removeEdge called");
-
         String[] infos = info.split("--");
         int sourceID = Integer.parseInt(infos[0]);
         int targetID = Integer.parseInt(infos[1]);
@@ -197,7 +194,6 @@ public class RequestHandler {
         try {
             sessionToGraph.get(sessionID).insertVertex(vertex);
             String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
-            System.out.println("adding vertex");
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -224,9 +220,6 @@ public class RequestHandler {
             sessionToGraph.get(sessionID).deleteVertex(v);
 
             Iterable<Vertex> vi = sessionToGraph.get(sessionID).vertices();
-            for (Vertex i : vi) {
-                System.out.println(i);
-            }
 
             String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
@@ -250,7 +243,6 @@ public class RequestHandler {
     public Response clear(@PathParam("info") String info) {
         String[] infos = info.split("--");
         String sessionID = infos[0];
-        System.out.println("removing: " + sessionID);
         try {
             sessionToGraph.get(sessionID).clear();
             String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
@@ -285,7 +277,6 @@ public class RequestHandler {
             Edge edge = new Edge(source, target);
             sessionToGraph.get(sessionID).insertEdge(edge);
             String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
-            System.out.println("adding edge");
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -529,7 +520,6 @@ public class RequestHandler {
     }
 
     private void handleSession(String sessionID) {
-        System.out.println(sessionID);
         if(!sessionToGraph.containsKey(sessionID)){
             sessionToGraph.put(sessionID, new GraphModel());
         }
