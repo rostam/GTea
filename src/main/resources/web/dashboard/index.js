@@ -5,6 +5,7 @@ var cy; //cytoscape object
 var selectedNode;
 var uuid = guid();
 var directed = 'triangle', undirected = 'none';
+var parallels = [];
 
 initCytoscape(directed);
 
@@ -130,6 +131,11 @@ function initCytoscape(arrow) {
     });
 }
 
+/*
+ * Sends a request to the backend to delete all vertices
+ * and edges from the current graph, then reloads the
+ * graph
+ */
 function clearCanvas() {
     $.get(serverAddr + 'clear/'
         + uuid)
@@ -512,7 +518,6 @@ function findParallels(element, v){
 
 }
 
-var parallels = [];
 function smoothParallelEdges(edges){
     parallels = [];
 
