@@ -75,7 +75,6 @@ public class RequestHandler {
         handleSession(sessionID);
         try {
             if ((type.equals("directed")) != sessionToGraph.get(sessionID).isDirected()) {
-                sessionToGraph.get(sessionID).clear();
                 if (type.equals("directed")) {
                     sessionToGraph.get(sessionID).setDirected(true);
                 } else if (type.equals("undirected")) {
