@@ -236,9 +236,10 @@ function addSingleEdge(source, target) {
         });
 }
 
+/**
+ * */
 function removeSingleEdge(edge) {
     console.log("drawing single vertex");
-    //console.log(edge);
 
     var sourceID = edge.source().id();
     var targetID = edge.target().id();
@@ -471,7 +472,6 @@ function loadG6() {
         });
 }
 
-
 function guid() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -498,6 +498,8 @@ function applyLayout(){
     }
 }
 
+/**
+ * Finds if an edge is parallel */
 function findParallels(element, v){
 
     if(element.isEdge()) {
@@ -518,11 +520,28 @@ function findParallels(element, v){
 
 }
 
+/**
+ * Finds all edges that are parallel and 'smooths' them down into one edge.
+ * */
 function smoothParallelEdges(){
     parallels = [];
 
     var _root = cy.$('#0');
-    BFSrun(_root, findParallels);
+    var rt = BFSrun(_root, findParallels);
+
+    // Run the BFS on all components.  This could be refactored to be more efficient.
+    for(var i=0; i<rt.length-1 ;i++) {
+        for (var j = 0; j < cy.elements().length-1; j++) {
+            if (rt[i].id() === cy.$('#' + j).id()) {
+                // Do nothing
+            } else {
+                // run BFS on non-connected component
+                BFSrun(cy.$('#' + j), findParallels);
+                break;
+            }
+        }
+    }
+
 
     if(parallels.length > 0) {
 
@@ -542,12 +561,10 @@ function smoothParallelEdges(){
             // TODO: Fix so JSON is returned from handler
             var data = JSON.parse(_data)
 
-            var nodes = data.nodes;
-            var curEdges = data.edges;
+            var edges = data.edges;
+            cy.edges().remove();
+            cy.add(edges);
 
-            reload(nodes, curEdges);
-
-            return curEdges;
         }).fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
         });
@@ -555,9 +572,12 @@ function smoothParallelEdges(){
 
 }
 
+/**
+ * Reloads the nodes and edges in cytoscape
+ * */
 var reload = function(nodes, edges){
 
-    if(nodes === null || edges == null){
+    if(nodes == null || edges == null){
         return;
     }
 
