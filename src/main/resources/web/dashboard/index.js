@@ -195,6 +195,11 @@ function addSingleVertex() {
 }
 
 function removeSingleVertex(node) {
+    if(node === selectedNode) {
+        cy.$('#'+selectedNode.data('id')).classes('node');
+        selectedNode = null;
+    }
+
     $.get(serverAddr + 'remove/'
         + node.data('label')
         + "--" + uuid)
@@ -331,19 +336,29 @@ function Draw() {
 cy.on('tap', function(event) {
     var evtTarget = event.target;
 
+    if(evtTarget === selectedNode) {
+        // If node is already selected, deselect the node
+        cy.$('#'+selectedNode.data('id')).classes('node');
+        selectedNode = null;
+        return;
+    }
+
     if (evtTarget === cy) {
         addSingleVertex(event);
     }
     else if (evtTarget.isNode()) {
         if (selectedNode == null) {
+            // Update the selectedNode and change the color of it
             selectedNode = evtTarget;
-
             cy.$('#'+selectedNode.data('id')).classes('selected');
+
         }
         else {
-            console.log(selectedNode.data('label'), evtTarget.data('label'));
+            // Adds an edge between the selected node and the newly selected node.
+            // Resets the color.
             addSingleEdge(selectedNode.data('label'), evtTarget.data('label'));
             cy.$('#'+selectedNode.data('label')).classes('node');
+
             selectedNode = null;
         }
         console.log("Clicked a node");
@@ -351,10 +366,12 @@ cy.on('tap', function(event) {
 });
 
 cy.on('cxttapend', 'node', function(event) {
+    console.log("Remove vertex clicked");
     var evtTarget = event.target;
-    if(evtTarget.isNode){
+    //if(evtTarget.isNode){
         removeSingleVertex(evtTarget);
-    }
+    //}
+
 });
 
 cy.on('cxttapend', 'edge', function(event) {
@@ -471,23 +488,6 @@ function guid() {
     var y = n.data("y");
  });
 
-/*var preset = {
-  name: 'preset',
-
-  positions: undefined, // map of (node id) => (position obj); or function(node){ return somPos; }
-  zoom: undefined, // the zoom level to set (prob want fit = false if set)
-  pan: undefined, // the pan level to set (prob want fit = false if set)
-  fit: true, // whether to fit to viewport
-  padding: 30, // padding on fit
-  animate: false, // whether to transition the node positions
-  animationDuration: 500, // duration of animation in ms if enabled
-  animationEasing: undefined, // easing of animation if enabled
-  animateFilter: function ( node, i ){ return true; }, // a function that determines whether the node should be animated.  All nodes animated by default on animate enabled.  Non-animated nodes are positioned immediately when the layout starts
-  ready: undefined, // callback on layoutready
-  stop: undefined, // callback on layoutstop
-  transform: function (node, position ){ return position; } // transform a given node position. Useful for changing flow direction in discrete layouts
-};*/
-
 function applyLayout(){
     var lay = $('#layouts').find('option:selected').text();
     if (lay == "Preset") {
@@ -518,7 +518,7 @@ function findParallels(element, v){
 
 }
 
-function smoothParallelEdges(edges){
+function smoothParallelEdges(){
     parallels = [];
 
     var _root = cy.$('#0');
@@ -545,7 +545,6 @@ function smoothParallelEdges(edges){
             var nodes = data.nodes;
             var curEdges = data.edges;
 
-            // TODO: Below is also run when this function returns, it would be best to only be called once.
             reload(nodes, curEdges);
 
             return curEdges;
@@ -557,7 +556,7 @@ function smoothParallelEdges(edges){
 }
 
 var reload = function(nodes, edges){
-    //console.log("nodes: ", nodes, "edges: ", edges);
+
     if(nodes === null || edges == null){
         return;
     }
