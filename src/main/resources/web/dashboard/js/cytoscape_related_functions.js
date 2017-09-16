@@ -35,7 +35,7 @@ function initCytoscape(arrow) {
             {
                 selector: '.selected',
                 style: {
-                    'background-color': 'blue',
+                    'background-color': 'rgb(0,0,255,0.5)',
                     'label': 'data(label)',
                     'text-valign': 'center'
                 }
