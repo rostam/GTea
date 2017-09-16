@@ -1,4 +1,6 @@
 var serverAddr;
+var uuid;
+var parallels = [];
 
 /**
  * Finds if an edge is parallel */
@@ -21,8 +23,9 @@ function findParallels(element, v){
     }
 }
 
-function initCytoscape(arrow, _serverAddr) {
+function initCytoscape(arrow, _serverAddr, _uuid) {
     serverAddr = _serverAddr;
+    uuid = _uuid;
 
     cy = cytoscape({
         container: document.getElementById('canvas'),
@@ -284,4 +287,17 @@ var reload = function(nodes, edges){
     });
     setTimeout(reload, 1000);
 };
+
+function clearCanvas(){
+    console.log("Clear");
+
+    $.get(serverAddr + 'clear/'
+        + uuid
+    ).done(function (data) {
+        reload(data.nodes, data.edges);
+
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        alert(errorThrown);
+    });
+}
 

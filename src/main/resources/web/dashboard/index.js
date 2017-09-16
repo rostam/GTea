@@ -4,10 +4,10 @@ var cy; //cytoscape object
 var selectedNode;
 var uuid = guid();
 var directed = 'triangle', undirected = 'none';
-var parallels = [];
+//var parallels = [];
 var report_results;
 
-initCytoscape(undirected, serverAddr);
+initCytoscape(undirected, serverAddr, uuid);
 
 var original_data = {};
 $.get(serverAddr + 'graphs/')
