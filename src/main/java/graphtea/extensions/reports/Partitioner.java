@@ -133,7 +133,6 @@ public class Partitioner {
         curSet--;
         set[vid] = false;
 
-
         for (i = 0; i < ss; i++) {
             mark[nv[i]] = markbck[i];
         }
@@ -146,7 +145,6 @@ public class Partitioner {
         findMaxIndSetsRecursively(iiv);
         //////////////////////////////////
     }
-
 
     public boolean findAllPartitionings(final int t, final ColoringListener listener) {
         color = new int[vertices.length];

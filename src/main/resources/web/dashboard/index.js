@@ -1,4 +1,4 @@
-var serverAddr = "http://localhost:2342/";
+var serverAddr = "http://0.0.0.0:2342/";
 var nodeId = 0;
 //var edgeId = -1;
 var cy; //cytoscape object
@@ -6,8 +6,9 @@ var selectedNode;
 var uuid = guid();
 var directed = 'triangle', undirected = 'none';
 var parallels = [];
+var report_results;
 
-initCytoscape(directed);
+initCytoscape(undirected);
 
 var original_data = {};
 $.get(serverAddr + 'graphs/')
@@ -72,9 +73,9 @@ function Report() {
         + ($('#reportPropsKeys').html() + ":" + $('#reportPropsVals').val())
         + "--" + uuid)
         .done(function (data) {
-            $('#reportResults').html(JSON.stringify(data));
-//                $('#results-body').html(JSON.stringify(data));
+            report_results = data;
             if (data.titles != undefined) {
+                $('#reportResults').html(JSON.stringify(data));
                 var titles = data.titles.substr(1, data.titles.indexOf("]") - 1);
                 var tts = titles.split(",");
                 var builtHTML = "<table><tr>";
@@ -92,6 +93,14 @@ function Report() {
                 });
                 builtHTML += "</tr></table>";
                 $('#results-body').html(builtHTML);
+            } else {
+                var res = "";
+                Object.keys(data).forEach(function (t) {
+                    res+= t + ":" + JSON.stringify(data[t]) + ",";
+                });
+                res = res.substr(0,res.length-1);
+                $('#reportResults').html(res);
+                $('#results-body').html(res);
             }
 
         })
@@ -100,231 +109,31 @@ function Report() {
         });
 }
 
-
-function initCytoscape(arrow) {
-     cy = cytoscape({
-        container: document.getElementById('canvas'),
-        style: [ // the stylesheet for the graph
-            {
-                selector: 'node',
-                style: {
-                    'background-color': 'lightgray',
-                    'label': 'data(label)',
-                    'text-valign': 'center'
-                }
-            },
-            {
-                selector: '.selected',
-                style: {
-                    'background-color': 'blue',
-                    'label': 'data(label)',
-                    'text-valign': 'center'
-                }
-            },
-            {
-                selector: 'edge',
-                style: {
-                    'curve-style': 'bezier',
-                    'target-arrow-shape': arrow
-                }
-            }]
-    });
-}
-
-/*
- * Sends a request to the backend to delete all vertices
- * and edges from the current graph, then reloads the
- * graph
- */
-function clearCanvas() {
-    $.get(serverAddr + 'clear/'
-        + uuid)
-        .done(function(data) {
-            var edges = data.edges;
-            var nodes = data.nodes;
-            cy.elements().remove();
-            cy.add(nodes);
-            cy.add(edges);
-            //nodeId = 0;
-        })
-        .fail(function (jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
-        });
-}
-
-/*
- * This function is for resetting the labels of the vertices, since we
- * use the labels as ids to send to the backend, and the backend flattens the
- * ids of the vertices when one of them is removed.
- */
-function setVertexIds() {
-   var lowestId = 0;
-    var len = cy.nodes().length;
-    for (var i = 0; i < nodeId; i++) {
-        if (cy.$('#' + i).length > 0) {
-            cy.$('#' + i).data('label', lowestId);
-            lowestId++;
-        }
-    }
-
-}
-
-function addSingleVertex() {
-    var offset = $('#canvas').offset();
-    var xPos = event.pageX - offset.left;
-    var yPos = event.pageY - offset.top;
-
-    $.get(serverAddr + 'addVertex/'
-        + nodeId + "--" + xPos + "--" + yPos
-        + "--" + uuid)
-        .done(function (data) {
-
-            cy.add({
-                data: {id: nodeId, label: nodeId},
-                renderedPosition: {x: xPos, y: yPos}
-            });
-
-            nodeId++;
-            setVertexIds();
-
-        })
-        .fail(function (jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
-        });
-
-}
-
-function removeSingleVertex(node) {
-    if(node === selectedNode) {
-        cy.$('#'+selectedNode.data('id')).classes('node');
-        selectedNode = null;
-    }
-
-    $.get(serverAddr + 'remove/'
-        + node.data('label')
-        + "--" + uuid)
-        .done(function (data) {
-
-            cy.remove(node);
-            //nodeId--;
-            setVertexIds();
-            applyLayout();
-
-        })
-        .fail(function (jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
-        });
-}
-
-
-function addSingleEdge(source, target) {
-    $.get(serverAddr + 'addEdge/'
-        + source + "--" + target
-        + "--" + uuid)
-        .done(function (data) {
-            var edges = data.edges;
-            var nodes = data.nodes;
-
-            reload(nodes, edges);
-
-        })
-        .fail(function (jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
-        });
-}
-
-/**
- * */
-function removeSingleEdge(edge) {
-    var sourceID = edge.source().id();
-    var targetID = edge.target().id();
-
-    $.get(serverAddr + 'removeEdge/'
-        + sourceID + "--"
-        + targetID + "--"
-        + "none" + "--"
-        + uuid
-    ).done(function (data) {
-        cy.remove(edge);
-    }).fail(function (jqXHR, textStatus, errorThrown) {
-        alert(errorThrown);
-    });
-}
-
-/**
- * Updates the graph type to either directed or undirected
- * */
-function selectType() {
-
-    var type = $('#graphType').find('option:selected').text();
-
-    if (type === 'directed') {
-        cy.style()
-            .selector('edge')
-            .css({
-                'curve-style': 'bezier',
-                'target-arrow-shape': directed
-            })
-    } else if (type === "undirected") {
-        cy.style()
-            .selector('edge')
-            .css({
-                'target-arrow-shape': undirected
-            })
-    }
-
-    $.get(serverAddr + 'selectType/'
-        + type
-        + "--" + uuid)
-        .done(function (data) {
-            if(data == null){
-                // The type was not different, so ignore.
-                return;
-            }
-
-            var nodes = data.nodes;
-            var edges = data.edges;
-
-            smoothParallelEdges(edges);
-
-            reload(nodes, edges);
-
-
-        })
-        .fail(function (jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
-        });
-
-
-}
-
-function Draw() {
+function load_generator(isDraw) {
     var lay = $('#layouts').find('option:selected').text();
     var type = $('#graphType').find('option:selected').text();
     if (lay == "Botanical Tree") {
         drawBotanical();
         return;
     }
-    $.get(serverAddr + 'draw/'
+    server(serverAddr + 'draw/'
         + $('#categories').find('option:selected').text() + "--"
         + $('#reports').find('option:selected').text() + "--" +
         ($('#props_keys').html() + ":" + $('#props_vals').val())
         + "--" + type
-        + "--" + uuid)
-        .done(function (data) {
-            nodeId = 0; //resets counter for freehand vertices
-            var nodes = data.nodes;
-            var edges = data.edges;
-            cy.elements().remove();
-            cy.add(nodes);
-            cy.add(edges);
-            nodeId += nodes.length; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
-            setVertexIds();
-            applyLayout();
+        + "--" + uuid,function (data) {
+            if (isDraw) {
+                nodeId = 0; //resets counter for freehand vertices
+                var nodes = data.nodes;
+                var edges = data.edges;
+                cy.elements().remove();
+                cy.add(nodes);
+                cy.add(edges);
+                nodeId += nodes.length; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
+                setVertexIds();
+                applyLayout();
+            }
         })
-        .fail(function (jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
-        });
 }
 
 cy.on('tap', function(event) {
@@ -434,153 +243,67 @@ function sizeOfIntersectionOfArrays(arr1, arr2) {
     return cnt;
 }
 
+$('.loaders').hide();
 $('#generators').show();
-$('#g6format').hide();
+
 function selectLoader() {
-    var loader = $('#loaders ').find('option:selected').text();
+    var loader = $('#loaders').find('option:selected').text();
+    $('.loaders').hide();
     switch (loader) {
         case "Generators":
             $('#generators').show();
-            $('#g6format').hide();
             break;
         case "Edge list":
+            $('#elformat').show();
+            break;
         case "Adjacency matrix":
+            $('#adjMatformat').show();
+            break;
         case "G6 format":
-            $('#generators').hide();
             $('#g6format').show();
             break;
     }
 }
 
-function loadG6() {
-    $.get(serverAddr + 'g6/'+$('#g6string').val())
-        .done(function (data) {
-
-        })
-        .fail(function (jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
+function load_graph(type,isDraw) {
+    var str = $('#'+type+'string').val().replace(/\n/g,"-");
+    var isDirected = $('#graphType').find('option:selected').text();
+    server(serverAddr + 'loadGraph' + '/'+ type + "--"
+    +str+"--"+isDirected+"--"+uuid,function (data) {
+            if(isDraw) {
+                cy = cytoscape({
+                    container: document.getElementById('canvas'),
+                    style: [ // the stylesheet for the graph
+                        {
+                            selector: 'node',
+                            style: {
+                                'background-color': 'lightgray',
+                                'label': 'data(id)',
+                                'text-valign': 'center'
+                            }
+                        }]
+                });
+                var nodes = data.nodes;
+                var edges = data.edges;
+                cy.elements().remove();
+                cy.add(nodes);
+                cy.add(edges);
+                cy.layout({name: 'cose'}).run();
+            }
         });
 }
 
-
-/*
- * Generates a random string used for client identification.
- */
-function guid() {
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
-  }
-  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-    s4() + '-' + s4() + s4() + s4();
-}
-
- var modifiedPositions = cy.nodes().forEach(function(n){
-    if(n.data )
-    var x = n.data("x");
-    var y = n.data("y");
- });
-
-function applyLayout(){
-    var lay = $('#layouts').find('option:selected').text();
-    if (lay == "Preset") {
-        //cy.layout({name: 'preset'}).run();
-        cy.layout(preset).run();
-    } else if (lay == "Force Directed") {
-        cy.layout({name: 'cose'}).run();
-    }
-}
-
-/**
- * Finds if an edge is parallel */
-function findParallels(element, v){
-
-    if(element.isEdge()) {
-        var trg = cy.$("#" + element.data().target);
-
-        if(v.edgesWith(trg).length >= 2){
-
-            var pEdge = cy.$("#" + trg.id()).edgesTo(v).id();
-            var iEdge = element.data().id;
-
-            if(parallels.includes(iEdge) || parallels.includes(pEdge)){
-                return;
-            }
-            parallels.push(iEdge);
-
-        }
-    }
-
-}
-
-/**
- * Finds all edges that are parallel and 'smooths' them down into one edge.
- * */
-function smoothParallelEdges(){
-    parallels = [];
-
-    var _root = cy.$('#0');
-    var rt = BFSrun(_root, findParallels);
-
-    // Runs BFS on all components, this could be refactored to run quicker.
-    for(var j =0; j < cy.elements().length-1; j++) {
-        if (rt[j] != null) {
-            if (rt[j].id() !== cy.$('#' + j).id()) {
-                BFSrun(cy.$('#' + j), findParallels);
-            }
-        } else {
-            BFSrun(cy.$('#' + j), findParallels);
-        }
-    }
-
-
-    if(parallels.length > 0) {
-
-        var str = "", sArr = [];
-        var len = parallels.length
-        for (var i = len; i > 0; i--) {
-            var edge = parallels.pop();
-            sArr[i] = edge + "~~";
-        }
-        str = sArr.join("");
-
-        $.get(serverAddr + 'condenseParallelEdges/'
-            + str + "--"
-            + uuid
-        ).done(function (_data) {
-            // TODO: Fix so JSON is returned from handler
-            var data = JSON.parse(_data)
-
-            var edges = data.edges;
-            cy.edges().remove();
-            cy.add(edges);
-
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
+function showOnGraph() {
+    if (report_results.colors != undefined) {
+        var colors = report_results.colors;
+        cy.nodes().forEach(function (n) {
+            var color = colors[parseInt(n.id())];
+            var actualColor = distinctColors[Object.keys(distinctColors)[color]];
+            n.style('background-color', actualColor);
         });
     }
-
 }
 
-/**
- * Reloads the nodes and edges in cytoscape
- * */
-var reload = function(nodes, edges){
-
-    if(nodes == null || edges == null){
-        return;
-    }
-
-    cy.batch(function(){
-        cy.elements().remove();
-        cy.add(nodes);
-        cy.add(edges);
-        applyLayout();
-    });
-    setTimeout(reload, 1000);
-
-};
 
 
 

@@ -1,5 +1,8 @@
 package graphtea.graph.graph;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
+
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Vector;

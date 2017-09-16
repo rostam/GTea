@@ -1,11 +1,11 @@
 package server;
 
 import graphtea.extensions.Centrality;
+import graphtea.extensions.G6Format;
 import graphtea.extensions.RandomTree;
 import graphtea.graph.graph.*;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 import graphtea.plugins.reports.extension.GraphReportExtension;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -13,7 +13,6 @@ import org.reflections.Reflections;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.awt.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -24,7 +23,6 @@ import java.util.*;
 @Path("")
 public class RequestHandler {
     private static HashMap<String,Class> extensionNameToClass = new HashMap<>();
-    //private static GraphModel currentGraph = new GraphModel();
     private static HashMap<String, GraphModel> sessionToGraph = new HashMap<>();
 
 
@@ -296,10 +294,6 @@ public class RequestHandler {
         String sessionID = infos[4];
         handleSession(sessionID);
 
-        for(String s : reportProps) {
-            System.out.println(s);
-        }
-
         try {
             if(sessionToGraph.get(sessionID).getVerticesCount() == 0)
                 sessionToGraph.put(sessionID, generateGraph(props, graph));
@@ -307,12 +301,14 @@ public class RequestHandler {
             if(!report.contains("No ")) {
                 GraphReportExtension gre = ((GraphReportExtension) extensionNameToClass.get(report).newInstance());
                 Object o = gre.calculate(sessionToGraph.get(sessionID));
+                if(o instanceof JSONObject) {
+                    return Response.ok(o.toString()).header("Access-Control-Allow-Origin", "*").build();
+                }
                 JSONObject jsonObject = new JSONObject();
                 if(o instanceof RenderTable) {
                     jsonObject.put("titles",((RenderTable)o).getTitles().toString());
                 }
                 jsonObject.put("results",o.toString());
-                System.out.println(jsonObject);
                 return Response.ok(jsonObject.toString()).header("Access-Control-Allow-Origin", "*").build();
             } else {
                 return Response.ok("").header("Access-Control-Allow-Origin", "*").build();
@@ -328,6 +324,79 @@ public class RequestHandler {
         return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
     }
 
+    @GET
+    @Path("/loadGraph/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response edgeList(@PathParam("info") String info) {
+        String[] data = info.split("--");
+        String loadType = data[0];
+        String graph = data[1];
+        String type = data[2];
+        String sessionID = data[3];
+        handleSession(sessionID);
+        GraphModel g = new GraphModel();
+        switch (loadType) {
+            case "el":
+                g = getGraphFromEdgeList(graph);
+                break;
+            case "g6":
+                g = G6Format.stringToGraphModel(graph);
+                break;
+            case "adj":
+                String[] rows = info.split("-");
+                for (String row : rows) g.addVertex(new Vertex());
+                for(int i=0;i<rows.length;i++) {
+                    String tmp[] = rows[i].split(",");
+                    for(int j=0;j<tmp.length;j++) {
+                        if(tmp[j].equals("1")) {
+                            g.addEdge(new Edge(g.getVertex(i),g.getVertex(j)));
+                        }
+                    }
+                }
+                break;
+        }
+        sessionToGraph.put(sessionID, g);
+        if(type.equals("directed")){
+            sessionToGraph.get(sessionID).setDirected(true);
+        } else if (type.equals("undirected")){
+            sessionToGraph.get(sessionID).setDirected(false);
+        }
+        try {
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    private GraphModel getGraphFromEdgeList(String info) {
+        String[] rows = info.split("-");
+        Vector<String> vs = new Vector<>();
+        for(String row : rows) {
+            String tmp[] = row.split(",");
+            String v1 = tmp[0].trim();
+            String v2 = tmp[1].trim();
+            if(!vs.contains(v1)) vs.add(v1);
+            if(!vs.contains(v2)) vs.add(v2);
+        }
+        HashMap<String,Vertex> labelVertex = new HashMap<>();
+        GraphModel currentGraph = new GraphModel();
+        for(String v : vs) {
+            Vertex vertex = new Vertex();
+            vertex.setLabel(v);
+            labelVertex.put(v,vertex);
+            currentGraph.addVertex(vertex);
+        }
+        for(String row : rows) {
+            String tmp[] = row.split(",");
+            String v1 = tmp[0].trim();
+            String v2 = tmp[1].trim();
+            Edge e = new Edge(labelVertex.get(v1),labelVertex.get(v2));
+            currentGraph.addEdge(e);
+        }
+        return currentGraph;
+    }
 
     @GET
     @Path("/draw/{info}")
@@ -337,22 +406,17 @@ public class RequestHandler {
         String graph = infos[0];
         String report = infos[1];
         String[] props = infos[2].replaceAll(" ","").split(":");
-
         String type = infos[3];
         String sessionID = infos[4];
         handleSession(sessionID);
-
         try {
             sessionToGraph.put(sessionID, generateGraph(props, graph));
 
             if(type.equals("directed")){
-                System.out.println("Directed!!");
                 sessionToGraph.get(sessionID).setDirected(true);
             } else if (type.equals("undirected")){
-                System.out.println("Undirected!!");
                 sessionToGraph.get(sessionID).setDirected(false);
             }
-
             String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
