@@ -3,10 +3,7 @@ package server;
 import graphtea.extensions.Centrality;
 import graphtea.extensions.G6Format;
 import graphtea.extensions.RandomTree;
-import graphtea.graph.graph.Edge;
-import graphtea.graph.graph.GraphModel;
-import graphtea.graph.graph.RenderTable;
-import graphtea.graph.graph.Vertex;
+import graphtea.graph.graph.*;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 import org.codehaus.jettison.json.JSONArray;
@@ -26,7 +23,8 @@ import java.util.*;
 @Path("")
 public class RequestHandler {
     private static HashMap<String,Class> extensionNameToClass = new HashMap<>();
-    private static GraphModel currentGraph = new GraphModel();
+    private static HashMap<String, GraphModel> sessionToGraph = new HashMap<>();
+
 
     public GraphModel generateGraph(String[] props, String graph) {
         try {
@@ -58,6 +56,231 @@ public class RequestHandler {
         return new GraphModel();
     }
 
+    /**
+     * Switches the type of graph to directed or undirected,
+     * @param info string containing the vertex ID and the session ID string name
+     * @return Response containing the graph as a JSON, in cytoscape conform format,
+     *  or noContent if type shouldn't be changed
+     * @throws JSONException if JSON creation fails
+     * */
+    @GET
+    @Path("/selectType/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response selectType(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String type = infos[0];
+        String sessionID = infos[1];
+        handleSession(sessionID);
+        try {
+            if ((type.equals("directed")) != sessionToGraph.get(sessionID).isDirected()) {
+                if (type.equals("directed")) {
+                    sessionToGraph.get(sessionID).setDirected(true);
+                } else if (type.equals("undirected")) {
+                    sessionToGraph.get(sessionID).setDirected(false);
+                }
+
+            } else {
+                // Only change if types differ
+                return Response.noContent().header("Access-Control-Allow-Origin", "*").build();
+
+            }
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    /**
+     *  Condenses all parallel edges into a singular edge,
+     *  ids contains all of the edges that have a parallel edge.
+     *  Those edges are then deleted and the remaining edges become undirected.
+     *
+     * @param info string containing the vertex ID and the session ID string name
+     * @return Response containing the graph as a JSON, in cytoscape conform format.
+     * @throws JSONException if JSON creation fails
+     */
+    @GET
+    @Path("/condenseParallelEdges/{info}")
+    public Response condenseParallelEdges(@PathParam("info") String info){
+        String[] infos = info.split("--");
+        String[] ids = infos[0].split("~~");
+        String sessionID = infos[1];
+        handleSession(sessionID);
+
+        try {
+
+            for(String id : ids) {
+                String[] sId = id.split(",");
+                int _source = Integer.parseInt(sId[0]);
+                int _target = Integer.parseInt(sId[1]);
+
+
+                Vertex vertex = sessionToGraph.get(sessionID).getVertex(_source);
+                Vertex opposingVertex = sessionToGraph.get(sessionID).getVertex(_target);
+
+                Edge parallelEdge = sessionToGraph.get(sessionID).getEdge(vertex, opposingVertex);
+                sessionToGraph.get(sessionID).removeEdge(parallelEdge);
+
+            }
+
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+
+
+    }
+
+    /**
+     * Deletes a particular edge by the source vertex ID and target vertex ID
+     *
+     * @param info string containing the source vertex ID, target vertex ID and the session ID string name
+     * @return Response containing the graph as a JSON, in cytoscape conform format.
+     * @throws JSONException if JSON creation fails
+     */
+    @GET
+    @Path("/removeEdge/{info}")
+    public Response removeEdge(@PathParam("info") String info){
+        String[] infos = info.split("--");
+        int sourceID = Integer.parseInt(infos[0]);
+        int targetID = Integer.parseInt(infos[1]);
+        String edgeType = infos[2];
+        String sessionID = infos[3];
+        handleSession(sessionID);
+
+        Vertex _source = sessionToGraph.get(sessionID).getVertex(sourceID);
+        Vertex _target = sessionToGraph.get(sessionID).getVertex(targetID);
+
+        try {
+            Edge _edge = sessionToGraph.get(sessionID).getEdge(_source, _target);
+            sessionToGraph.get(sessionID).removeEdge(_edge);
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+
+    }
+
+    /**
+     * Adds a vertex into the graph
+     *
+     * @param info string containing the ID of the new vertex, position on the x-axis, y-axis and the session ID string name
+     * @return Response containing the graph as a JSON, in cytoscape conform format.
+     * @throws JSONException if JSON creation fails
+     */
+    @GET
+    @Path("/addVertex/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response addVertex(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String vertexId = infos[0];
+        Double xPos = Double.parseDouble(infos[1]);
+        Double yPos = Double.parseDouble(infos[2]);
+        String sessionID = infos[3];
+        handleSession(sessionID);
+
+        Vertex vertex = new Vertex();
+        vertex.setLabel(vertexId);
+        vertex.setLocation(new GPoint(xPos, yPos));
+        try {
+            sessionToGraph.get(sessionID).insertVertex(vertex);
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    /**
+     * Deletes a particular vertex (and subsequently all of its edges) by ID
+     *
+     * @param info string containing the vertex ID and the session ID string name
+     * @return Response containing the graph as a JSON, in cytoscape conform format.
+     * @throws JSONException if JSON creation fails
+     */
+    @GET
+    @Path("/remove/{info}")
+    public Response deleteVertex(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String vertexId = infos[0];
+        String sessionID = infos[1];
+        handleSession(sessionID);
+        try {
+            Vertex v = sessionToGraph.get(sessionID).getVertex(Integer.parseInt(vertexId));
+            sessionToGraph.get(sessionID).deleteVertex(v);
+
+            Iterable<Vertex> vi = sessionToGraph.get(sessionID).vertices();
+
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+
+    }
+
+    /**
+     * Deletes all edges and vertices of the current graph
+     *
+     * @param info string containing the session ID string name
+     * @return Response containing the graph as a JSON, in cytoscape conform format.
+     * @throws JSONException if JSON creation fails
+     */
+    @GET
+    @Path("/clear/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response clear(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String sessionID = infos[0];
+        try {
+            sessionToGraph.get(sessionID).clear();
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    /**
+     * Adds a single edge between two given vertices
+     *
+     * @param info string containing the ID of the source vertex, target vertex and the session ID string name
+     * @return Response containing the graph as a JSON, in cytoscape conform format.
+     * @throws JSONException if JSON creation fails
+     */
+    @GET
+    @Path("/addEdge/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response addEdge(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String sourceID = infos[0];
+        String targetID = infos[1];
+
+        String sessionID = infos[2];
+        handleSession(sessionID);
+
+        try {
+            Vertex source = sessionToGraph.get(sessionID).getVertex(Integer.parseInt(sourceID));
+            Vertex target = sessionToGraph.get(sessionID).getVertex(Integer.parseInt(targetID));
+            Edge edge = new Edge(source, target);
+            sessionToGraph.get(sessionID).insertEdge(edge);
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+    }
+
     @GET
     @Path("/report/{info}")
     @Produces("application/json;charset=utf-8")
@@ -67,10 +290,17 @@ public class RequestHandler {
         String report = infos[1];
         String[] props = infos[2].replaceAll(" ","").split(":");
         String[] reportProps = infos[3].replaceAll(" ","").split(":");
+
+        String sessionID = infos[4];
+        handleSession(sessionID);
+
         try {
+            if(sessionToGraph.get(sessionID).getVerticesCount() == 0)
+                sessionToGraph.put(sessionID, generateGraph(props, graph));
+                        //= generateGraph(props,graph);
             if(!report.contains("No ")) {
                 GraphReportExtension gre = ((GraphReportExtension) extensionNameToClass.get(report).newInstance());
-                Object o = gre.calculate(currentGraph);
+                Object o = gre.calculate(sessionToGraph.get(sessionID));
                 if(o instanceof JSONObject) {
                     return Response.ok(o.toString()).header("Access-Control-Allow-Origin", "*").build();
                 }
@@ -95,50 +325,44 @@ public class RequestHandler {
     }
 
     @GET
-    @Path("/g6/{info}")
-    @Produces("application/json;charset=utf-8")
-    public Response g6(@PathParam("info") String info) {
-        GraphModel g = G6Format.stringToGraphModel(info);
-        try {
-            String json = CytoJSONBuilder.getJSON(g);
-            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return Response.ok("").header("Access-Control-Allow-Origin", "*").build();
-    }
-
-    @GET
-    @Path("/el/{info}")
+    @Path("/loadGraph/{info}")
     @Produces("application/json;charset=utf-8")
     public Response edgeList(@PathParam("info") String info) {
-        currentGraph = getGraphFromEdgeList(info);
-        try {
-            String json = CytoJSONBuilder.getJSON(currentGraph);
-            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return Response.ok("").header("Access-Control-Allow-Origin", "*").build();
-    }
-
-    @GET
-    @Path("/adj/{info}")
-    @Produces("application/json;charset=utf-8")
-    public Response adjMat(@PathParam("info") String info) {
-        currentGraph = new GraphModel();
-        String[] rows = info.split("-");
-        for(int i=0;i<rows.length;i++) currentGraph.addVertex(new Vertex());
-        for(int i=0;i<rows.length;i++) {
-            String tmp[] = rows[i].split(",");
-            for(int j=0;j<tmp.length;j++) {
-                if(tmp[j].equals("1")) {
-                    currentGraph.addEdge(new Edge(currentGraph.getVertex(i),currentGraph.getVertex(j)));
+        String[] data = info.split("--");
+        String loadType = data[0];
+        String graph = data[1];
+        String type = data[2];
+        String sessionID = data[3];
+        handleSession(sessionID);
+        GraphModel g = new GraphModel();
+        switch (loadType) {
+            case "el":
+                g = getGraphFromEdgeList(graph);
+                break;
+            case "g6":
+                g = G6Format.stringToGraphModel(graph);
+                break;
+            case "adj":
+                String[] rows = info.split("-");
+                for (String row : rows) g.addVertex(new Vertex());
+                for(int i=0;i<rows.length;i++) {
+                    String tmp[] = rows[i].split(",");
+                    for(int j=0;j<tmp.length;j++) {
+                        if(tmp[j].equals("1")) {
+                            g.addEdge(new Edge(g.getVertex(i),g.getVertex(j)));
+                        }
+                    }
                 }
-            }
+                break;
+        }
+        sessionToGraph.put(sessionID, g);
+        if(type.equals("directed")){
+            sessionToGraph.get(sessionID).setDirected(true);
+        } else if (type.equals("undirected")){
+            sessionToGraph.get(sessionID).setDirected(false);
         }
         try {
-            String json = CytoJSONBuilder.getJSON(currentGraph);
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -157,7 +381,7 @@ public class RequestHandler {
             if(!vs.contains(v2)) vs.add(v2);
         }
         HashMap<String,Vertex> labelVertex = new HashMap<>();
-        currentGraph = new GraphModel();
+        GraphModel currentGraph = new GraphModel();
         for(String v : vs) {
             Vertex vertex = new Vertex();
             vertex.setLabel(v);
@@ -182,9 +406,18 @@ public class RequestHandler {
         String graph = infos[0];
         String report = infos[1];
         String[] props = infos[2].replaceAll(" ","").split(":");
+        String type = infos[3];
+        String sessionID = infos[4];
+        handleSession(sessionID);
         try {
-            currentGraph = generateGraph(props,graph);
-            String json = CytoJSONBuilder.getJSON(currentGraph);
+            sessionToGraph.put(sessionID, generateGraph(props, graph));
+
+            if(type.equals("directed")){
+                sessionToGraph.get(sessionID).setDirected(true);
+            } else if (type.equals("undirected")){
+                sessionToGraph.get(sessionID).setDirected(false);
+            }
+            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -347,6 +580,12 @@ public class RequestHandler {
 
         String json = "";//CytoJSONBuilder.getJSON(newEdgeList,newPos);
         return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    private void handleSession(String sessionID) {
+        if(!sessionToGraph.containsKey(sessionID)){
+            sessionToGraph.put(sessionID, new GraphModel());
+        }
     }
 
 }

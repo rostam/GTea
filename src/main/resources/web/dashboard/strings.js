@@ -19,6 +19,7 @@ var strings = {
 $('#strings-intro').html(strings.intro);
 $('#strings-generator').html(strings.generator);
 $('#strings-g6format').html(strings.g6format);
+$('#strings-freehand').html(strings.freehand);
 $("#strings-layout").html(strings.layout);
 $("#strings-report").html(strings.report);
 $("#strings-adjMatformat").html(strings.adjMat);

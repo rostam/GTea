@@ -1,9 +1,16 @@
-var serverAddr = "http://localhost:8008/";
-// var serverAddr = "http://homer.dh.uni-leipzig.de:8008/";
+var serverAddr = "http://0.0.0.0:2342/";
+var nodeId = 0;
+//var edgeId = -1;
+var cy; //cytoscape object
+var selectedNode;
+var uuid = guid();
+var directed = 'triangle', undirected = 'none';
+var parallels = [];
+var report_results;
+
+initCytoscape(undirected);
 
 var original_data = {};
-
-var report_results = "";
 $.get(serverAddr + 'graphs/')
     .done(function (data) {
         original_data = data;
@@ -59,12 +66,12 @@ function Report() {
     if (reportProps == "") {
         reportProps = "no";
     }
-    var graph = "";
     $.get(serverAddr + 'report/'
-        + graph + "--"
+        + $('#categories').find('option:selected').text() + "--"
         + $('#reports').find('option:selected').text() + "--"
         + ($('#props_keys').html() + ":" + $('#props_vals').val()) + "--"
-        + ($('#reportPropsKeys').html() + ":" + $('#reportPropsVals').val()))
+        + ($('#reportPropsKeys').html() + ":" + $('#reportPropsVals').val())
+        + "--" + uuid)
         .done(function (data) {
             report_results = data;
             if (data.titles != undefined) {
@@ -81,7 +88,7 @@ function Report() {
                     builtHTML += "<tr>";
                     row.forEach(function (col) {
                         builtHTML += "<td>" + col + "</td>";
-                    });
+                    })
                     builtHTML += "</tr>";
                 });
                 builtHTML += "</tr></table>";
@@ -95,15 +102,16 @@ function Report() {
                 $('#reportResults').html(res);
                 $('#results-body').html(res);
             }
+
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
         });
 }
 
-var cy;
 function load_generator(isDraw) {
     var lay = $('#layouts').find('option:selected').text();
+    var type = $('#graphType').find('option:selected').text();
     if (lay == "Botanical Tree") {
         drawBotanical();
         return;
@@ -111,35 +119,74 @@ function load_generator(isDraw) {
     server(serverAddr + 'draw/'
         + $('#categories').find('option:selected').text() + "--"
         + $('#reports').find('option:selected').text() + "--" +
-        ($('#props_keys').html() + ":" + $('#props_vals').val()),
-        function (data) {
-            console.log(isDraw + ",  " + data);
+        ($('#props_keys').html() + ":" + $('#props_vals').val())
+        + "--" + type
+        + "--" + uuid,function (data) {
             if (isDraw) {
-                cy = cytoscape({
-                    container: document.getElementById('canvas'),
-                    style: [ // the stylesheet for the graph
-                        {
-                            selector: 'node',
-                            style: {
-                                'background-color': 'lightgray',
-                                'label': 'data(id)',
-                                'text-valign': 'center'
-                            }
-                        }]
-                });
+                nodeId = 0; //resets counter for freehand vertices
                 var nodes = data.nodes;
                 var edges = data.edges;
                 cy.elements().remove();
                 cy.add(nodes);
                 cy.add(edges);
-                if (lay == "Preset") {
-                    cy.layout({name: 'preset'}).run();
-                } else if (lay == "Force Directed") {
-                    cy.layout({name: 'cose'}).run();
-                }
+                nodeId += nodes.length; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
+                setVertexIds();
+                applyLayout();
             }
-        });
+        })
 }
+
+cy.on('tap', function(event) {
+    var evtTarget = event.target;
+
+    if(evtTarget === selectedNode) {
+        // If node is already selected, deselect the node
+        cy.$('#'+selectedNode.data('id')).classes('node');
+        selectedNode = null;
+        return;
+    }
+
+    if (evtTarget === cy) {
+        addSingleVertex(event);
+    }
+    else if (evtTarget.isNode()) {
+        if (selectedNode == null) {
+            // Update the selectedNode and change the color of it
+            selectedNode = evtTarget;
+            cy.$('#'+selectedNode.data('id')).classes('selected');
+
+        }
+        else {
+            // Adds an edge between the selected node and the newly selected node.
+            // Resets the color.
+            addSingleEdge(selectedNode.data('label'), evtTarget.data('label'));
+            cy.$('#'+selectedNode.data('label')).classes('node');
+
+            selectedNode = null;
+        }
+    }
+});
+
+cy.on('cxttapend', 'node', function(event) {
+    var evtTarget = event.target;
+    //if(evtTarget.isNode){
+        removeSingleVertex(evtTarget);
+    //}
+
+});
+
+cy.on('cxttapend', 'edge', function(event) {
+    var evtTarget = event.target;
+    if(evtTarget.isEdge){
+        removeSingleEdge(evtTarget);
+    }
+});
+
+cy.on('layoutstop', function() {
+    cy.maxZoom(2.5);
+    cy.fit();
+    cy.maxZoom(100);
+});
 
 function getSelectedCategory() {
     return $('#categories').find('option:selected').text();
@@ -196,17 +243,12 @@ function sizeOfIntersectionOfArrays(arr1, arr2) {
     return cnt;
 }
 
+$('.loaders').hide();
 $('#generators').show();
-$('#g6format').hide();
-$('#elformat').hide();
-$('#adjMatformat').hide();
-function selectLoader() {
-    var loader = $('#loaders ').find('option:selected').text();
 
-    $('#generators').hide();
-    $('#g6format').hide();
-    $('#elformat').hide();
-    $('#adjMatformat').hide();
+function selectLoader() {
+    var loader = $('#loaders').find('option:selected').text();
+    $('.loaders').hide();
     switch (loader) {
         case "Generators":
             $('#generators').show();
@@ -225,7 +267,9 @@ function selectLoader() {
 
 function load_graph(type,isDraw) {
     var str = $('#'+type+'string').val().replace(/\n/g,"-");
-    server(serverAddr + type + '/'+str,function (data) {
+    var isDirected = $('#graphType').find('option:selected').text();
+    server(serverAddr + 'loadGraph' + '/'+ type + "--"
+    +str+"--"+isDirected+"--"+uuid,function (data) {
             if(isDraw) {
                 cy = cytoscape({
                     container: document.getElementById('canvas'),
@@ -250,20 +294,21 @@ function load_graph(type,isDraw) {
 }
 
 function showOnGraph() {
-    if(report_results.colors != undefined) {
+    if (report_results.colors != undefined) {
         var colors = report_results.colors;
         cy.nodes().forEach(function (n) {
             var color = colors[parseInt(n.id())];
             var actualColor = distinctColors[Object.keys(distinctColors)[color]];
-           n.style('background-color',actualColor);
+            n.style('background-color', actualColor);
         });
     }
 }
 
-function server(url,response) {
-    $.get(url).done(function (data) {
-        response(data);
-    }).fail(function (jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
-        });
-}
+
+
+
+
+
+
+
+
