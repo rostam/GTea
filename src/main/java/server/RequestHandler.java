@@ -182,8 +182,17 @@ public class RequestHandler {
         String vertexId = infos[0];
         Double xPos = Double.parseDouble(infos[1]);
         Double yPos = Double.parseDouble(infos[2]);
-        String sessionID = infos[3];
-        handleSession(sessionID);
+        String type = infos[3];
+        String sessionID = infos[4];
+
+        if(handleSession(sessionID)) {
+            // New session was created
+            if(type.equals("directed")){
+                sessionToGraph.get(sessionID).setDirected(true);
+            } else if (type.equals("undirected")){
+                sessionToGraph.get(sessionID).setDirected(false);
+            }
+        }
 
         Vertex vertex = new Vertex();
         vertex.setLabel(vertexId);
@@ -582,10 +591,12 @@ public class RequestHandler {
         return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
     }
 
-    private void handleSession(String sessionID) {
+    private boolean handleSession(String sessionID) {
         if(!sessionToGraph.containsKey(sessionID)){
             sessionToGraph.put(sessionID, new GraphModel());
+            return true; // Session created
         }
+        return false; // Session exists
     }
 
 }

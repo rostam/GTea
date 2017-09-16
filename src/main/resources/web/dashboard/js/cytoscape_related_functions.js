@@ -88,8 +88,11 @@ function setVertexIds() {
 }
 
 function addSingleVertex(event) {
+    var type = $('#graphType').find('option:selected').text();
+
     $.get(serverAddr + 'addVertex/'
         + nodeId + "--" + event.position.x + "--" + event.position.y
+        + "--" + type
         + "--" + uuid)
         .done(function (data) {
 
@@ -179,7 +182,6 @@ function applyLayout(){
  * Updates the graph type to either directed or undirected
  * */
 function selectType() {
-
     var type = $('#graphType').find('option:selected').text();
 
     if (type === 'directed') {
@@ -289,8 +291,6 @@ var reload = function(nodes, edges){
 };
 
 function clearCanvas(){
-    console.log("Clear");
-
     $.get(serverAddr + 'clear/'
         + uuid
     ).done(function (data) {
