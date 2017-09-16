@@ -1,3 +1,4 @@
+var serverAddr;
 
 /**
  * Finds if an edge is parallel */
@@ -20,7 +21,9 @@ function findParallels(element, v){
     }
 }
 
-function initCytoscape(arrow) {
+function initCytoscape(arrow, _serverAddr) {
+    serverAddr = _serverAddr;
+
     cy = cytoscape({
         container: document.getElementById('canvas'),
         style: [ // the stylesheet for the graph
