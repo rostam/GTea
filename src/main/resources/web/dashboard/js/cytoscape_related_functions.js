@@ -98,8 +98,8 @@ function addSingleVertex(event) {
 
             cy.add({
                 data: {id: nodeId, label: nodeId},
-                position: event.position,
-                renderedPosition: event.position
+                position: event.position//,
+                //renderedPosition: event.position
             });
 
             nodeId++;
