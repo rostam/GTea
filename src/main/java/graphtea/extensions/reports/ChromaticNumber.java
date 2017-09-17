@@ -29,8 +29,13 @@ public class ChromaticNumber implements GraphReportExtension, ColoringListener {
         p = new Partitioner(g);
         ct = 1;
         found = false;
+        if(g.getEdgesCount() == 0) {
+            ct = 1;
+            found = true;
+        }
         while (!found) {
-            found = isColorable(ct++);
+            found = isColorable(ct);
+            ct++;
         }
         return ct;
     }

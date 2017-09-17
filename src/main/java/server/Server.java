@@ -25,10 +25,11 @@ public class Server {
    * Default port
    */
   private static final int PORT = 2342;
+//  private static final int PORT = 8008;
   /**
    * Path to demo application
    */
-  private static final String APPLICATION_PATH = "server/dashboard/index2.html";
+  private static final String APPLICATION_PATH = "server/dashboard/index.html";
 
   /**
    * Creates the base URI.

@@ -64,8 +64,8 @@ public class RandomMatching implements GraphReportExtension {
             sg.vertices.add(vv.get(v));
         }
 
-        sg.edges.addAll(vv.keySet().stream().map(v -> g.getEdge(v, vv.get(v))).collect(Collectors.toList()));
-
+        sg.edges.addAll(vv.keySet().stream()
+                .map(v -> g.getEdge(v, vv.get(v))).collect(Collectors.toList()));
         Vector<Object> ret = new Vector<>();
         ret.add("Number of Matching:" + sg.edges.size());
         ret.add(sg);
@@ -75,7 +75,6 @@ public class RandomMatching implements GraphReportExtension {
 
 	@Override
 	public String getCategory() {
-		// TODO Auto-generated method stub
 		return "General";
 	}
 

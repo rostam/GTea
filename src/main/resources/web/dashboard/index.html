@@ -26,40 +26,51 @@
     <div style="font-size: 14px;margin: 10px;">
         <h5>GraphTea</h5>
         <p id="strings-intro"></p>
-        <select id="loaders">
+        <select id="loaders" onchange="selectLoader()">
             <option>Generators</option>
             <option>Edge list</option>
             <option>Adjacency matrix</option>
             <option>G6 format</option>
             <option>Freehand drawing</option>
         </select>
-        <button onclick="selectLoader()">Select</button>
-        <div id="generators">
+        <select id="graphType" onchange="selectType()">
+        <option>directed</option>
+        <option selected="selected">undirected</option></select>
+        <!--<button onclick="selectLoader()">Select</button>-->
+        <div id="generators" class="loaders">
             <p id="strings-generator"></p>
             <table><tr>
                 <td><select id="categories"><option>Select</option></select></td>
                 <td><div id="props"><span id="props_keys">n</span> : <input type="text" id="props_vals" placeholder="Integer"></div></td>
             </tr></table>
+            <p id="strings-layout"></p>
+            <select id="layouts">
+                <option>Force Directed</option>
+                <option>Preset</option>
+                <option>Botanical Tree</option>
+            </select>
+            <button onclick="load_generator(false)">Load Only</button>
+            <button onclick="load_generator(true)">Load and Draw</button>
+            <button onclick="cy.fit()">Fit</button>
         </div>
-        <div id="g6format">
+        <div id="elformat" class="loaders">
+            <p id="strings-elformat"></p>
+            Edge list in csv format: <br/><textarea id="elstring" name="Text1" cols="20" rows="5"></textarea>
+            <br/><button onclick="load_graph('el',false)">Load Only</button>
+                 <button onclick="load_graph('el',true)">Load and Draw</button>
+        </div>
+        <div id="adjMatformat" class="loaders">
+            <p id="strings-adjMatformat"></p>
+            <br/><textarea id="adjstring" name="Text1" cols="20" rows="5"></textarea>
+            <br/><button onclick="load_graph('adj',false)">Load Only</button>
+            <button onclick="load_graph('adj',true)">Load and Draw</button>
+        </div>
+        <div id="g6format" class="loaders">
             <p id="strings-g6format"></p>
             G6 Format: <input id="g6string" type="text">
-            <button onclick="loadG6()">Load</button>
+            <br/><button onclick="load_graph('g6',false)">Load Only</button>
+            <button onclick="load_graph('g6',true)">Load and Draw</button>
         </div>
-
-        <select id="graphType">
-            <option selected="selected">directed</option>
-            <option>undirected</option>
-        </select>
-        <button onclick="selectType()">Select</button>
-
-        <p id="strings-layout"></p>
-        <select id="layouts">
-            <option>Force Directed</option>
-            <option>Preset</option>
-            <option>Botanical Tree</option>
-        </select>
-        <button onclick="Draw()">Draw</button>
         <p id="strings-report"></p>
         <select id="reports"></select>
         <button onclick="Report()">Report</button>
@@ -67,6 +78,7 @@
         <div>Report Results:<br/>
             <textarea name="Text1" cols="50" rows="6" id="reportResults"></textarea>
             <button id="myBtn">View Styled</button>
+            <button onclick="showOnGraph()">Show On Graph</button>
         </div>
         <button onclick="clearCanvas()">Clear</button>
 
@@ -91,11 +103,12 @@
         </div>
     </div>
 </div>
-<script src="js/helper.js"></script>
-<script src="js/require.js"></script>
 <script src="cytoscape/jquery.cytoscape.js-edgehandles.js"></script>
+<script src="js/server.js"></script>
+<script src="js/cytoscape_related_functions.js"></script>
 <script src="index.js"></script>
 <script src="modal.js"></script>
 <script src="strings.js"></script>
+<script src="distinctColors.js"></script>
 </body>
 </html>
