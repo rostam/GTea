@@ -1,5 +1,6 @@
 package graphtea.library.algorithms.planarity;
 
+import graphtea.graph.graph.Edge;
 import graphtea.library.BaseVertex;
 import graphtea.library.BaseEdge;
 import graphtea.library.BaseGraph;
@@ -7,6 +8,7 @@ import graphtea.library.algorithms.Algorithm;
 import graphtea.library.algorithms.AutomatedAlgorithm;
 import graphtea.library.event.GraphRequest;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Tests whether a graph is planar.
@@ -16,40 +18,54 @@ import java.util.ArrayList;
  * */
 public class PlanarityCheckerSlow <VertexType extends BaseVertex, EdgeType extends BaseEdge<VertexType>> extends Algorithm implements AutomatedAlgorithm {
 
+    boolean quitEarly = false;
+
     public boolean isPlanar( CustomGraph graph ){
 
-        if(isNotPlanar(graph)) return false;
+        if(quitEarly) return false;
 
-        for (CustomEdge e : graph.edgesList) {
+        if(graph.getEdgeList().size() < 9 || graph.getVerticesList().size() < 5){
+            return true;
+        }
+
+        if(isNotPlanar(graph)) {
+            System.out.println("Is Not Planar!");
+            quitEarly = true;
+            return false;
+        }
+
+        for (CustomEdge e : graph.getEdgeList()) {
             isPlanar( removeEdge(e, graph) );
             isPlanar( contractEdge(e, graph) );
 
             // TODO: I think subdivideEdge(...) causes an infinite loop because it adds a vertex and edge
-            isPlanar( subdivideEdge(e, graph) );
+            // isPlanar( subdivideEdge(e, graph) );
         }
 
-        for (CustomVertex v : graph.verticesList) {
+        for (CustomVertex v : graph.getVerticesList()) {
             isPlanar( removeVertex(v, graph) );
         }
+
+        if(quitEarly) return false;
 
         return true;
     }
 
     public CustomGraph removeEdge( CustomEdge edge, CustomGraph graph ){
-        CustomGraph g = new CustomGraph(new ArrayList<>(graph.edgesList), new ArrayList<>(graph.verticesList));
-        g.edgesList.remove(edge);
+        CustomGraph g = new CustomGraph(new ArrayList<>(graph.getEdgeList()), new ArrayList<>(graph.getVerticesList()));
+        g.getEdgeList().remove(edge);
         return g;
     }
 
     /** Contracts source into target */
     public CustomGraph contractEdge(CustomEdge edge, CustomGraph graph){
-        CustomGraph g = new CustomGraph(new ArrayList<>(graph.edgesList), new ArrayList<>(graph.verticesList));
+        CustomGraph g = new CustomGraph(new ArrayList<>(graph.getEdgeList()), new ArrayList<>(graph.getVerticesList()));
 
         CustomVertex trg = edge.target;
         CustomVertex srcContract = edge.source;
 
-        g.edgesList.remove(edge);
-        for ( CustomEdge e : g.edgesList ) {
+        g.getEdgeList().remove(edge);
+        for ( CustomEdge e : g.getEdgeList() ) {
             if( e.source == srcContract ){
                 e.source = trg;
             }
@@ -57,29 +73,37 @@ public class PlanarityCheckerSlow <VertexType extends BaseVertex, EdgeType exten
                 e.target = trg;
             }
         }
-        g.verticesList.remove(srcContract);
+        g.getVerticesList().remove(srcContract);
 
         return g;
     }
 
     public CustomGraph subdivideEdge(CustomEdge edge, CustomGraph graph ){
-        CustomGraph g = new CustomGraph(new ArrayList<>(graph.edgesList), new ArrayList<>(graph.verticesList));
+        CustomGraph g = new CustomGraph(new ArrayList<>(graph.getEdgeList()), new ArrayList<>(graph.getVerticesList()));
 
         CustomVertex trg = edge.target;
         CustomVertex src = edge.source;
 
-        g.edgesList.remove(edge);
+        g.getEdgeList().remove(edge);
         CustomVertex newVertex = new CustomVertex(g.getNewVertexId());
-        g.edgesList.add(new CustomEdge(src, newVertex));
-        g.edgesList.add(new CustomEdge(newVertex, trg));
-        g.verticesList.add(newVertex);
+        g.getEdgeList().add(new CustomEdge(src, newVertex));
+        g.getEdgeList().add(new CustomEdge(newVertex, trg));
+        g.getVerticesList().add(newVertex);
 
         return g;
     }
 
     public CustomGraph removeVertex(CustomVertex vertex, CustomGraph graph ){
-        CustomGraph g = new CustomGraph(new ArrayList<>(graph.edgesList), new ArrayList<>(graph.verticesList));
-        g.verticesList.remove(vertex);
+        CustomGraph g = new CustomGraph(new ArrayList<>(graph.getEdgeList()), new ArrayList<>(graph.getVerticesList()));
+
+        for(Iterator<CustomEdge> it = g.getEdgeList().iterator(); it.hasNext(); ){
+            CustomEdge e = it.next();
+            if(e.getSource() == vertex || e.getTarget() == vertex){
+                it.remove();
+            }
+        }
+
+        g.getVerticesList().remove(vertex);
         return g;
     }
 
@@ -88,17 +112,17 @@ public class PlanarityCheckerSlow <VertexType extends BaseVertex, EdgeType exten
      * Returns true if the current graph is not isomorphic to k5 or k3,3 */
     public boolean isNotPlanar( CustomGraph graph ) {
         /**k5 check*/
-        if (graph.edgesList.size() == 10 && graph.verticesList.size() == 5) {
+        if (graph.getEdgeList().size() == 10 && graph.getVerticesList().size() == 5) {
             return true; // Definitely not planar
         }
 
         /**k3,3 check*/
-        if (graph.edgesList.size() == 9 && graph.verticesList.size() == 6) {
+        if (graph.getEdgeList().size() == 9 && graph.getVerticesList().size() == 6) {
 
-            for (CustomVertex v : graph.verticesList) {
+            for (CustomVertex v : graph.getVerticesList()) {
 
                 int degree = 0;
-                for (CustomEdge e : graph.edgesList) {
+                for (CustomEdge e : graph.getEdgeList()) {
                     if (e.source == v || e.target == v) {
                         degree++;
                     }
@@ -133,8 +157,6 @@ public class PlanarityCheckerSlow <VertexType extends BaseVertex, EdgeType exten
     }
 
     public PlanarityCheckerSlow() { }
-
-    ////
 
 }
 

@@ -18,5 +18,18 @@ public class CustomEdge  <VertexType extends BaseVertex, EdgeType extends BaseEd
         this.target = new CustomVertex(target.getId());
         marked = false;
     }
+    public void mark(){
+        marked = true;
+    }
+    public boolean isMarked(){
+        return marked;
+    }
+    public CustomVertex getSource(){
+        return source;
+    }
+    public CustomVertex getTarget(){
+        return target;
+    }
+
 
 }

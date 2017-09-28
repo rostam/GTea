@@ -5,8 +5,8 @@ import java.util.ArrayList;
 
 public class CustomGraph {
     int increasingVertexId;
-    final ArrayList<CustomEdge> edgesList;
-    final ArrayList<CustomVertex> verticesList;
+    private final ArrayList<CustomEdge> edgesList;
+    private final ArrayList<CustomVertex> verticesList;
 
     public CustomGraph(ArrayList<CustomEdge> x, ArrayList<CustomVertex> y) {
         this.edgesList = x;

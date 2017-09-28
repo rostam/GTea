@@ -1,7 +1,6 @@
 package graphtea.library.algorithms;
 
-import graphtea.extensions.generators.CompleteGraphGenerator;
-import graphtea.extensions.generators.KmnGenerator;
+import graphtea.extensions.generators.*;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
@@ -21,6 +20,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class PlanarityCheckerSlowTest {
 
+    PlanarityCheckerSlow pc = new PlanarityCheckerSlow();
 
     /*********************
      * Helper Functions
@@ -209,49 +209,77 @@ public class PlanarityCheckerSlowTest {
     }
 
     /**
-     * TODO: FAILS, we have an infinite loop caused by subdivideEdge(...)
      * */
     @Test
-    public void k2Test(){
+    public void kTest(){
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
-        GraphModel gm = gen.generateCompleteGraph(2);
+        GraphModel gm = gen.generateCompleteGraph(12);
         PlanarityCheckerSlow pc = new PlanarityCheckerSlow();
         CustomGraph graph = CreateCustomGraph(gm);
-
-        assertTrue(pc.isPlanar(graph));
+        assertFalse( pc.isPlanar(graph) );
     }
 
-    /*@Test
-    public void CompleteGraphTest() {
-        CompleteGraphGenerator gen = new CompleteGraphGenerator();
-        for (int i = 1; i < 20; i++) {
-            GraphModel gm = gen.generateCompleteGraph(i);
-            if (i < 5) {
-                PlanarityCheckerSlow pc = new PlanarityCheckerSlow(gm);
-                assertTrue(pc.planar());
-            }
-            else {
-                //assertFalse(PlanarityChecker.isPlanar(gm));
-                PlanarityCheckerSlow pc = new PlanarityCheckerSlow(gm);
-                assertFalse(pc.planar());
-            }
-        }
-    }*/
-    /*@Test
-    public void CircleGraphTest() {
-        CircleGenerator gen = new CircleGenerator();
-        for (int i = 1; i < 20; i++) {
-            GraphModel gm = gen.generateCircle(i);
-            //assertTrue(PlanarityChecker.isPlanar(gm));
-        }
+    /* // Runs too slow
+    @Test
+    public void TreeTest(){
+        TreeGenerator tree = new TreeGenerator();
+        GraphModel gm = tree.generateGraph();
+        PlanarityCheckerSlow pc = new PlanarityCheckerSlow();
+        CustomGraph graph = CreateCustomGraph(gm);
+        assertTrue(pc.isPlanar(graph));
     }*/
 
-    /*@Test
+    @Test
+    public void CompleteGraphMultipleTest() {
+        CompleteGraphGenerator gen = new CompleteGraphGenerator();
+        for (int i = 1; i < 12; i++) {
+            GraphModel gm = gen.generateCompleteGraph(i);
+            if (i < 5) {
+                PlanarityCheckerSlow pc = new PlanarityCheckerSlow();
+                CustomGraph graph = CreateCustomGraph(gm);
+                assertTrue( pc.isPlanar(graph) );
+            }
+            else {
+                PlanarityCheckerSlow pc = new PlanarityCheckerSlow();
+                CustomGraph graph = CreateCustomGraph(gm);
+                assertFalse( pc.isPlanar(graph) );
+            }
+        }
+    }
+
+    @Test
+    public void CircleGraphTest() {
+        CircleGenerator gen = new CircleGenerator();
+        GraphModel gm = gen.generateCircle(10);
+        CustomGraph graph = CreateCustomGraph(gm);
+        assertTrue( pc.isPlanar(graph) );
+
+    }
+
+    @Test
+    public void CircleGraphMutltipleTest() {
+        CircleGenerator gen = new CircleGenerator();
+        for (int i = 1; i < 13; i++) {
+            System.out.println("Testing for n = " + i);
+
+            GraphModel gm = gen.generateCircle(i);
+            PlanarityCheckerSlow pc = new PlanarityCheckerSlow();
+            CustomGraph graph = CreateCustomGraph(gm);
+            assertTrue( pc.isPlanar(graph) );
+        }
+    }
+
+    @Test
     public void BananaTreeGraphTest() {
         GearGenerator gen = new GearGenerator();
-        for (int i = 1; i < 9; i++) {
+        for (int i = 1; i < 5; i++) {
+            System.out.println("Testing for n = " + i);
             GraphModel gm = gen.generateGear(i);
-            //assertTrue(PlanarityChecker.isPlanar(gm));
+            PlanarityCheckerSlow pc = new PlanarityCheckerSlow();
+            CustomGraph graph = CreateCustomGraph(gm);
+            assertTrue( pc.isPlanar(graph) );
         }
-    }*/
+    }
+
+
 }
