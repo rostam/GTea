@@ -10,7 +10,7 @@ import graphtea.library.event.typedef.BaseGraphRequest;
 
 public class PlanarityChecker extends Algorithm implements AutomatedAlgorithm {
     public static <VertexType extends BaseVertex, EdgeType extends BaseEdge<VertexType>>
-    boolean isBipartite(BaseGraph<VertexType, EdgeType> graph) {
+    boolean isPlanar(BaseGraph<VertexType, EdgeType> graph) {
         return false;
     }
 
