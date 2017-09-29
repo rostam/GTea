@@ -1,9 +1,6 @@
 package extensions.reports.planarity;
 
-import graphtea.extensions.generators.CircleGenerator;
-import graphtea.extensions.generators.CompleteGraphGenerator;
-import graphtea.extensions.generators.GearGenerator;
-import graphtea.extensions.generators.KmnGenerator;
+import graphtea.extensions.generators.*;
 import graphtea.extensions.reports.planarity.Planarity;
 import graphtea.extensions.reports.planarity.WagnerMethod;
 import graphtea.graph.graph.Edge;
@@ -22,7 +19,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class WagnerMethodTest {
 
-    WagnerMethod pc = new WagnerMethod();
+    //WagnerMethod pc = new WagnerMethod();
 
     /*********************
      * Helper Functions
@@ -60,6 +57,7 @@ public class WagnerMethodTest {
     public void removeEdgeTest(){
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
         GraphModel gm = gen.generateCompleteGraph(5);
+        WagnerMethod pc = new WagnerMethod();
         int edgeCountBeforeRemoval = gm.getEdgesCount();
         Edge edge = gm.getEdges().iterator().next();
 
@@ -72,6 +70,7 @@ public class WagnerMethodTest {
     public void contractEdgeTest(){
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
         GraphModel gm = gen.generateCompleteGraph(3);
+        WagnerMethod pc = new WagnerMethod();
 
         Edge edge = gm.getEdges().iterator().next();
         Vertex src = edge.source;
@@ -97,6 +96,7 @@ public class WagnerMethodTest {
     public void removeVertexTest(){
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
         GraphModel gm = gen.generateCompleteGraph(10);
+        WagnerMethod pc = new WagnerMethod();
 
         Vertex v = gm.getVertexArray()[5];
         assertTrue(gm.containsVertex(v));
@@ -108,12 +108,14 @@ public class WagnerMethodTest {
     public void isNotPlanarK5Test(){
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
         GraphModel gm = gen.generateCompleteGraph(5);
+        WagnerMethod pc = new WagnerMethod();
         assertTrue(pc.isNotPlanar(gm));
     }
 
     @Test public void isNotPlanarK33Test(){
         KmnGenerator gen = new KmnGenerator();
         GraphModel gm = gen.generateGraph();
+        WagnerMethod pc = new WagnerMethod();
         assertTrue(pc.isNotPlanar(gm));
     }
 
@@ -127,6 +129,7 @@ public class WagnerMethodTest {
     public void k5Test(){
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
         GraphModel gm = gen.generateCompleteGraph(5);
+        WagnerMethod pc = new WagnerMethod();
         assertFalse(pc.isPlanar(gm));
     }
 
@@ -134,6 +137,7 @@ public class WagnerMethodTest {
     public void k33Test(){
         KmnGenerator gen = new KmnGenerator();
         GraphModel gm = gen.generateGraph();
+        WagnerMethod pc = new WagnerMethod();
         assertFalse(pc.isPlanar(gm));
     }
 
@@ -142,25 +146,28 @@ public class WagnerMethodTest {
     @Test
     public void kTest(){
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
-        GraphModel gm = gen.generateCompleteGraph(6);
+        WagnerMethod pc = new WagnerMethod();
+        GraphModel gm = gen.generateCompleteGraph(8);
         assertFalse( pc.isPlanar(gm));
     }
 
     /* // Runs too slow
     @Test
     public void TreeTest(){
-        TreeGenerator tree = new TreeGenerator();
-        GraphModel gm = tree.generateGraph();
-        PlanarityCheckerSlow pc = new PlanarityCheckerSlow();
-        CustomGraph graph = CreateCustomGraph(gm);
-        assertTrue(pc.isPlanar(graph));
+        TreeGenerator gen = new TreeGenerator();
+        GraphModel gm = gen.generateGraph();
+        WagnerMethod pc = new WagnerMethod();
+        assertFalse( pc.isPlanar(gm));
     }*/
 
     @Test
     public void CompleteGraphMultipleTest() {
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
-        for (int i = 1; i < 12; i++) {
+        for (int i = 1; i < 50; i++) {
+            System.out.println(i);
             GraphModel gm = gen.generateCompleteGraph(i);
+            WagnerMethod pc = new WagnerMethod();
+
             if (i < 5) {
                 assertTrue( pc.isPlanar(gm));
             }
@@ -173,7 +180,8 @@ public class WagnerMethodTest {
     @Test
     public void CircleGraphTest() {
         CircleGenerator gen = new CircleGenerator();
-        GraphModel gm = gen.generateCircle(10);
+        GraphModel gm = gen.generateCircle(4);
+        WagnerMethod pc = new WagnerMethod();
         assertTrue( pc.isPlanar(gm));
 
     }
@@ -185,6 +193,7 @@ public class WagnerMethodTest {
             System.out.println("Testing for n = " + i);
 
             GraphModel gm = gen.generateCircle(i);
+            WagnerMethod pc = new WagnerMethod();
             assertTrue( pc.isPlanar(gm));
         }
     }
@@ -195,6 +204,7 @@ public class WagnerMethodTest {
         for (int i = 1; i < 5; i++) {
             System.out.println("Testing for n = " + i);
             GraphModel gm = gen.generateGear(i);
+            WagnerMethod pc = new WagnerMethod();
             assertTrue( pc.isPlanar(gm));
         }
     }

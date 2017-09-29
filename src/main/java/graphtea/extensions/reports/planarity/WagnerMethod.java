@@ -27,9 +27,9 @@ public class WagnerMethod {
 
         if(quitEarly) return false;
 
-        //if(graph.getEdgesCount() < 9 || graph.getVerticesCount() < 5){
-        //    return true;
-        //}
+        if(graph.getEdgesCount() < 9 || graph.getVerticesCount() < 5){
+            return true;
+        }
 
         if(isNotPlanar(graph)) {
             System.out.println("Is Not Planar!");
@@ -38,15 +38,13 @@ public class WagnerMethod {
         }
 
         for (Edge e : graph.getEdges()) {
-            isPlanar( removeEdge(e, graph));
             isPlanar( contractEdge(e, graph));
-
-            // TODO: I think subdivideEdge(...) causes an infinite loop because it adds a vertex and edge
-            // isPlanar( subdivideEdge(e, graph) );
+            isPlanar( removeEdge(e, graph));
         }
 
         for (Vertex v : graph) {
             isPlanar( removeVertex(v, graph));
+            if(quitEarly) return false;
         }
 
         if(quitEarly) return false;
@@ -56,12 +54,12 @@ public class WagnerMethod {
 
     public GraphModel removeEdge( Edge edge, GraphModel graph ){
         GraphModel g = new GraphModel();
+
         for (Vertex v : graph) {
             g.insertVertex(v);
         }
-        for (Edge e : graph.edges()) {
-            g.insertEdge(e);
-        }
+
+        g.insertEdges(graph.getEdges());
         g.removeEdge(edge);
         return g;
     }
@@ -69,34 +67,28 @@ public class WagnerMethod {
     /** Contracts source into target */
     public GraphModel contractEdge(Edge edge, GraphModel graph){
         GraphModel g = new GraphModel();
+
         for (Vertex v : graph) {
             g.insertVertex(v);
         }
-        for (Edge e : graph.edges()) {
-            g.insertEdge(e);
-        }
+        g.insertEdges(graph.getEdges());
 
         Vertex trg = edge.target;
         Vertex srcContract = edge.source;
 
-        ArrayList<Edge> edgesToDelete = new ArrayList<Edge>();
         ArrayList<Edge> edgesToAdd = new ArrayList<Edge>();
         g.removeEdge(edge);
-        for ( Edge e : g.edges() ) {
-            if (e.source == srcContract) {
-                //Set edge source as trg
-                Edge eNew = new Edge(trg, e.target);
-                edgesToDelete.add(e);
-                edgesToAdd.add(eNew);
-            } else if (e.target == srcContract) {
-                Edge eNew = new Edge(e.source, trg);
-                edgesToDelete.add(e);
-                edgesToAdd.add(eNew);
+
+        for(Vertex v : g.directNeighbors(srcContract)){
+            edgesToAdd.add(new Edge(v, trg));
+            if(g.getEdge(v, srcContract) != null) {
+                g.removeEdge(g.getEdge(v, srcContract));
+            }
+            else {
+                g.removeEdge(g.getEdge(srcContract, v));
             }
         }
-        for ( Edge e : edgesToDelete) {
-            g.removeEdge(e);
-        }
+
         for (Edge e : edgesToAdd) {
             g.insertEdge(e);
         }
@@ -107,12 +99,12 @@ public class WagnerMethod {
 
     public GraphModel removeVertex(Vertex vertex, GraphModel graph ){
         GraphModel g = new GraphModel();
+
+
         for (Vertex v : graph) {
             g.insertVertex(v);
         }
-        for (Edge e : graph.edges()) {
-            g.insertEdge(e);
-        }
+        g.insertEdges(graph.getEdges());
 
         g.removeVertex(vertex);
         return g;
@@ -133,15 +125,16 @@ public class WagnerMethod {
             for (Vertex v : graph) {
 
                 int degree = 0;
-                for (Edge e : graph.edges()) {
-                    if (e.source == v || e.target == v) {
-                        degree++;
-                    }
+                for(Vertex vi : graph.directNeighbors(v)){
+                    degree++;
                 }
                 if (degree != 3) return false; // May be planar
+                
             }
             return true; // Definitely not planar
         }
         return false; // May be planar
     }
+
+
 }
