@@ -34,8 +34,9 @@ public class Planarity extends Algorithm implements GraphReportExtension {
 	}
 
 	public Object calculate(GraphModel g) {
-        g = g;
-        return null;
+		WagnerMethod wm = new WagnerMethod();
+        return wm.isPlanar(g);
+        //return doAlgorithm();
 	}
 
 	@Override
@@ -44,7 +45,7 @@ public class Planarity extends Algorithm implements GraphReportExtension {
 		return "General";
 	}
 
-    public void doAlgorithm() {
+    public boolean doAlgorithm() {
         //GraphRequest<Vertex, Edge> gr = new GraphRequest<>();
         //dispatchEvent(gr);
         //BaseGraph<Vertex, Edge> graph = gr.getGraph();
@@ -53,6 +54,7 @@ public class Planarity extends Algorithm implements GraphReportExtension {
         System.out.println("Checking planarity ... ");
         WagnerMethod wm = new WagnerMethod();
         boolean p = wm.isPlanar(g);
+        return p;
     }
 
 }
