@@ -209,5 +209,77 @@ public class WagnerMethodTest {
         }
     }
 
+    @Test
+    public void ManualGraph1() {
+        GraphModel gm = new GraphModel();
+        ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+        for (int i = 0; i < 8; i++) {
+            Vertex v = new Vertex();
+            vertices.add(v);
+            gm.addVertex(v);
+        }
+        gm.addEdge(new Edge(vertices.get(0), vertices.get(1)));
+        gm.addEdge(new Edge(vertices.get(0), vertices.get(2)));
+        gm.addEdge(new Edge(vertices.get(0), vertices.get(3)));
+        gm.addEdge(new Edge(vertices.get(0), vertices.get(4)));
+        gm.addEdge(new Edge(vertices.get(0), vertices.get(5)));
 
+        gm.addEdge(new Edge(vertices.get(1), vertices.get(2)));
+        gm.addEdge(new Edge(vertices.get(1), vertices.get(3)));
+        gm.addEdge(new Edge(vertices.get(1), vertices.get(5)));
+        gm.addEdge(new Edge(vertices.get(1), vertices.get(6)));
+
+        gm.addEdge(new Edge(vertices.get(2), vertices.get(3)));
+        gm.addEdge(new Edge(vertices.get(2), vertices.get(6)));
+        gm.addEdge(new Edge(vertices.get(2), vertices.get(7)));
+
+        gm.addEdge(new Edge(vertices.get(3), vertices.get(4)));
+        gm.addEdge(new Edge(vertices.get(3), vertices.get(7)));
+
+        gm.addEdge(new Edge(vertices.get(4), vertices.get(5)));
+        gm.addEdge(new Edge(vertices.get(4), vertices.get(7)));
+
+        gm.addEdge(new Edge(vertices.get(5), vertices.get(6)));
+
+        gm.addEdge(new Edge(vertices.get(6), vertices.get(7)));
+
+        WagnerMethod wm = new WagnerMethod();
+        assertFalse(wm.isPlanar(gm));
+    }
+
+    @Test
+    public void ManualGraph2() {
+        GraphModel gm = new GraphModel();
+        ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+        for (int i = 0; i < 8; i++) {
+            Vertex v = new Vertex();
+            vertices.add(v);
+            gm.addVertex(v);
+        }
+        gm.addEdge(new Edge(vertices.get(0), vertices.get(1)));
+        gm.addEdge(new Edge(vertices.get(0), vertices.get(3)));
+        gm.addEdge(new Edge(vertices.get(0), vertices.get(4)));
+        gm.addEdge(new Edge(vertices.get(0), vertices.get(5)));
+
+        gm.addEdge(new Edge(vertices.get(1), vertices.get(2)));
+        gm.addEdge(new Edge(vertices.get(1), vertices.get(5)));
+        gm.addEdge(new Edge(vertices.get(1), vertices.get(6)));
+
+        gm.addEdge(new Edge(vertices.get(2), vertices.get(3)));
+        gm.addEdge(new Edge(vertices.get(2), vertices.get(6)));
+        gm.addEdge(new Edge(vertices.get(2), vertices.get(7)));
+
+        gm.addEdge(new Edge(vertices.get(3), vertices.get(4)));
+        gm.addEdge(new Edge(vertices.get(3), vertices.get(7)));
+
+        gm.addEdge(new Edge(vertices.get(4), vertices.get(5)));
+        gm.addEdge(new Edge(vertices.get(4), vertices.get(7)));
+
+        gm.addEdge(new Edge(vertices.get(5), vertices.get(6)));
+
+        gm.addEdge(new Edge(vertices.get(6), vertices.get(7)));
+
+        WagnerMethod wm = new WagnerMethod();
+        assertTrue(wm.isPlanar(gm));
+    }
 }
