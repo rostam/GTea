@@ -1,20 +1,9 @@
 package graphtea.extensions.reports.planarity;
 
 import graphtea.graph.graph.Edge;
-import graphtea.library.BaseVertex;
-import graphtea.library.BaseEdge;
-import graphtea.library.BaseGraph;
-import graphtea.library.algorithms.Algorithm;
-import graphtea.library.algorithms.AutomatedAlgorithm;
-import graphtea.library.algorithms.planarity.CustomEdge;
-import graphtea.library.algorithms.planarity.CustomGraph;
-import graphtea.library.algorithms.planarity.CustomVertex;
-import graphtea.library.event.GraphRequest;
 import graphtea.graph.graph.GraphModel;
-import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.Vertex;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class WagnerMethod {
 
@@ -100,7 +89,6 @@ public class WagnerMethod {
     public GraphModel removeVertex(Vertex vertex, GraphModel graph ){
         GraphModel g = new GraphModel();
 
-
         for (Vertex v : graph) {
             g.insertVertex(v);
         }
@@ -124,12 +112,9 @@ public class WagnerMethod {
 
             for (Vertex v : graph) {
 
-                int degree = 0;
-                for(Vertex vi : graph.directNeighbors(v)){
-                    degree++;
-                }
-                if (degree != 3) return false; // May be planar
-                
+                if(graph.directNeighbors(v).size() != 3)
+                    return false; // May be planar
+
             }
             return true; // Definitely not planar
         }
