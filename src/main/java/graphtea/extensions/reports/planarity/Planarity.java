@@ -1,19 +1,8 @@
 package graphtea.extensions.reports.planarity;
 
 import graphtea.graph.graph.GraphModel;
-import graphtea.library.BaseVertex;
-import graphtea.library.BaseEdge;
-import graphtea.library.BaseGraph;
-import graphtea.graph.graph.Edge;
-import graphtea.graph.graph.Vertex;
 import graphtea.library.algorithms.Algorithm;
-import graphtea.library.algorithms.AutomatedAlgorithm;
-import graphtea.library.algorithms.planarity.CustomEdge;
-import graphtea.library.algorithms.planarity.CustomGraph;
-import graphtea.library.algorithms.planarity.CustomVertex;
-import graphtea.library.event.GraphRequest;
 import graphtea.plugins.reports.extension.GraphReportExtension;
-import java.util.ArrayList;
 
 /**
  * Tests whether a graph is planar.

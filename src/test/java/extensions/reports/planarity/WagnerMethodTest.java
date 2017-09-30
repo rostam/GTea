@@ -6,37 +6,11 @@ import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import org.junit.Test;
-
 import java.util.ArrayList;
-
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
 public class WagnerMethodTest {
-
-    //WagnerMethod pc = new WagnerMethod();
-
-    /*********************
-     * Helper Functions
-     *********************/
-
-    /**
-     * Checks if the edge is subdivided in a certain direction
-     *
-     * @Returns true if subdivision worked, false otherwise */
-    private boolean checkSubdivided(GraphModel g, Vertex src, Vertex trg, Vertex addedVertex){
-        for(Edge e : g.edges()) {
-            if(e.source == addedVertex && e.target == src){
-                for(Edge eb : g.edges()) {
-                    if(eb.target == addedVertex && eb.source == trg){
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
 
     /**********************
      * Singular Function Tests
