@@ -1,8 +1,12 @@
 package graphtea.extensions.reports.planarity;
 
+import graphtea.extensions.algs4.Bipartite;
+import graphtea.extensions.reports.basicreports.NumOfTriangles;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
+import graphtea.library.algorithms.util.BipartiteChecker;
+
 import java.util.ArrayList;
 
 public class WagnerMethod {
@@ -28,7 +32,7 @@ public class WagnerMethod {
 
         for (Edge e : graph.getEdges()) {
             isPlanar( contractEdge(e, graph));
-            isPlanar( removeEdge(e, graph));
+            //isPlanar( removeEdge(e, graph));
         }
 
         for (Vertex v : graph) {
@@ -65,11 +69,14 @@ public class WagnerMethod {
         Vertex trg = edge.target;
         Vertex srcContract = edge.source;
 
-        ArrayList<Edge> edgesToAdd = new ArrayList<Edge>();
         g.removeEdge(edge);
 
+        ArrayList<Edge> edgesToAdd = new ArrayList<Edge>();
         for(Vertex v : g.directNeighbors(srcContract)){
-            edgesToAdd.add(new Edge(v, trg));
+
+            if(!g.directNeighbors(trg).contains(v))
+                edgesToAdd.add(new Edge(v, trg));
+
             if(g.getEdge(v, srcContract) != null) {
                 g.removeEdge(g.getEdge(v, srcContract));
             }
@@ -111,12 +118,16 @@ public class WagnerMethod {
         if (graph.getEdgesCount() == 9 && graph.getVerticesCount() == 6) {
 
             for (Vertex v : graph) {
-
-                if(graph.directNeighbors(v).size() != 3)
+                if (graph.directNeighbors(v).size() != 3)
                     return false; // May be planar
-
             }
-            return true; // Definitely not planar
+            NumOfTriangles nt = new NumOfTriangles();
+            int numTriangles = ((int) nt.calculate(graph));
+            if( numTriangles == 0 ) {
+                System.out.println("No triangle!");
+                return true; // Definitely not planar
+            }
+
         }
         return false; // May be planar
     }
