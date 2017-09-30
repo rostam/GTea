@@ -291,6 +291,7 @@ var reload = function(nodes, edges){
 };
 
 function clearCanvas(){
+    $('#reportResults').html('');
     $.get(serverAddr + 'clear/'
         + uuid
     ).done(function (data) {
