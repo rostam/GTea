@@ -112,11 +112,8 @@ public class WagnerMethod {
 
             for (Vertex v : graph) {
 
-                int degree = 0;
-                for(Vertex vi : graph.directNeighbors(v)){
-                    degree++;
-                }
-                if (degree != 3) return false; // May be planar
+                if(graph.directNeighbors(v).size() != 3)
+                    return false; // May be planar
 
             }
             return true; // Definitely not planar
