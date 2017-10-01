@@ -58,6 +58,7 @@ $.get(serverAddr + 'graphs/')
     });
 
 function Report() {
+    $('#reportResults').html('computing...');
     var reportProps = "";
     $('#reportProps').children('input').each(function (i, item) {
         reportProps += item.name + ":" + item.value + "-"

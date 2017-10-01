@@ -98,8 +98,8 @@ function addSingleVertex(event) {
 
             cy.add({
                 data: {id: nodeId, label: nodeId},
-                position: event.position,
-                renderedPosition: event.position
+                position: event.position//,
+                //renderedPosition: event.position
             });
 
             nodeId++;
@@ -291,6 +291,7 @@ var reload = function(nodes, edges){
 };
 
 function clearCanvas(){
+    $('#reportResults').html('');
     $.get(serverAddr + 'clear/'
         + uuid
     ).done(function (data) {
