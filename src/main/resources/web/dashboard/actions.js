@@ -28,5 +28,7 @@ function do_saves() {
         window.open(serverAddr + 'tea/currentGraph--'+uuid);
         // server(serverAddr + 'tea/currentGraph--'+uuid,function (data) {
         // });
+    } else if(output == "LaTeX") {
+        window.open(serverAddr + 'tex/currentGraph--'+uuid);
     }
 }

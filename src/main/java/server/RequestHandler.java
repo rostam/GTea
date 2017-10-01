@@ -5,6 +5,7 @@ import com.sun.jersey.multipart.FormDataParam;
 import graphtea.extensions.Centrality;
 import graphtea.extensions.G6Format;
 import graphtea.extensions.RandomTree;
+import graphtea.extensions.io.LatexWriter;
 import graphtea.extensions.io.SaveGraph;
 import graphtea.graph.graph.*;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
@@ -295,6 +296,36 @@ public class RequestHandler {
         return Response
                 .ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
                 .header("content-disposition", "attachment; filename = " + name +".tea")
+                .build();
+    }
+
+    @GET
+    @Path("/tex/{info}")
+    public Response saveTex(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String name = infos[0];String sessionID = infos[1];
+        GraphModel g = sessionToGraph.get(sessionID);
+        try {
+            new LatexWriter().write(new File(name+".tex"),g);
+        } catch (GraphIOException e) {
+            e.printStackTrace();
+        }
+        StreamingOutput fileStream = new StreamingOutput() {
+            @Override
+            public void write(java.io.OutputStream output) throws IOException, WebApplicationException {
+                try {
+                    java.nio.file.Path path = Paths.get(name+".tex");
+                    byte[] data = Files.readAllBytes(path);
+                    output.write(data);
+                    output.flush();
+                } catch (Exception e) {
+                    throw e;
+                }
+            }
+        };
+        return Response
+                .ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
+                .header("content-disposition", "attachment; filename = " + name +".tex")
                 .build();
     }
 
