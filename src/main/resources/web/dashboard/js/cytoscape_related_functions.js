@@ -1,3 +1,6 @@
+var serverAddr;
+var uuid;
+var parallels = [];
 
 /**
  * Finds if an edge is parallel */
@@ -20,7 +23,10 @@ function findParallels(element, v){
     }
 }
 
-function initCytoscape(arrow) {
+function initCytoscape(arrow, _serverAddr, _uuid) {
+    serverAddr = _serverAddr;
+    uuid = _uuid;
+
     cy = cytoscape({
         container: document.getElementById('canvas'),
         style: [ // the stylesheet for the graph
@@ -82,15 +88,18 @@ function setVertexIds() {
 }
 
 function addSingleVertex(event) {
+    var type = $('#graphType').find('option:selected').text();
+
     $.get(serverAddr + 'addVertex/'
         + nodeId + "--" + event.position.x + "--" + event.position.y
+        + "--" + type
         + "--" + uuid)
         .done(function (data) {
 
             cy.add({
                 data: {id: nodeId, label: nodeId},
-                position: event.position,
-                renderedPosition: event.position
+                position: event.position//,
+                //renderedPosition: event.position
             });
 
             nodeId++;
@@ -173,7 +182,6 @@ function applyLayout(){
  * Updates the graph type to either directed or undirected
  * */
 function selectType() {
-
     var type = $('#graphType').find('option:selected').text();
 
     if (type === 'directed') {
@@ -281,4 +289,16 @@ var reload = function(nodes, edges){
     });
     setTimeout(reload, 1000);
 };
+
+function clearCanvas(){
+    $('#reportResults').html('');
+    $.get(serverAddr + 'clear/'
+        + uuid
+    ).done(function (data) {
+        reload(data.nodes, data.edges);
+
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        alert(errorThrown);
+    });
+}
 

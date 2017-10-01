@@ -1,14 +1,13 @@
-var serverAddr = "http://0.0.0.0:2342/";
+var serverAddr = "http://127.0.0.1:2342/"; //"http://0.0.0.0:2342/";
 var nodeId = 0;
-//var edgeId = -1;
 var cy; //cytoscape object
 var selectedNode;
 var uuid = guid();
 var directed = 'triangle', undirected = 'none';
-var parallels = [];
+//var parallels = [];
 var report_results;
 
-initCytoscape(undirected);
+initCytoscape(undirected, serverAddr, uuid);
 
 var original_data = {};
 $.get(serverAddr + 'graphs/')
@@ -59,6 +58,7 @@ $.get(serverAddr + 'graphs/')
     });
 
 function Report() {
+    $('#reportResults').html('computing...');
     var reportProps = "";
     $('#reportProps').children('input').each(function (i, item) {
         reportProps += item.name + ":" + item.value + "-"
@@ -169,17 +169,13 @@ cy.on('tap', function(event) {
 
 cy.on('cxttapend', 'node', function(event) {
     var evtTarget = event.target;
-    //if(evtTarget.isNode){
-        removeSingleVertex(evtTarget);
-    //}
+    removeSingleVertex(evtTarget);
 
 });
 
 cy.on('cxttapend', 'edge', function(event) {
     var evtTarget = event.target;
-    if(evtTarget.isEdge){
-        removeSingleEdge(evtTarget);
-    }
+    removeSingleEdge(evtTarget);
 });
 
 cy.on('layoutstop', function() {
