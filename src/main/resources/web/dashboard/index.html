@@ -34,15 +34,23 @@
             <option>Freehand drawing</option>
         </select>
         <select id="graphType" onchange="selectType()">
-        <option>directed</option>
-        <option selected="selected">undirected</option></select>
+            <option>directed</option>
+            <option selected="selected">undirected</option>
+        </select>
         <!--<button onclick="selectLoader()">Select</button>-->
         <div id="generators" class="loaders">
             <p id="strings-generator"></p>
-            <table><tr>
-                <td><select id="categories"><option>Select</option></select></td>
-                <td><div id="props"><span id="props_keys">n</span> : <input type="text" id="props_vals" placeholder="Integer"></div></td>
-            </tr></table>
+            <table>
+                <tr>
+                    <td><select id="categories">
+                        <option>Select</option>
+                    </select></td>
+                    <td>
+                        <div id="props"><span id="props_keys">n</span> : <input type="text" id="props_vals"
+                                                                                placeholder="Integer"></div>
+                    </td>
+                </tr>
+            </table>
             <p id="strings-layout"></p>
             <select id="layouts">
                 <option>Force Directed</option>
@@ -64,19 +72,22 @@
         <div id="elformat" class="loaders">
             <p id="strings-elformat"></p>
             Edge list in csv format: <br/><textarea id="elstring" name="Text1" cols="20" rows="5"></textarea>
-            <br/><button onclick="load_graph('el',false)">Load Only</button>
-                 <button onclick="load_graph('el',true)">Load and Draw</button>
+            <br/>
+            <button onclick="load_graph('el',false)">Load Only</button>
+            <button onclick="load_graph('el',true)">Load and Draw</button>
         </div>
         <div id="adjMatformat" class="loaders">
             <p id="strings-adjMatformat"></p>
             <br/><textarea id="adjstring" name="Text1" cols="20" rows="5"></textarea>
-            <br/><button onclick="load_graph('adj',false)">Load Only</button>
+            <br/>
+            <button onclick="load_graph('adj',false)">Load Only</button>
             <button onclick="load_graph('adj',true)">Load and Draw</button>
         </div>
         <div id="g6format" class="loaders">
             <p id="strings-g6format"></p>
             G6 Format: <input id="g6string" type="text">
-            <br/><button onclick="load_graph('g6',false)">Load Only</button>
+            <br/>
+            <button onclick="load_graph('g6',false)">Load Only</button>
             <button onclick="load_graph('g6',true)">Load and Draw</button>
         </div>
         <p id="strings-report"></p>
@@ -87,6 +98,19 @@
             <textarea name="Text1" cols="50" rows="6" id="reportResults"></textarea>
             <button id="myBtn">View Styled</button>
             <button onclick="showOnGraph()">Show On Graph</button>
+        </div>
+        <hr>
+        <p id="strings-save"></p>
+        <div>Save:
+            <select id="output">
+                <option>G6 Format</option>
+                <option>Adjacency Matrix</option>
+                <option>Adjacency List</option>
+                <option>GraphTea Format</option>
+                <option>LaTeX</option>
+            </select>
+            <button onclick="do_saves()">Go</button>
+            <textarea name="Text2" cols="50" rows="6" id="outputResults"></textarea>
         </div>
         <!--<button onclick="clearCanvas()">Clear</button>-->
 

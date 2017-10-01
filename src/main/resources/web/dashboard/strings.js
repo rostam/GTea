@@ -13,7 +13,9 @@ var strings = {
     "        A styled version can be also generated.",
     adjMat: "The adjacency matrix should be written in the following format." +
     "        The elements in a row are separated with a comma." +
-    "        Each row comes in a new line. "
+    "        Each row comes in a new line. ",
+    save: "Here, you can save the current graph to different format. The outputs" +
+            "that are textual are shown on the text area."
 };
 
 $('#strings-intro').html(strings.intro);
@@ -23,3 +25,4 @@ $('#strings-freehand').html(strings.freehand);
 $("#strings-layout").html(strings.layout);
 $("#strings-report").html(strings.report);
 $("#strings-adjMatformat").html(strings.adjMat);
+$("#strings-save").html(strings.save);

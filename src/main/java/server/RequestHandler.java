@@ -9,6 +9,7 @@ import graphtea.plugins.reports.extension.GraphReportExtension;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONString;
 import org.reflections.Reflections;
 
 import javax.ws.rs.*;
@@ -349,6 +350,7 @@ public class RequestHandler {
                 g = getGraphFromEdgeList(graph);
                 break;
             case "g6":
+                graph = graph.replaceAll("qqq","?");
                 g = G6Format.stringToGraphModel(graph);
                 break;
             case "adj":
@@ -405,6 +407,30 @@ public class RequestHandler {
             currentGraph.addEdge(e);
         }
         return currentGraph;
+    }
+
+    @GET
+    @Path("/save/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response save(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String sessionID = infos[1];
+        handleSession(sessionID);
+        String output = infos[0];
+        String result = "";
+        GraphModel g = sessionToGraph.get(sessionID);
+        if(g.getVerticesCount() != 0) {
+            if (output.equals("g6")) {
+                result=G6Format.graphToG6(g);
+            }
+        }
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("results",result);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok(jsonObject.toString()).header("Access-Control-Allow-Origin", "*").build();
     }
 
     @GET

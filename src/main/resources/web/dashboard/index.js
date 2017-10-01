@@ -264,6 +264,9 @@ function selectLoader() {
 function load_graph(type,isDraw) {
     var str = $('#'+type+'string').val().replace(/\n/g,"-");
     var isDirected = $('#graphType').find('option:selected').text();
+    if(type == "g6") {
+        str = str.replaceAll(/\?/g,"qqq");
+    }
     server(serverAddr + 'loadGraph' + '/'+ type + "--"
     +str+"--"+isDirected+"--"+uuid,function (data) {
             if(isDraw) {
