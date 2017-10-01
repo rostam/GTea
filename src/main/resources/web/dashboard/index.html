@@ -49,9 +49,17 @@
                 <option>Preset</option>
                 <option>Botanical Tree</option>
             </select>
-            <button onclick="load_generator(false)">Load Only</button>
-            <button onclick="load_generator(true)">Load and Draw</button>
-            <button onclick="cy.fit()">Fit</button>
+            <select id="actions">
+                <option>Load and Draw</option>
+                <option>Load Only</option>
+                <option>Fit Canvas</option>
+                <option>Clear Canvas</option>
+                <option>Canvas to Image</option>
+            </select>
+            <button onclick="do_actions()">Go</button>
+            <!--<button onclick="load_generator(false)">Load Only</button>-->
+            <!--<button onclick="load_generator(true)">Load and Draw</button>-->
+            <!--<button onclick="cy.fit()">Fit</button>-->
         </div>
         <div id="elformat" class="loaders">
             <p id="strings-elformat"></p>
@@ -80,7 +88,7 @@
             <button id="myBtn">View Styled</button>
             <button onclick="showOnGraph()">Show On Graph</button>
         </div>
-        <button onclick="clearCanvas()">Clear</button>
+        <!--<button onclick="clearCanvas()">Clear</button>-->
 
         <!--<div id="reportResults"></div>-->
         <canvas id="paperCanvas"></canvas>
@@ -110,5 +118,6 @@
 <script src="modal.js"></script>
 <script src="strings.js"></script>
 <script src="distinctColors.js"></script>
+<script src="actions.js"></script>
 </body>
 </html>
