@@ -1,10 +1,14 @@
 package server;
 
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataParam;
 import graphtea.extensions.Centrality;
 import graphtea.extensions.G6Format;
 import graphtea.extensions.RandomTree;
+import graphtea.extensions.io.SaveGraph;
 import graphtea.graph.graph.*;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
+import graphtea.plugins.main.saveload.core.GraphIOException;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -13,9 +17,13 @@ import org.codehaus.jettison.json.JSONString;
 import org.reflections.Reflections;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -259,6 +267,37 @@ public class RequestHandler {
         }
         return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
     }
+
+    @GET
+    @Path("/tea/{info}")
+    public Response saveTea(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String name = infos[0];String sessionID = infos[1];
+        GraphModel g = sessionToGraph.get(sessionID);
+        try {
+            new SaveGraph().write(new File(name+".tea"),g);
+        } catch (GraphIOException e) {
+            e.printStackTrace();
+        }
+        StreamingOutput fileStream = new StreamingOutput() {
+            @Override
+            public void write(java.io.OutputStream output) throws IOException, WebApplicationException {
+                try {
+                    java.nio.file.Path path = Paths.get(name+".tea");
+                    byte[] data = Files.readAllBytes(path);
+                    output.write(data);
+                    output.flush();
+                } catch (Exception e) {
+                    throw e;
+                }
+            }
+        };
+        return Response
+                .ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
+                .header("content-disposition", "attachment; filename = " + name +".tea")
+                .build();
+    }
+
 
     /**
      * Adds a single edge between two given vertices
@@ -624,5 +663,4 @@ public class RequestHandler {
         }
         return false; // Session exists
     }
-
 }

@@ -167,13 +167,16 @@ function removeSingleEdge(edge) {
     });
 }
 
-
 function applyLayout(){
     var lay = $('#layouts').find('option:selected').text();
     if (lay == "Preset") {
         cy.layout({name: 'preset'}).run();
     } else if (lay == "Force Directed") {
         cy.layout({name: 'cose'}).run();
+    } else if (lay == "Circular") {
+        cy.layout({name: 'circle'}).run();
+    } else if (lay == "Grid") {
+        cy.layout({name: 'grid'}).run();
     }
 }
 

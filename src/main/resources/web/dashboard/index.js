@@ -258,6 +258,9 @@ function selectLoader() {
         case "G6 format":
             $('#g6format').show();
             break;
+        case "File":
+            $('#fileformat').show();
+            break;
     }
 }
 

@@ -32,6 +32,7 @@
             <option>Adjacency matrix</option>
             <option>G6 format</option>
             <option>Freehand drawing</option>
+            <option>File</option>
         </select>
         <select id="graphType" onchange="selectType()">
             <option>directed</option>
@@ -54,6 +55,8 @@
             <p id="strings-layout"></p>
             <select id="layouts">
                 <option>Force Directed</option>
+                <option>Circular</option>
+                <option>Grid</option>
                 <option>Preset</option>
                 <option>Botanical Tree</option>
             </select>
@@ -89,6 +92,13 @@
             <br/>
             <button onclick="load_graph('g6',false)">Load Only</button>
             <button onclick="load_graph('g6',true)">Load and Draw</button>
+        </div>
+        <div id="fileformat" class="loaders">
+            <p id="strings-fileformat"></p>
+            <form action="upload" method="post" enctype="multipart/form-data">
+                Select a file : <input type="file" name="file" size="45" /><br/>
+                <input type="submit" value="Upload It" />
+            </form>
         </div>
         <p id="strings-report"></p>
         <select id="reports"></select>

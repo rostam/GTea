@@ -20,5 +20,13 @@ function do_saves() {
         server(serverAddr + 'save/g6--'+uuid,function (data) {
             $("#outputResults").html(data.results);
         });
+    } else if(output == "Adjacency List") {
+
+    } else if(output == "Adjacency Matrix") {
+
+    } else if(output == "GraphTea Format") {
+        window.open(serverAddr + 'tea/currentGraph--'+uuid);
+        // server(serverAddr + 'tea/currentGraph--'+uuid,function (data) {
+        // });
     }
 }
