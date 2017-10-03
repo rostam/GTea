@@ -1,20 +1,30 @@
 package server;
 
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataParam;
 import graphtea.extensions.Centrality;
 import graphtea.extensions.G6Format;
 import graphtea.extensions.RandomTree;
+import graphtea.extensions.io.LatexWriter;
+import graphtea.extensions.io.SaveGraph;
 import graphtea.graph.graph.*;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
+import graphtea.plugins.main.saveload.core.GraphIOException;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONString;
 import org.reflections.Reflections;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -259,6 +269,67 @@ public class RequestHandler {
         return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
     }
 
+    @GET
+    @Path("/tea/{info}")
+    public Response saveTea(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String name = infos[0];String sessionID = infos[1];
+        GraphModel g = sessionToGraph.get(sessionID);
+        try {
+            new SaveGraph().write(new File(name+".tea"),g);
+        } catch (GraphIOException e) {
+            e.printStackTrace();
+        }
+        StreamingOutput fileStream = new StreamingOutput() {
+            @Override
+            public void write(java.io.OutputStream output) throws IOException, WebApplicationException {
+                try {
+                    java.nio.file.Path path = Paths.get(name+".tea");
+                    byte[] data = Files.readAllBytes(path);
+                    output.write(data);
+                    output.flush();
+                } catch (Exception e) {
+                    throw e;
+                }
+            }
+        };
+        return Response
+                .ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
+                .header("content-disposition", "attachment; filename = " + name +".tea")
+                .build();
+    }
+
+    @GET
+    @Path("/tex/{info}")
+    public Response saveTex(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String name = infos[0];String sessionID = infos[1];
+        GraphModel g = sessionToGraph.get(sessionID);
+        try {
+            new LatexWriter().write(new File(name+".tex"),g);
+        } catch (GraphIOException e) {
+            e.printStackTrace();
+        }
+        StreamingOutput fileStream = new StreamingOutput() {
+            @Override
+            public void write(java.io.OutputStream output) throws IOException, WebApplicationException {
+                try {
+                    java.nio.file.Path path = Paths.get(name+".tex");
+                    byte[] data = Files.readAllBytes(path);
+                    output.write(data);
+                    output.flush();
+                } catch (Exception e) {
+                    throw e;
+                }
+            }
+        };
+        return Response
+                .ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
+                .header("content-disposition", "attachment; filename = " + name +".tex")
+                .build();
+    }
+
+
     /**
      * Adds a single edge between two given vertices
      *
@@ -349,6 +420,7 @@ public class RequestHandler {
                 g = getGraphFromEdgeList(graph);
                 break;
             case "g6":
+                graph = graph.replaceAll("qqq","?");
                 g = G6Format.stringToGraphModel(graph);
                 break;
             case "adj":
@@ -405,6 +477,30 @@ public class RequestHandler {
             currentGraph.addEdge(e);
         }
         return currentGraph;
+    }
+
+    @GET
+    @Path("/save/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response save(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String sessionID = infos[1];
+        handleSession(sessionID);
+        String output = infos[0];
+        String result = "";
+        GraphModel g = sessionToGraph.get(sessionID);
+        if(g.getVerticesCount() != 0) {
+            if (output.equals("g6")) {
+                result=G6Format.graphToG6(g);
+            }
+        }
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("results",result);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Response.ok(jsonObject.toString()).header("Access-Control-Allow-Origin", "*").build();
     }
 
     @GET
@@ -598,5 +694,4 @@ public class RequestHandler {
         }
         return false; // Session exists
     }
-
 }
