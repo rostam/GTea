@@ -268,7 +268,11 @@ function load_graph(type,isDraw) {
     var str = $('#'+type+'string').val().replace(/\n/g,"-");
     var isDirected = $('#graphType').find('option:selected').text();
     if(type == "g6") {
-        str = str.replaceAll(/\?/g,"qqq");
+        var str2 = "";
+        for(var i=0;i<str.length;i++)
+            if(str[i] == "?") str2 += "qqq";
+            else str2 += str[i];
+        str = str2;
     }
     server(serverAddr + 'loadGraph' + '/'+ type + "--"
     +str+"--"+isDirected+"--"+uuid,function (data) {
