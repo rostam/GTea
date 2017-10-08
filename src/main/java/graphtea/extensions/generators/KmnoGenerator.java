@@ -49,7 +49,7 @@ public class KmnoGenerator implements GraphGeneratorExtension, Parametrizable, S
 
 	public String getDescription()
 	{
-		return "Generate Km,n,o";
+		return "Generate a multipartite graph consisting of three parts with the sizes m,n,o";
 	}
 
 	Vertex[] v;
