@@ -8,7 +8,7 @@ public class PQTree {
 
     PQNode _root;
 
-    public PQTree(Iterable<PQEdge> U, Iterable<PQEdge> S){
+    public PQTree(Iterable<PQNode> U, Iterable<PQNode> S){
 
     }
 

@@ -1,10 +1,9 @@
 package graphtea.extensions.reports.planarity.planaritypq;
 
-import graphtea.graph.graph.Vertex;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PQNode extends Vertex {
+public class PQNode {
     static String PNODE = "p-node";
     static String QNODE = "q-node";
     static String PSEUDO_NODE = "pseudonode";
@@ -34,8 +33,6 @@ public class PQNode extends Vertex {
     List<PQNode> siblings = new ArrayList<>();
 
     public PQNode(){
-        super();
-
         blocked = false;
         marked = false;
         pertinentChildCount = 0;
