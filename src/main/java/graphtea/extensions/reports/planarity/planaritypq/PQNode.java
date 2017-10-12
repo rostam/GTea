@@ -1,8 +1,6 @@
 package graphtea.extensions.reports.planarity.planaritypq;
 
-import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.Vertex;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +13,7 @@ public class PQNode extends Vertex {
     static String PARTIAL = "partial";
     static String FULL = "full";
     static String EMPTY = "EMPTY";
-    String label = "";
+    String labelType = "";
 
     PQNode circularLink_next;
     PQNode circularLink_prev;
@@ -36,6 +34,8 @@ public class PQNode extends Vertex {
     List<PQNode> siblings = new ArrayList<>();
 
     public PQNode(){
+        super();
+
         blocked = false;
         marked = false;
         pertinentChildCount = 0;

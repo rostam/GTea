@@ -142,7 +142,6 @@ public class PQ {
     public boolean TEMPLATE_L1(PQNode x){
         return false;
     }
-
     public boolean TEMPLATE_P1(PQNode x){
         return false;
     }
@@ -184,7 +183,7 @@ public class PQ {
 
         y.parent = x.parent;
         y.pertinentLeafCount = x.pertinentLeafCount;
-        y.label = PQNode.PARTIAL;
+        y.labelType = PQNode.PARTIAL;
         y.parent.setPartialChildren( union(y.parent.partialChildren(), Arrays.asList(y)) );
 
         // Remove Y from the list of children of X formed by the CIRCULAR_LINK fields
@@ -211,7 +210,7 @@ public class PQ {
             else {
                 zf = new PQNode();
                 zf.nodeType = PQNode.PNODE;
-                zf.label = PQNode.FULL;
+                zf.labelType = PQNode.FULL;
                 for(PQNode w : x.fullChildren()){
                     w.removeFromCircularLink();
                     w.parent = zf;
@@ -247,7 +246,7 @@ public class PQ {
             }
             else{
                 ze = x;
-                ze.label = PQNode.EMPTY;
+                ze.labelType = PQNode.EMPTY;
                 ze.childCount = numberEmpty;
             }
             ze.parent = y;
@@ -306,7 +305,7 @@ public class PQ {
             return false;
         }
 
-        x.label = PQNode.PARTIAL;
+        x.labelType = PQNode.PARTIAL;
         x.parent.setPartialChildren(union(x.parent.partialChildren(), Arrays.asList(x)));
 
         if(x.partialChildren().size() > 0){
