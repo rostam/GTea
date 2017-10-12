@@ -25,7 +25,7 @@ public class PQ {
 
             List<PQNode> BS = new ArrayList<>();
             List<PQNode> US = new ArrayList<>();
-            for(PQNode n : root.immediateSiblings(x)){
+            for(PQNode n : x.immediateSiblings()){
                 if(n.blocked) {
                     BS.add(n);
                 }
@@ -47,7 +47,9 @@ public class PQ {
                 PQNode y = x.parent;
                 if(BS.size() > 0){
                     // list := the maximal consecutive set of blocked siblings adjacent to x
-                    List<PQNode> list = x.siblings.stream().filter(u -> u.blocked).collect(Collectors.toList());
+                    //List<PQNode> list = x.siblings.stream().filter(u -> u.blocked).collect(Collectors.toList());
+                    List<PQNode> list = maximalConsecutiveSetOfSiblingsAdjacent(x, true);
+
                     listSize = list.size();
                     for(PQNode z : list){
                         z.blocked = false;
@@ -124,6 +126,10 @@ public class PQ {
         }
 
         return T;
+    }
+
+    public List<PQNode> maximalConsecutiveSetOfSiblingsAdjacent(PQNode x, boolean blocked){
+        return null;
     }
 
     public void replace(PQNode T, PQTree TPrime){
