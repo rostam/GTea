@@ -30,7 +30,7 @@ public class PQNode {
     int childCount;
 
     PQNode parent;
-    List<PQNode> siblings = new ArrayList<>();
+    List<PQNode> children = new ArrayList<>();
 
     public PQNode(){
         blocked = false;
@@ -60,6 +60,11 @@ public class PQNode {
     }
 
     public PQNode emptySibling(){
+        PQNode = this.circularLink_next;
+            if (v.labelType.equals(EMPTY)) {
+                return v;
+            }
+        }
         return null;
     }
 
@@ -71,7 +76,10 @@ public class PQNode {
     }
 
     public List<PQNode> immediateSiblings(){
-        return null;
+        List<PQNode> adjacents = new ArrayList<PQNode>();
+        adjacents.add(this.circularLink_prev);
+        adjacents.add(this.circularLink_next);
+        return adjacents;
     }
 
     public void replaceInCircularLink(PQNode x, PQNode y){
@@ -79,6 +87,8 @@ public class PQNode {
     }
 
     public void replaceInImmediateSiblings(PQNode x, PQNode y){
+        this.circularLink_prev = x;
+        this.circularLink_next = y;
         // x is replaced by y
     }
 
@@ -87,7 +97,13 @@ public class PQNode {
     }
 
     public List<PQNode> fullChildren(){
-        return null;
+        List<PQNode> full = new ArrayList<PQNode>();
+        for (PQNode c : children) {
+            if (c.labelType.equals(FULL)) {
+                full.add(c);
+            }
+        }
+        return full;
     }
 
     public void setImmediateSiblings(List<PQNode> list){

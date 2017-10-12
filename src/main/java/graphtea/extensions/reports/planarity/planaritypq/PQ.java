@@ -8,7 +8,7 @@ public class PQ {
     private int blockedNodes;
     private int offTheTop;
 
-    public PQTree bubble(PQTree T, List<PQNode> S){
+    public PQNode bubble(PQNode _root, List<PQNode> S){
         Queue<PQNode> queue = new LinkedList<>(S);
         blockCount = 0;
         blockedNodes = 0;
@@ -16,8 +16,8 @@ public class PQ {
 
         while(queue.size() + blockCount + offTheTop > 1){
             if(queue.size() == 0){
-                T = null;
-                return T;
+                _root = null;
+                return _root;
             }
 
             PQNode x = queue.remove().parent;
@@ -25,7 +25,7 @@ public class PQ {
 
             List<PQNode> BS = new ArrayList<>();
             List<PQNode> US = new ArrayList<>();
-            for(PQNode n : T.immediateSiblings(x)){
+            for(PQNode n : root.immediateSiblings(x)){
                 if(n.blocked) {
                     BS.add(n);
                 }
@@ -38,7 +38,7 @@ public class PQ {
                 x.parent = US.get(0).parent;
                 x.blocked = false;
             }
-            else if(T.immediateSiblings(x).size() < 2){
+            else if(x.immediateSiblings().size() < 2){
                 x.blocked = false;
             }
 
@@ -74,7 +74,7 @@ public class PQ {
 
         }
 
-        return T;
+        return _root;
     }
 
     public PQTree reduce(PQTree T, List<PQNode> S){
