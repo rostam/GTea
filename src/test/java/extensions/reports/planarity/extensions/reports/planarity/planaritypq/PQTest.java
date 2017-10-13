@@ -3,6 +3,7 @@ package extensions.reports.planarity.extensions.reports.planarity.planaritypq;
 import graphtea.extensions.generators.CompleteGraphGenerator;
 import graphtea.extensions.reports.planarity.planaritypq.PQ;
 import graphtea.extensions.reports.planarity.planaritypq.PQNode;
+import graphtea.extensions.reports.planarity.planaritypq.PQTree;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import org.junit.Test;
@@ -15,7 +16,7 @@ import java.util.List;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 
-public class PQTreeTest {
+public class PQTest {
 
     @Test
     public void createPQNode(){
@@ -71,8 +72,24 @@ public class PQTreeTest {
 
     }
 
+    /** Tests bubbling up
+     * Checks:
+     * - All nodes processed
+     * - Marks all nodes in PRUNED(T,S)*/
     @Test
     public void bubbleTest(){
+
+        PQNode root = new PQNode();
+        List<PQNode> S = new ArrayList<>();
+
+        // Create tree to PQ-ify
+
+
+        // Test PQTree
+
+        PQ PQTree = new PQ();
+        PQNode treeRoot = PQTree.bubble(root, S);
+
 
     }
 
