@@ -20,22 +20,15 @@ public class PQ {
                 return _root;
             }
 
-            PQNode x = queue.remove().parent;
+            PQNode x = queue.remove();
             x.blocked = true;
 
-            List<PQNode> BS = new ArrayList<>();
-            List<PQNode> US = new ArrayList<>();
-            for(PQNode n : x.immediateSiblings()){
-                if(n.blocked) {
-                    BS.add(n);
-                }
-                else {
-                    US.add(n);
-                }
-            }
+            List<PQNode> BS = x.immediateSiblings().stream().filter(u -> u.blocked).collect(Collectors.toList());
+            List<PQNode> US = x.immediateSiblings().stream().filter(u -> !u.blocked).collect(Collectors.toList());
 
             if(US.size() > 0){
-                x.parent = US.get(0).parent;
+                PQNode y = US.get(0);
+                x.parent = y.parent;
                 x.blocked = false;
             }
             else if(x.immediateSiblings().size() < 2){
