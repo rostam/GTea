@@ -2,6 +2,7 @@ package graphtea.extensions.reports.planarity.planaritypq;
 
 import java.util.ArrayList;
 import java.util.List;
+import graphtea.extensions.reports.planarity.planaritypq.IllegalNodeTypeException;
 
 public class PQNode {
     static String PNODE = "p-node";
@@ -47,25 +48,39 @@ public class PQNode {
         return nodeType.equals(checkType);
     }
 
-    public List<PQNode> partialChildren(){
-        return null;
+    public List<PQNode> partialChildren() {
+        List<PQNode> cList = new ArrayList<PQNode>();
+        for (PQNode v : this.children) {
+            if (v.labelType == PARTIAL) {
+                cList.add(v);
+            }
+        }
+        return cList;
     }
 
     public void setPartialChildren(List<PQNode> list){
 
     }
 
-    public List<PQNode> endmostChildren(){
-        return null;
+    /*
+     * Note: only for q-nodes
+     */
+    public List<PQNode> endmostChildren() throws IllegalNodeTypeException{
+        try {
+            if (this.nodeType != QNODE) {
+
+                throw new IllegalNodeTypeException("endmostChildren() is only valid for Q-Nodes");
+            }
+            return
+            return null;
+        }
+        catch (IllegalNodeTypeException e) {
+
+        }
     }
 
     public PQNode emptySibling(){
-        PQNode = this.circularLink_next;
-            if (v.labelType.equals(EMPTY)) {
-                return v;
-            }
-        }
-        return null;
+       return null;
     }
 
     public void removeFromCircularLink(){
