@@ -1,12 +1,6 @@
-package extensions.reports.planarity.extensions.reports.planarity.planaritypq;
+package graphtea.extensions.reports.planarity.planaritypq;
 
-import graphtea.extensions.generators.CompleteGraphGenerator;
-import graphtea.extensions.reports.planarity.planaritypq.PQ;
-import graphtea.extensions.reports.planarity.planaritypq.PQNode;
-import graphtea.graph.graph.GraphModel;
-import graphtea.graph.graph.Vertex;
 import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -15,7 +9,8 @@ import java.util.List;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 
-public class PQTreeTest {
+
+public class PQTest {
 
     @Test
     public void createPQNode(){
@@ -71,9 +66,73 @@ public class PQTreeTest {
 
     }
 
+    /** Tests bubbling up
+     * Checks:
+     * - Returns null */
     @Test
-    public void bubbleTest(){
+    public void bubbleSEmptyTest(){
+        PQNode _root = new PQNode();
+        PQNode A = new PQNode();
+        PQNode B = new PQNode();
+        PQNode C = new PQNode();
 
+        // Create tree
+        _root.nodeType = PQNode.PNODE;
+        A.nodeType = PQNode.PSEUDO_NODE;
+        B.nodeType = PQNode.PSEUDO_NODE;
+        C.nodeType = PQNode.PSEUDO_NODE;
+
+        _root.children = Arrays.asList(A, B, C);
+        A.parent = _root;
+        B.parent = _root;
+        C.parent = _root;
+
+        // Constraint set S := {B,C}
+        List<PQNode> S = new ArrayList<>();
+
+        // Test PQTree
+        PQ PQTree = new PQ();
+        PQNode tree = PQTree.bubble(_root, S);
+
+        assertTrue(tree == null);
+    }
+
+    /** Tests bubbling up
+     * Checks:
+     * - All nodes processed
+     * - Marks all nodes in PRUNED(T,S)*/
+    @Test
+    public void bubbleTest1(){
+
+        PQNode _root = new PQNode();
+        PQNode A = new PQNode();
+        PQNode B = new PQNode();
+        PQNode C = new PQNode();
+
+        // Create tree
+        _root.nodeType = PQNode.PNODE;
+        A.nodeType = PQNode.PSEUDO_NODE;
+        B.nodeType = PQNode.PSEUDO_NODE;
+        C.nodeType = PQNode.PSEUDO_NODE;
+
+        _root.children = Arrays.asList(A, B, C);
+        A.parent = _root;
+        B.parent = _root;
+        C.parent = _root;
+
+        // Constraint set S := {B,C}
+        List<PQNode> S = Arrays.asList(B, C);
+
+        // Test PQTree
+        PQ PQTree = new PQ();
+        PQNode tree = PQTree.bubble(_root, S);
+
+        // ASSERT
+        assertTrue(!A.marked);
+        assertTrue(B.marked);
+        assertTrue(C.marked);
+        assertTrue(_root.partialChildren() == Arrays.asList(B, C)
+                ||_root.partialChildren() == Arrays.asList(C, B));
     }
 
     @Test
@@ -127,3 +186,4 @@ public class PQTreeTest {
     }
 
 }
+
