@@ -65,22 +65,31 @@ public class PQNode {
     /*
      * Note: only for q-nodes
      */
-    public List<PQNode> endmostChildren() throws IllegalNodeTypeException{
+    public List<PQNode> endmostChildren(){
         try {
             if (this.nodeType != QNODE) {
 
                 throw new IllegalNodeTypeException("endmostChildren() is only valid for Q-Nodes");
             }
-            return
-            return null;
+            return this.children;
         }
         catch (IllegalNodeTypeException e) {
 
         }
+        return null;
     }
 
     public PQNode emptySibling(){
-       return null;
+        PQNode currNode = this.circularLink_next;
+        while (true) {
+            if (currNode.labelType == EMPTY && currNode != this) {
+                return currNode;
+            }
+            else if (currNode == this) {
+                return null;
+            }
+            currNode = currNode.circularLink_next;
+        }
     }
 
     public void removeFromCircularLink(){
@@ -97,8 +106,13 @@ public class PQNode {
         return adjacents;
     }
 
-    public void replaceInCircularLink(PQNode x, PQNode y){
-        // x is replaced by y
+    public void replaceInCircularLink(PQNode x){
+        this.circularLink_next.circularLink_prev = x;
+        this.circularLink_prev.circularLink_next = x;
+        x.circularLink_prev = this.circularLink_prev;
+        x.circularLink_next = this.circularLink_next;
+        this.circularLink_next = null;
+        this.circularLink_prev = null;
     }
 
     public void replaceInImmediateSiblings(PQNode x, PQNode y){

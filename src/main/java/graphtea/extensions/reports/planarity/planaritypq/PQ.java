@@ -189,7 +189,7 @@ public class PQ {
         y.removeFromCircularLink();
 
         if(x.immediateSiblings().size() == 0){
-            x.parent.replaceInCircularLink(x, y);
+            x.parent.replaceInCircularLink(x);
         }
         else {
             x.parent.replaceInImmediateSiblings(x, y);

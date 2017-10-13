@@ -33,8 +33,8 @@ public class Planar extends PQ {
                 // TODO: S.add((PQNode) graph.getEdge(curVertex, v));
             }
 
-            T = bubble(T, S);
-            T = reduce(T, S);
+            //T = bubble(T, S);
+            //T = reduce(T, S);
 
             if(T == null){
                 return false;
