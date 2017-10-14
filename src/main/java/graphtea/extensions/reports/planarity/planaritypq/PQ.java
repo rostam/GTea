@@ -3,16 +3,17 @@ package graphtea.extensions.reports.planarity.planaritypq;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.intersection;
+import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.subset;
+import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.union;
+
 public class PQ {
-    private int blockCount;
-    private int blockedNodes;
-    private int offTheTop;
 
     public PQNode bubble(PQNode _root, List<PQNode> S){
         Queue<PQNode> queue = new LinkedList<>(S);
-        blockCount = 0;
-        blockedNodes = 0;
-        offTheTop = 0;
+        int blockCount = 0;
+        int blockedNodes = 0;
+        int offTheTop = 0;
 
         while(queue.size() + blockCount + offTheTop > 1){
             if(queue.size() == 0){
@@ -23,8 +24,21 @@ public class PQ {
             PQNode x = queue.remove();
             x.blocked = true;
 
-            List<PQNode> BS = x.immediateSiblings().stream().filter(u -> u.blocked).collect(Collectors.toList());
-            List<PQNode> US = x.immediateSiblings().stream().filter(u -> !u.blocked).collect(Collectors.toList());
+            List<PQNode> BS = new ArrayList<>();
+            List<PQNode> US = new ArrayList<>();
+            for(PQNode u : x.immediateSiblings()){
+                if(u == null){
+                    continue;
+                }
+                if(u.blocked){
+                    BS.add(u);
+                }
+                else {
+                    US.add(u);
+                }
+            }
+            //List<PQNode> BS = x.immediateSiblings().stream().filter(u -> u.blocked).collect(Collectors.toList());
+            //List<PQNode> US = x.immediateSiblings().stream().filter(u -> !u.blocked).collect(Collectors.toList());
 
             if(US.size() > 0){
                 PQNode y = US.get(0);
@@ -39,9 +53,7 @@ public class PQ {
             if(!x.blocked){
                 PQNode y = x.parent;
                 if(BS.size() > 0){
-                    // list := the maximal consecutive set of blocked siblings adjacent to x
-                    //List<PQNode> list = x.siblings.stream().filter(u -> u.blocked).collect(Collectors.toList());
-                    List<PQNode> list = maximalConsecutiveSetOfSiblingsAdjacent(x, true);
+                    Set<PQNode> list = x.maximalConsecutiveSetOfSiblingsAdjacent(true);
 
                     listSize = list.size();
                     for(PQNode z : list){
@@ -54,7 +66,7 @@ public class PQ {
                 }
                 else {
                     y.pertinentChildCount++;
-                    if(!y.marked){
+                    if(!y.queued){
                         queue.add(y);
                         y.queued = true;
                     }
@@ -119,10 +131,6 @@ public class PQ {
         }
 
         return T;
-    }
-
-    public List<PQNode> maximalConsecutiveSetOfSiblingsAdjacent(PQNode x, boolean blocked){
-        return null;
     }
 
     public void replace(PQNode T, PQTree TPrime){
@@ -342,26 +350,6 @@ public class PQ {
     }
     public boolean TEMPLATE_Q3(PQNode x){
         return false;
-    }
-
-    public static <E> boolean subset(List<E> list1, List<E> list2) {
-        return list2.containsAll(list1);
-    }
-
-    public static <E> List<E> intersection(List<E> list1, List<E> list2){
-        list1.retainAll(list2);
-        return list1;
-    }
-
-
-    public static <E> List<E> union(List<E> list1, List<E> list2) {
-        HashSet<E> set = new HashSet<>();
-
-        // set does not insert duplicates
-        set.addAll(list1);
-        set.addAll(list2);
-
-        return new ArrayList<>(set);
     }
 
 }
