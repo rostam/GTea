@@ -199,7 +199,7 @@ public class PQNodeTest {
         children.add(c9);
 
         root.children = children;
-
+        
         Set<PQNode> results = c4.maximalConsecutiveSetOfSiblingsAdjacent(true);
         assertTrue(results.contains(c5) && results.contains(c6) && results.contains(c7));
     }
