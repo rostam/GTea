@@ -167,6 +167,26 @@ public class PQNodeTest {
         c8.blocked = false;
         c9.blocked = true;
 
+        c1.circularLink_next = c2;
+        c1.circularLink_prev = c9;
+        c2.circularLink_next = c3;
+        c2.circularLink_prev = c1;
+        c3.circularLink_next = c4;
+        c3.circularLink_prev = c2;
+        c4.circularLink_next = c5;
+        c4.circularLink_prev = c4;
+        c5.circularLink_next = c6;
+        c5.circularLink_prev = c5;
+        c6.circularLink_next = c7;
+        c6.circularLink_prev = c5;
+        c7.circularLink_next = c8;
+        c7.circularLink_prev = c6;
+        c8.circularLink_next = c9;
+        c8.circularLink_prev = c7;
+        c9.circularLink_next = c1;
+        c9.circularLink_prev = c8;
+
+
         List<PQNode> children = new ArrayList<PQNode>();
         children.add(c1);
         children.add(c2);
@@ -180,7 +200,7 @@ public class PQNodeTest {
 
         root.children = children;
 
-        Set<PQNode> results = root.maximalConsecutiveSetOfSiblingsAdjacent(true);
+        Set<PQNode> results = c4.maximalConsecutiveSetOfSiblingsAdjacent(true);
         assertTrue(results.contains(c5) && results.contains(c6) && results.contains(c7));
     }
 
