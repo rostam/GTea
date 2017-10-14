@@ -140,4 +140,48 @@ public class PQNodeTest {
     public void endmostChild() throws Exception {
     }
 
+    @Test
+    public void maximalConsectutiveSetOfSiblingsAdjacent() throws Exception {
+        /* Testing: 011011101
+        *              ^
+        *              x
+        */
+        PQNode root = new PQNode();
+        PQNode c1 = new PQNode();
+        PQNode c2 = new PQNode();
+        PQNode c3 = new PQNode();
+        PQNode c4 = new PQNode();
+        PQNode c5 = new PQNode();
+        PQNode c6 = new PQNode();
+        PQNode c7 = new PQNode();
+        PQNode c8 = new PQNode();
+        PQNode c9 = new PQNode();
+
+        c1.blocked = false;
+        c2.blocked = true;
+        c3.blocked = true;
+        c4.blocked = false;
+        c5.blocked = true;
+        c6.blocked = true;
+        c7.blocked = true;
+        c8.blocked = false;
+        c9.blocked = true;
+
+        List<PQNode> children = new ArrayList<PQNode>();
+        children.add(c1);
+        children.add(c2);
+        children.add(c3);
+        children.add(c4);
+        children.add(c5);
+        children.add(c6);
+        children.add(c7);
+        children.add(c8);
+        children.add(c9);
+
+        root.children = children;
+
+        Set<PQNode> results = root.maximalConsecutiveSetOfSiblingsAdjacent(true);
+        assertTrue(results.contains(c5) && results.contains(c6) && results.contains(c7));
+    }
+
 }
