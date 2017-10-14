@@ -1,7 +1,7 @@
 package graphtea.extensions.reports.planarity.planaritypq;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
 import graphtea.extensions.reports.planarity.planaritypq.IllegalNodeTypeException;
 
 public class PQNode {
@@ -26,7 +26,7 @@ public class PQNode {
 
     boolean blocked;
 
-    boolean marked;
+    //boolean marked;
 
     int childCount;
 
@@ -35,7 +35,7 @@ public class PQNode {
 
     public PQNode(){
         blocked = false;
-        marked = false;
+        //marked = false;
         pertinentChildCount = 0;
         pertinentLeafCount = 0;
         queued = false;
@@ -101,8 +101,10 @@ public class PQNode {
 
     public List<PQNode> immediateSiblings(){
         List<PQNode> adjacents = new ArrayList<PQNode>();
-        adjacents.add(this.circularLink_prev);
-        adjacents.add(this.circularLink_next);
+        if(this.circularLink_prev != null)
+            adjacents.add(this.circularLink_prev);
+        if(this.circularLink_next != null)
+            adjacents.add(this.circularLink_next);
         return adjacents;
     }
 
@@ -140,11 +142,112 @@ public class PQNode {
     }
 
     public PQNode getImmediateSiblingOfNodeType(String nodeType){
+        if(this.circularLink_next.nodeType.equals(nodeType)){
+            return this.circularLink_next;
+        }
+        else if(this.circularLink_prev.nodeType.equals(nodeType)){
+            return this.circularLink_prev;
+        }
         return null;
     }
 
     public PQNode endmostChild(String nodeType){
         return null;
+    }
+
+
+    /** todo: Check if we should be returning max{left, right}, or left union right
+     *
+     * Returns:
+     * 11110[1111]
+     *     ^
+     * [11111111]00
+     *      ^ (any of the 1's)
+     * 00[111111111]
+     *       ^ (any of the 1's)
+     * 1100[111]000011
+     *       ^ ()any of the three 1's)
+     * 00001110000
+     *  ^  (any of the four 0's)
+     * 1110[11111]
+     *    ^ (Max{left, right})
+     * etc
+     * */
+    public Set<PQNode> maximalConsecutiveSetOfSiblingsAdjacent(boolean blocked){
+        Set<PQNode> left = null;
+        Set<PQNode> right = null;
+        if(this.circularLink_prev != null) {
+            left = this.circularLink_prev.siblingsAdjacent(blocked, true);
+        }
+        if(this.circularLink_next != null) {
+            right = this.circularLink_next.siblingsAdjacent(blocked, false);
+        }
+
+        if(left == null && right != null){
+            if(this.blocked == blocked) {
+                right.add(this);
+                return right;
+            }
+            return right;
+        }
+        else if(right == null && left != null){
+            if(this.blocked == blocked){
+                left.add(this);
+                return left;
+            }
+            return left;
+        }
+        else if(left == null && right == null){
+            return null;
+        }
+
+        if(this.blocked == blocked){
+            left.add(this);
+            right.add(this);
+        }
+
+        if(this.blocked == blocked) {
+            left.addAll(right);
+            return left;
+        }
+        else if(left.size() > right.size()){
+            return left;
+        }
+        else {
+            return right;
+        }
+    }
+
+    private Set<PQNode> siblingsAdjacent(boolean blocked, boolean goLeft){
+
+        if(this.blocked == blocked) {
+            if(goLeft && this.circularLink_prev != null){
+                try {
+                    Set<PQNode> list = new HashSet<PQNode>(this.circularLink_prev.siblingsAdjacent(blocked, goLeft));
+                    list.add(this);
+                    return list;
+                }
+                catch (NullPointerException e){
+                    return Collections.singleton(this);
+                }
+            }
+            else if(this.circularLink_next != null){
+                try {
+                    Set<PQNode> list = new HashSet<>(this.circularLink_next.siblingsAdjacent(blocked, goLeft));
+                    list.add(this);
+                    return list;
+                }
+                catch (NullPointerException e){
+                    return Collections.singleton(this);
+                }
+            }
+            else {
+                return Collections.singleton(this);
+            }
+        }
+        else {
+            return null;
+        }
     }
 
 
