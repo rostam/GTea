@@ -159,21 +159,20 @@ public class PQ {
     }
 
     public boolean TEMPLATE_P2(PQNode x){
-        if(!x.labelType.equals(PQNode.FULL)){
+        if (!x.labelType.equals(PQNode.FULL)) {
             List<PQNode> pNodeChildren = new LinkedList<>();
             PQNode pNode = new PQNode();
             List<PQNode> newChildren = new ArrayList<>();
-            for(PQNode n : x.children){
-                if(n.labelType.equals(PQNode.FULL)){
+            for (PQNode n : x.children) {
+                if (n.labelType.equals(PQNode.FULL)) {
                     pNodeChildren.add(n);
                     //x.children.remove(i);
                     n.parent = pNode;
-                }
-                else {
+                } else {
                     newChildren.add(n);
                 }
             }
-            if(pNodeChildren.size() > 0){
+            if (pNodeChildren.size() > 0) {
                 pNode.labelType = PQNode.FULL;
                 pNode.nodeType = PQNode.PNODE;
                 pNode.children = pNodeChildren;
@@ -187,10 +186,44 @@ public class PQ {
                 return true;
             }
         }
-
         return false;
     }
     public boolean TEMPLATE_P3(PQNode x){
+        if (!x.blocked) {
+            List<PQNode> emptyChildren = new ArrayList<PQNode>();
+            List<PQNode> fullChildren = new ArrayList<PQNode>();
+            for (PQNode n : x.children) {
+                if (n.labelType.equals(PQNode.FULL)) {
+                    fullChildren.add(n);
+                }
+                else {
+                    emptyChildren.add(n);
+                }
+            }
+
+            setCircularLinks(emptyChildren);
+            setCircularLinks(fullChildren);
+
+
+            PQNode newRoot = x;
+            newRoot.nodeType = PQNode.QNODE;
+            newRoot.labelType = PQNode.PARTIAL;
+
+            PQNode emptySubRoot = new PQNode();
+            PQNode fullSubRoot = new PQNode();
+
+            emptySubRoot.parent = newRoot;
+            fullSubRoot.parent = newRoot;
+
+            emptySubRoot.children = emptyChildren;
+            fullSubRoot.children = fullChildren;
+
+            newRoot.children = Arrays.asList(emptySubRoot, fullSubRoot);
+
+            setCircularLinks(newRoot.children);
+
+        }
+
         return false;
     }
     public boolean TEMPLATE_P4(PQNode x){

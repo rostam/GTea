@@ -365,7 +365,41 @@ public class PQTest {
 
     @Test
     public void templateP3Test(){
+        PQNode _root = new PQNode();
+        PQNode A = new PQNode();
+        PQNode B = new PQNode();
+        PQNode C = new PQNode();
+        PQNode D = new PQNode();
+        PQNode E = new PQNode();
 
+        A.parent = _root;
+        B.parent = _root;
+        C.parent = _root;
+        D.parent = _root;
+        E.parent = _root;
+
+        A.labelType = PQNode.FULL;
+        B.labelType = PQNode.FULL;
+        C.labelType = PQNode.FULL;
+
+        D.labelType = PQNode.EMPTY;
+        E.labelType = PQNode.EMPTY;
+
+        List<PQNode> list = new ArrayList<>(Arrays.asList(A,B,C,D,E));
+        _root.children = list;
+        setCircularLinks(list);
+
+        PQ PQTree = new PQ();
+        boolean rt = PQTree.TEMPLATE_P3(_root);
+        assertTrue(_root.nodeType == PQNode.QNODE);
+        assertTrue(_root.labelType == PQNode.PARTIAL);
+        assertTrue(_root.children.size() == 2);
+        for (PQNode notFullChild : _root.children.get(0).children) {
+            assertTrue(notFullChild.labelType != PQNode.FULL);
+        }
+        for (PQNode fullChild : _root.children.get(1).children) {
+            assertTrue(fullChild.labelType == PQNode.FULL);
+        }
     }
 
     @Test
