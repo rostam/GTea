@@ -3,9 +3,7 @@ package graphtea.extensions.reports.planarity.planaritypq;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.intersection;
-import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.subset;
-import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.union;
+import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.*;
 
 public class PQ {
 
@@ -16,6 +14,7 @@ public class PQ {
         int offTheTop = 0;
 
         while(queue.size() + blockCount + offTheTop > 1){
+            //System.out.println("|Queue| = " + queue.size());
             if(queue.size() == 0){
                 _root = null;
                 return _root;
@@ -23,6 +22,7 @@ public class PQ {
 
             PQNode x = queue.remove();
             x.blocked = true;
+            //System.out.println("Processing: " + x.id);
 
             List<PQNode> BS = new ArrayList<>();
             List<PQNode> US = new ArrayList<>();
@@ -37,9 +37,8 @@ public class PQ {
                     US.add(u);
                 }
             }
-            //List<PQNode> BS = x.immediateSiblings().stream().filter(u -> u.blocked).collect(Collectors.toList());
-            //List<PQNode> US = x.immediateSiblings().stream().filter(u -> !u.blocked).collect(Collectors.toList());
-
+            //System.out.println("|BS| = " + BS.size());
+            //System.out.println("|US| = " + US.size());
             if(US.size() > 0){
                 PQNode y = US.get(0);
                 x.parent = y.parent;
@@ -84,7 +83,7 @@ public class PQ {
         return _root;
     }
 
-    public PQTree reduce(PQTree T, List<PQNode> S){
+    public PQNode reduce(PQNode T, List<PQNode> S){
         Queue<PQNode> queue = new LinkedList<>(S);
         for(PQNode x : S){
             x.pertinentLeafCount = 1;
@@ -100,32 +99,30 @@ public class PQ {
                 if(y.pertinentChildCount == 0){
                     queue.add(y);
                 }
-                if(TEMPLATE_L1(x)) break;
+                //if(TEMPLATE_L1(x)) break;
                 if(TEMPLATE_P1(x)) break;
-                if(TEMPLATE_P3(x)) break;
-                if(TEMPLATE_P5(x)) break;
-                if(TEMPLATE_Q1(x)) break;
-                if(TEMPLATE_Q2(x)) break;
+                //if(TEMPLATE_P3(x)) break;
+                //if(TEMPLATE_P5(x)) break;
+                //if(TEMPLATE_Q1(x)) break;
+                //if(TEMPLATE_Q2(x)) break;
 
                 // If all templates fail, return null tree
-                T = null;
-                return T;
+                return null;
             }
             else {
                 // X is ROOT(T, S)
 
-                if(TEMPLATE_L1(x)) break;
+                //if(TEMPLATE_L1(x)) break;
                 if(TEMPLATE_P1(x)) break;
-                if(TEMPLATE_P2(x)) break;
-                if(TEMPLATE_P4(x)) break;
-                if(TEMPLATE_P6(x)) break;
-                if(TEMPLATE_Q1(x)) break;
-                if(TEMPLATE_Q2(x)) break;
-                if(TEMPLATE_Q3(x)) break;
+                //if(TEMPLATE_P2(x)) break;
+                //if(TEMPLATE_P4(x)) break;
+                //if(TEMPLATE_P6(x)) break;
+                //if(TEMPLATE_Q1(x)) break;
+                //if(TEMPLATE_Q2(x)) break;
+                //if(TEMPLATE_Q3(x)) break;
 
                 // If all templates fail, return null tree
-                T = null;
-                return T;
+                return null;
             }
 
         }
@@ -133,11 +130,11 @@ public class PQ {
         return T;
     }
 
-    public void replace(PQNode T, PQTree TPrime){
+    public void replace(PQNode T, PQNode TPrime){
 
     }
 
-    public PQNode root(PQTree T, List<PQNode> S){
+    public PQNode root(PQNode T, List<PQNode> S){
 
         return null;
     }
@@ -146,13 +143,51 @@ public class PQ {
     * TEMPLATES
     * */
 
-    public boolean TEMPLATE_L1(PQNode x){
-        return false;
-    }
+    public boolean TEMPLATE_L1(PQNode x){ return false; }
+
     public boolean TEMPLATE_P1(PQNode x){
+        if(!x.labelType.equals(PQNode.FULL)){
+            for(PQNode n : x.children){
+                if(!n.labelType.equals(PQNode.FULL)){
+                    return false;
+                }
+            }
+            x.labelType = PQNode.FULL;
+            return true;
+        }
         return false;
     }
+
     public boolean TEMPLATE_P2(PQNode x){
+        if(!x.labelType.equals(PQNode.FULL)){
+            List<PQNode> pNodeChildren = new LinkedList<>();
+            PQNode pNode = new PQNode();
+            List<PQNode> newChildren = new ArrayList<>();
+            for(PQNode n : x.children){
+                if(n.labelType.equals(PQNode.FULL)){
+                    pNodeChildren.add(n);
+                    //x.children.remove(i);
+                    n.parent = pNode;
+                }
+                else {
+                    newChildren.add(n);
+                }
+            }
+            if(pNodeChildren.size() > 0){
+                pNode.labelType = PQNode.FULL;
+                pNode.nodeType = PQNode.PNODE;
+                pNode.children = pNodeChildren;
+                pNode.parent = x;
+                newChildren.add(pNode);
+                x.children = newChildren;
+
+                setCircularLinks(x.children);
+                setCircularLinks(pNode.children);
+
+                return true;
+            }
+        }
+
         return false;
     }
     public boolean TEMPLATE_P3(PQNode x){
@@ -353,6 +388,7 @@ public class PQ {
     }
 
 }
+
 
 
 

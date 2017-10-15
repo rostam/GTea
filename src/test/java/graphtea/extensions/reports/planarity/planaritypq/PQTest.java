@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.setCircularLinks;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 
@@ -72,12 +73,8 @@ public class PQTest {
         A.parent = _root;
         B.parent = _root;
         C.parent = _root;
-        A.circularLink_prev = C;
-        A.circularLink_next = B;
-        B.circularLink_prev = A;
-        B.circularLink_next = C;
-        C.circularLink_prev = B;
-        C.circularLink_next = A;
+        List<PQNode> list = new ArrayList<>(Arrays.asList(A,B,C));
+        setCircularLinks(list);
 
         // Constraint set S := {B,C}
         List<PQNode> S = Arrays.asList(B, C);
@@ -87,24 +84,16 @@ public class PQTest {
         PQNode r = PQTree.bubble(_root, S);
 
         // ASSERT
-        assertTrue(r.partialChildren().contains(B));
-        assertTrue(r.partialChildren().contains(C));
-        assertTrue(r.fullChildren().contains(B));
-        assertTrue(r.fullChildren().contains(C));
         assertTrue(r.children.contains(A));
         assertTrue(r.children.contains(B));
         assertTrue(r.children.contains(C));
         assertTrue(r.nodeType(PQNode.PNODE));
-        //assertTrue(B.marked);
-        //assertTrue(C.marked);
-        //assertTrue(_root.fullChildren() == Arrays.asList(B, C)
-        //        ||_root.fullChildren() == Arrays.asList(C, B));
+        assertTrue(!B.blocked);
+        assertTrue(!C.blocked);
     }
 
-    /*
     @Test
     public void bubbleTest2_QNodePNode(){
-
         PQNode _root = new PQNode();
         PQNode A = new PQNode();
         PQNode B = new PQNode();
@@ -131,25 +120,31 @@ public class PQTest {
         C.parent = _root;
         qNode.parent = _root;
         D.parent = qNode;
-        E.parent = qNode;
+        //E.parent = qNode;
         F.parent = qNode;
 
+        setCircularLinks(Arrays.asList(qNode,A,B,C));
+        setCircularLinks(Arrays.asList(D,E,F));
 
         // Constraint set S
         List<PQNode> S = Arrays.asList(D, E, F);
 
         // Test PQTree
         PQ PQTree = new PQ();
-        PQNode tree = PQTree.bubble(_root, S);
+        PQNode r = PQTree.bubble(_root, S);
 
         // ASSERT
-        assertTrue(!A.marked && !B.marked && !C.marked && D.marked && E.marked && F.marked);
+        assertTrue(D.parent == qNode);
+        assertTrue(E.parent == qNode);
+        assertTrue(F.parent == qNode);
+        assertTrue(!D.blocked);
+        assertTrue(!E.blocked);
+        assertTrue(!F.blocked);
 
     }
 
     @Test
     public void bubbleTest3_QNodePNode(){
-
         PQNode _root = new PQNode();
         PQNode A = new PQNode();
         PQNode B = new PQNode();
@@ -158,7 +153,6 @@ public class PQTest {
         PQNode D = new PQNode();
         PQNode E = new PQNode();
         PQNode F = new PQNode();
-
 
         // Create tree
         _root.nodeType = PQNode.PNODE;
@@ -176,24 +170,30 @@ public class PQTest {
         C.parent = _root;
         qNode.parent = _root;
         D.parent = qNode;
-        E.parent = qNode;
+        //E.parent = qNode;
         F.parent = qNode;
 
+        setCircularLinks(Arrays.asList(qNode,A,B,C));
+        setCircularLinks(Arrays.asList(D,E,F));
 
         // Constraint set S
-        List<PQNode> S = Arrays.asList(F, E, D);
+        List<PQNode> S = Arrays.asList(D, E, A);
 
         // Test PQTree
         PQ PQTree = new PQ();
-        PQNode tree = PQTree.bubble(_root, S);
+        PQNode r = PQTree.bubble(_root, S);
 
         // ASSERT
-        assertTrue(!A.marked && !B.marked && !C.marked && D.marked && E.marked && F.marked);
+        assertTrue(A.parent == r);
+        assertTrue(D.parent == qNode);
+        assertTrue(E.parent == qNode);
+        assertTrue(!D.blocked);
+        assertTrue(!E.blocked);
+        assertTrue(!A.blocked);
     }
 
     @Test
     public void bubbleTest4_QNodePNode(){
-
         PQNode _root = new PQNode();
         PQNode A = new PQNode();
         PQNode B = new PQNode();
@@ -202,7 +202,8 @@ public class PQTest {
         PQNode D = new PQNode();
         PQNode E = new PQNode();
         PQNode F = new PQNode();
-
+        PQNode G = new PQNode();
+        PQNode H = new PQNode();
 
         // Create tree
         _root.nodeType = PQNode.PNODE;
@@ -213,6 +214,19 @@ public class PQTest {
         D.nodeType = PQNode.PSEUDO_NODE;
         E.nodeType = PQNode.PSEUDO_NODE;
         F.nodeType = PQNode.PSEUDO_NODE;
+        G.nodeType = PQNode.PSEUDO_NODE;
+        H.nodeType = PQNode.PSEUDO_NODE;
+
+        _root.id = "root";
+        A.id = "A";
+        B.id = "B";
+        C.id = "C";
+        D.id = "D";
+        E.id = "E";
+        F.id = "F";
+        G.id = "G";
+        H.id = "H";
+
 
         _root.children = Arrays.asList(A, B, C, qNode);
         A.parent = _root;
@@ -220,165 +234,132 @@ public class PQTest {
         C.parent = _root;
         qNode.parent = _root;
         D.parent = qNode;
-        E.parent = qNode;
-        F.parent = qNode;
+        H.parent = qNode;
 
+        setCircularLinks(Arrays.asList(qNode,A,B,C));
+        setCircularLinks(Arrays.asList(D,E,F,G,H));
 
         // Constraint set S
-        List<PQNode> S = Arrays.asList(D, E, F, B);
+        List<PQNode> S = Arrays.asList(F, B, C);
 
         // Test PQTree
         PQ PQTree = new PQ();
-        PQNode tree = PQTree.bubble(_root, S);
+        PQNode r = PQTree.bubble(_root, S);
 
         // ASSERT
-        assertTrue(!A.marked && B.marked && !C.marked && D.marked && E.marked && F.marked);
+        assertTrue(F.parent == qNode);
+        assertTrue(B.parent == r);
+        assertTrue(C.parent == r);
+        assertTrue(!F.blocked);
+        assertTrue(!B.blocked);
+        assertTrue(!C.blocked);
+
     }
-
-    @Test
-    public void bubbleTest5_QNodePNode(){
-
-        PQNode _root = new PQNode();
-        PQNode A = new PQNode();
-        PQNode B = new PQNode();
-        PQNode C = new PQNode();
-        PQNode qNode = new PQNode();
-        PQNode D = new PQNode();
-        PQNode E = new PQNode();
-        PQNode F = new PQNode();
-
-
-        // Create tree
-        _root.nodeType = PQNode.PNODE;
-        A.nodeType = PQNode.PSEUDO_NODE;
-        B.nodeType = PQNode.PSEUDO_NODE;
-        C.nodeType = PQNode.PSEUDO_NODE;
-        qNode.nodeType = PQNode.QNODE;
-        D.nodeType = PQNode.PSEUDO_NODE;
-        E.nodeType = PQNode.PSEUDO_NODE;
-        F.nodeType = PQNode.PSEUDO_NODE;
-
-        _root.children = Arrays.asList(A, B, C, qNode);
-        A.parent = _root;
-        B.parent = _root;
-        C.parent = _root;
-        qNode.parent = _root;
-        D.parent = qNode;
-        E.parent = qNode;
-        F.parent = qNode;
-
-
-        // Constraint set S
-        List<PQNode> S = Arrays.asList(D, E, F, B, A);
-
-        // Test PQTree
-        PQ PQTree = new PQ();
-        PQNode tree = PQTree.bubble(_root, S);
-
-        // ASSERT
-        assertTrue(A.marked && B.marked && !C.marked && D.marked && E.marked && F.marked);
-    }
-
-    @Test
-    public void bubbleTest6_QNodePNode(){
-
-        PQNode _root = new PQNode();
-        PQNode A = new PQNode();
-        PQNode B = new PQNode();
-        PQNode C = new PQNode();
-        PQNode qNode = new PQNode();
-        PQNode D = new PQNode();
-        PQNode E = new PQNode();
-        PQNode F = new PQNode();
-
-
-        // Create tree
-        _root.nodeType = PQNode.PNODE;
-        A.nodeType = PQNode.PSEUDO_NODE;
-        B.nodeType = PQNode.PSEUDO_NODE;
-        C.nodeType = PQNode.PSEUDO_NODE;
-        qNode.nodeType = PQNode.QNODE;
-        D.nodeType = PQNode.PSEUDO_NODE;
-        E.nodeType = PQNode.PSEUDO_NODE;
-        F.nodeType = PQNode.PSEUDO_NODE;
-
-        _root.children = Arrays.asList(A, B, C, qNode);
-        A.parent = _root;
-        B.parent = _root;
-        C.parent = _root;
-        qNode.parent = _root;
-        D.parent = qNode;
-        E.parent = qNode;
-        F.parent = qNode;
-
-
-        // Constraint set S
-        List<PQNode> S = Arrays.asList(D, E, F, B, A, C);
-
-        // Test PQTree
-        PQ PQTree = new PQ();
-        PQNode tree = PQTree.bubble(_root, S);
-
-        // ASSERT
-        assertTrue(A.marked && B.marked && C.marked && D.marked && E.marked && F.marked);
-    }
-
-    @Test
-    public void bubbleTest7_QNodePNode(){
-
-        PQNode _root = new PQNode();
-        PQNode A = new PQNode();
-        PQNode B = new PQNode();
-        PQNode C = new PQNode();
-        PQNode qNode = new PQNode();
-        PQNode D = new PQNode();
-        PQNode E = new PQNode();
-        PQNode F = new PQNode();
-
-
-        // Create tree
-        _root.nodeType = PQNode.PNODE;
-        A.nodeType = PQNode.PSEUDO_NODE;
-        B.nodeType = PQNode.PSEUDO_NODE;
-        C.nodeType = PQNode.PSEUDO_NODE;
-        qNode.nodeType = PQNode.QNODE;
-        D.nodeType = PQNode.PSEUDO_NODE;
-        E.nodeType = PQNode.PSEUDO_NODE;
-        F.nodeType = PQNode.PSEUDO_NODE;
-
-        _root.children = Arrays.asList(A, B, C, qNode);
-        A.parent = _root;
-        B.parent = _root;
-        C.parent = _root;
-        qNode.parent = _root;
-        D.parent = qNode;
-        E.parent = qNode;
-        F.parent = qNode;
-
-
-        // Constraint set S
-        List<PQNode> S = Arrays.asList(E, D, F, B, A, C);
-
-        // Test PQTree
-        PQ PQTree = new PQ();
-        PQNode tree = PQTree.bubble(_root, S);
-
-        // ASSERT
-        assertTrue(tree == null);
-    }*/
 
     @Test
     public void reduceTest(){
+        PQNode _root = new PQNode();
+        PQNode A = new PQNode();
+        PQNode B = new PQNode();
+        PQNode C = new PQNode();
+
+        // Create tree
+        _root.nodeType = PQNode.PNODE;
+        A.nodeType = PQNode.PSEUDO_NODE;
+        B.nodeType = PQNode.PSEUDO_NODE;
+        C.nodeType = PQNode.PSEUDO_NODE;
+
+        _root.children = Arrays.asList(A, B, C);
+        A.parent = _root;
+        B.parent = _root;
+        C.parent = _root;
+        List<PQNode> list = new ArrayList<>(Arrays.asList(A,B,C));
+        setCircularLinks(list);
+
+        // Constraint set S := {B,C}
+        List<PQNode> S = Arrays.asList(B, C);
+
+        PQ PQTree = new PQ();
+        PQNode r = PQTree.reduce(_root, S);
+
+        assertTrue(r != null);
 
     }
 
     @Test
-    public void templateP1Test(){
+    public void templateP1Test01(){
+        PQNode _root = new PQNode();
+        PQNode A = new PQNode();
+        PQNode B = new PQNode();
 
+        _root.children = Arrays.asList(A,B);
+        A.parent = _root;
+        B.parent = _root;
+        _root.labelType = PQNode.EMPTY;
+        A.labelType = PQNode.FULL;
+        B.labelType = PQNode.FULL;
+
+        PQ PQTree = new PQ();
+
+        // All children blocked
+        assertTrue(!_root.labelType.equals(PQNode.FULL));
+        boolean rt = PQTree.TEMPLATE_P1(_root);
+        assertTrue(rt);
+        assertTrue(_root.labelType.equals(PQNode.FULL));
+
+        // One child not blocked
+        PQNode C = new PQNode();
+        C.parent = _root;
+        _root.labelType = PQNode.EMPTY;
+        C.labelType = PQNode.EMPTY;
+
+        _root.children = Arrays.asList(A,B,C);
+        rt = PQTree.TEMPLATE_P1(_root);
+        assertTrue(!rt);
+        assertTrue(!_root.labelType.equals(PQNode.FULL));
     }
 
     @Test
     public void templateP2Test(){
+        PQNode _root = new PQNode();
+        PQNode A = new PQNode();
+        PQNode B = new PQNode();
+        PQNode C = new PQNode();
+        PQNode D = new PQNode();
+        PQNode E = new PQNode();
+
+        A.parent = _root;
+        B.parent = _root;
+        C.parent = _root;
+        D.parent = _root;
+        E.parent = _root;
+
+        A.labelType = PQNode.FULL;
+        B.labelType = PQNode.FULL;
+        C.labelType = PQNode.FULL;
+
+        D.labelType = PQNode.EMPTY;
+        E.labelType = PQNode.EMPTY;
+
+        List<PQNode> list = new ArrayList<>(Arrays.asList(A,B,C,D,E));
+        _root.children = list;
+        setCircularLinks(list);
+
+        PQ PQTree = new PQ();
+        boolean rt = PQTree.TEMPLATE_P2(_root);
+
+        assertTrue(A.parent != _root);
+        assertTrue(B.parent != _root);
+        assertTrue(C.parent != _root);
+
+        assertTrue(D.parent == _root);
+        assertTrue(E.parent == _root);
+
+        assertTrue(A.parent.nodeType.equals(PQNode.PNODE));
+        assertTrue(B.parent.nodeType.equals(PQNode.PNODE));
+        assertTrue(C.parent.nodeType.equals(PQNode.PNODE));
+
+        assertTrue(A.parent.labelType.equals(PQNode.FULL));
 
     }
 

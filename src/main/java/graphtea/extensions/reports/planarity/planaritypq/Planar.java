@@ -7,6 +7,8 @@ import graphtea.graph.graph.Vertex;
 import java.util.ArrayList;
 import java.util.List;
 
+import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.union;
+
 public class Planar extends PQ {
     private GraphModel graph;
 
@@ -22,7 +24,7 @@ public class Planar extends PQ {
         for(Edge e : source){
             // TODO: U.add(new PQEdge(e, (PQNode) e.source, (PQNode) e.target));
         }
-        PQTree T = new PQTree(U, U);
+        //PQNode T = new PQTree(U, U);
 
         for(int j=2; j<graph.getVertexArray().length-1; j++){
             Vertex curVertex = graph.getVertex(j);
@@ -36,9 +38,9 @@ public class Planar extends PQ {
             //T = bubble(T, S);
             //T = reduce(T, S);
 
-            if(T == null){
-                return false;
-            }
+            //if(T == null){
+            //    return false;
+            //}
 
             // S' := the set of edges whose lower-numbered vertex is j
             List<PQNode> SPrime = new ArrayList<>();
@@ -46,14 +48,14 @@ public class Planar extends PQ {
                 // TODO: S.add((PQEdge) graph.getEdge(v, curVertex));
             }
 
-            PQNode root = root(T,S);
-            if(root.nodeType.equals(PQNode.QNODE)){
+            //PQNode root = root(T,S);
+            /*if(root.nodeType.equals(PQNode.QNODE)){
                 // Replace the full children of root(T,S) and their descendants by T(S',S')
-                replace(root, new PQTree(SPrime, SPrime));
+                //replace(root, new PQTree(SPrime, SPrime));
             } else {
                 // Replace root(T,S) and its descendants by T(S',S')
-                replace(root, new PQTree(SPrime, SPrime));
-            }
+                //replace(root, new PQTree(SPrime, SPrime));
+            }*/
 
             // U = U - S union S'
             U.removeAll(union(S, SPrime));

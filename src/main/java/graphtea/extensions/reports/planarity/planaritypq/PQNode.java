@@ -5,6 +5,7 @@ import java.util.*;
 import graphtea.extensions.reports.planarity.planaritypq.IllegalNodeTypeException;
 
 public class PQNode {
+    String id = "";
     static String PNODE = "p-node";
     static String QNODE = "q-node";
     static String PSEUDO_NODE = "pseudonode";
@@ -197,7 +198,7 @@ public class PQNode {
             }
             return left;
         }
-        else if(left == null && right == null){
+        else if(left == null){
             return null;
         }
 
