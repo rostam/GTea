@@ -189,7 +189,7 @@ public class PQ {
         return false;
     }
     public boolean TEMPLATE_P3(PQNode x){
-        if (!x.blocked) {
+        if (!x.labelType.equals(PQNode.FULL)) {
             List<PQNode> emptyChildren = new ArrayList<PQNode>();
             List<PQNode> fullChildren = new ArrayList<PQNode>();
             for (PQNode n : x.children) {
@@ -226,8 +226,48 @@ public class PQ {
 
         return false;
     }
+
     public boolean TEMPLATE_P4(PQNode x){
-        return false;
+        if(!x.labelType.equals(PQNode.PARTIAL)){
+            return false;
+        }
+
+        PQNode pNode = new PQNode();
+        pNode.nodeType = PQNode.PNODE;
+        pNode.labelType = PQNode.FULL;
+        List<PQNode> emptyChildren = new ArrayList<PQNode>();
+        List<PQNode> fullChildren = new ArrayList<PQNode>();
+        int numPartialQNodes = 0;
+        PQNode partialQNode = null;
+        for(PQNode n : x.children){
+            if(n.labelType.equals(PQNode.PARTIAL) && n.nodeType.equals(PQNode.QNODE)){
+                partialQNode = n;
+                numPartialQNodes++;
+                emptyChildren.add(n);
+            }
+            else if(n.labelType.equals(PQNode.FULL)){
+                fullChildren.add(n);
+                n.parent = pNode;
+            }
+            else {
+                emptyChildren.add(n);
+            }
+
+        }
+
+        if(numPartialQNodes != 1){
+            return false;
+        }
+
+        pNode.children = fullChildren;
+        pNode.parent = partialQNode;
+        partialQNode.children.add(pNode);
+
+        setCircularLinks(fullChildren);
+        setCircularLinks(emptyChildren);
+        setCircularLinks(partialQNode.children);
+
+        return true;
     }
 
     public boolean TEMPLATE_P5(PQNode x){

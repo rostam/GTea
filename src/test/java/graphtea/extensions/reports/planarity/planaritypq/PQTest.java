@@ -404,6 +404,74 @@ public class PQTest {
 
     @Test
     public void templateP4Test(){
+        PQNode _root = new PQNode();
+        PQNode A = new PQNode();
+        PQNode B = new PQNode();
+        PQNode C = new PQNode();
+        PQNode D = new PQNode();
+
+        PQNode qNode = new PQNode();
+        PQNode E = new PQNode();
+        PQNode F = new PQNode();
+        PQNode G = new PQNode();
+        PQNode H = new PQNode();
+
+        A.parent = _root;
+        B.parent = _root;
+        C.parent = _root;
+        D.parent = _root;
+
+        qNode.parent = _root;
+        E.parent = qNode;
+        F.parent = qNode;
+        G.parent = qNode;
+        H.parent = qNode;
+
+        A.labelType = PQNode.EMPTY;
+        B.labelType = PQNode.EMPTY;
+        C.labelType = PQNode.FULL;
+        D.labelType = PQNode.FULL;
+
+        qNode.labelType = PQNode.PARTIAL;
+        E.labelType = PQNode.EMPTY;
+        F.labelType = PQNode.EMPTY;
+        G.labelType = PQNode.FULL;
+        H.labelType = PQNode.FULL;
+
+        _root.labelType = PQNode.PARTIAL;
+
+        qNode.nodeType = PQNode.QNODE;
+        _root.nodeType = PQNode.PNODE;
+
+        List<PQNode> rootChildren = new ArrayList<>(Arrays.asList(A,B,qNode,C,D));
+        List<PQNode> qNodeChildren = new ArrayList<>(Arrays.asList(E,F,G,H));
+        setCircularLinks(rootChildren);
+        setCircularLinks(qNodeChildren);
+        _root.children = rootChildren;
+        qNode.children = qNodeChildren;
+
+        PQ PQTree = new PQ();
+        boolean rt = PQTree.TEMPLATE_P4(_root);
+
+        assertTrue(rt);
+        assertTrue(A.parent == _root);
+        assertTrue(B.parent == _root);
+        assertTrue(qNode.parent == _root);
+
+        assertTrue(C.parent != qNode && C.parent != _root);
+        assertTrue(D.parent != qNode && D.parent != _root);
+
+        assertTrue(E.parent == qNode);
+        assertTrue(F.parent == qNode);
+        assertTrue(G.parent == qNode);
+        assertTrue(H.parent == qNode);
+        assertTrue(C.parent == D.parent);
+        assertTrue(C.parent.parent == qNode);
+        assertTrue(qNode.children.contains(C.parent));
+        assertTrue(_root.children.contains(qNode));
+        assertTrue(C.parent.nodeType(PQNode.PNODE));
+        assertTrue(C.parent.labelType.equals(PQNode.FULL));
+        assertTrue(qNode.labelType.equals(PQNode.PARTIAL));
 
     }
 
