@@ -234,7 +234,11 @@ public class PQTest {
         C.parent = _root;
         qNode.parent = _root;
         D.parent = qNode;
+        E.parent = qNode;
+        F.parent = qNode;
+        G.parent = qNode;
         H.parent = qNode;
+
 
         setCircularLinks(Arrays.asList(qNode,A,B,C));
         setCircularLinks(Arrays.asList(D,E,F,G,H));
