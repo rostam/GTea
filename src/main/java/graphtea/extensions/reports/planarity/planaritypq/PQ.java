@@ -380,7 +380,7 @@ public class PQ {
     }
 
     public boolean TEMPLATE_Q1(PQNode x){
-        return false;
+        return TEMPLATE_P1(x);
     }
 
     public boolean TEMPLATE_Q2(PQNode x){

@@ -496,7 +496,57 @@ public class PQTest {
 
     @Test
     public void templateQ2Test(){
+        PQNode _root = new PQNode();
+        PQNode A = new PQNode();
+        PQNode B = new PQNode();
+        PQNode C = new PQNode();
+        PQNode Ca = new PQNode();
+        PQNode Cb = new PQNode();
+        PQNode Cc = new PQNode();
+        PQNode Cd = new PQNode();
+        PQNode D = new PQNode();
+        PQNode E = new PQNode();
 
+        _root.nodeType = PQNode.QNODE;
+        C.nodeType = PQNode.QNODE;
+
+        A.parent = _root;
+        B.parent = _root;
+        C.parent = _root;
+        Ca.parent = C;
+        Cb.parent = C;
+        Cc.parent = C;
+        Cd.parent = C;
+        D.parent = _root;
+        E.parent = _root;
+
+
+        A.labelType = PQNode.EMPTY;
+        B.labelType = PQNode.EMPTY;
+        C.labelType = PQNode.PARTIAL;
+        Ca.labelType = PQNode.EMPTY;
+        Cb.labelType = PQNode.EMPTY;
+        Cc.labelType = PQNode.FULL;
+        Cd.labelType = PQNode.FULL;
+        D.labelType = PQNode.FULL;
+        E.labelType = PQNode.FULL;
+
+        setCircularLinks(Arrays.asList(A, B, C, D, E));
+        setCircularLinks(Arrays.asList(Ca, Cb, Cc, Cd));
+
+        PQ PQTree = new PQ();
+        boolean rt = PQTree.TEMPLATE_Q2(_root);
+
+        assertTrue(rt);
+
+        int flips = 0;
+        String lastState = PQNode.EMPTY;
+        for (PQNode child : _root.children) {
+            if (lastState != child.labelType) {
+                flips++;
+            }
+        }
+        assertTrue(flips == 1);
     }
 
     @Test
