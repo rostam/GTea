@@ -50,7 +50,9 @@ public class Server {
     ResourceConfig rc = new PackagesResourceConfig("server");
     rc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
     HttpServer server = GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
-    HttpHandler staticHandler = new StaticHttpHandler(Server.class.getResource("/web").getPath());
+    String path =  Server.class.getResource("/web").getPath();
+//    path = path.substring(path.indexOf(":")+1,path.lastIndexOf("target/")+6) + "/classes/web";
+    HttpHandler staticHandler = new StaticHttpHandler(path);
     server.getServerConfiguration().addHttpHandler( staticHandler, "/server" );
 
     return server;
