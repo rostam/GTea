@@ -41,7 +41,7 @@ function initCytoscape(arrow, _serverAddr, _uuid) {
             {
                 selector: '.selected',
                 style: {
-                    'background-color': 'rgb(0,0,255,0.5)',
+                    'background-color': 'rgba(150, 211, 255,0.6)',
                     'label': 'data(label)',
                     'text-valign': 'center'
                 }
@@ -138,11 +138,10 @@ function addSingleEdge(source, target) {
         + source + "--" + target
         + "--" + uuid)
         .done(function (data) {
-            var edges = data.edges;
-            var nodes = data.nodes;
-
-            reload(nodes, edges);
-
+            // var edges = data.edges;
+            // var nodes = data.nodes;
+            // reload(nodes, edges);
+            cy.add({group:"edges",data : {id : source+","+target, source : source , target : target}})
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
