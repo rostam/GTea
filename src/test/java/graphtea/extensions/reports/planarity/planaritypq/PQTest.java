@@ -324,7 +324,7 @@ public class PQTest {
     }
 
     @Test
-    public void templateP2Test(){
+    public void templateP2Test1(){
         PQNode _root = new PQNode();
         PQNode A = new PQNode();
         PQNode B = new PQNode();
@@ -346,6 +346,50 @@ public class PQTest {
         E.labelType = PQNode.EMPTY;
 
         List<PQNode> list = new ArrayList<>(Arrays.asList(A,B,C,D,E));
+        _root.children = list;
+        setCircularLinks(list);
+
+        PQ PQTree = new PQ();
+        boolean rt = PQTree.TEMPLATE_P2(_root);
+
+        assertTrue(A.parent != _root);
+        assertTrue(B.parent != _root);
+        assertTrue(C.parent != _root);
+
+        assertTrue(D.parent == _root);
+        assertTrue(E.parent == _root);
+
+        assertTrue(A.parent.nodeType.equals(PQNode.PNODE));
+        assertTrue(B.parent.nodeType.equals(PQNode.PNODE));
+        assertTrue(C.parent.nodeType.equals(PQNode.PNODE));
+
+        assertTrue(A.parent.labelType.equals(PQNode.FULL));
+
+    }
+
+    @Test
+    public void templateP2Test2(){
+        PQNode _root = new PQNode();
+        PQNode A = new PQNode();
+        PQNode B = new PQNode();
+        PQNode C = new PQNode();
+        PQNode D = new PQNode();
+        PQNode E = new PQNode();
+
+        A.parent = _root;
+        B.parent = _root;
+        C.parent = _root;
+        D.parent = _root;
+        E.parent = _root;
+
+        A.labelType = PQNode.FULL;
+        B.labelType = PQNode.FULL;
+        C.labelType = PQNode.FULL;
+
+        D.labelType = PQNode.EMPTY;
+        E.labelType = PQNode.EMPTY;
+
+        List<PQNode> list = new ArrayList<>(Arrays.asList(A,C,E,D,B));
         _root.children = list;
         setCircularLinks(list);
 
