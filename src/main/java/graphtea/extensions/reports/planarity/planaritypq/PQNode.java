@@ -9,12 +9,12 @@ public class PQNode {
     static String PNODE = "p-node";
     static String QNODE = "q-node";
     static String PSEUDO_NODE = "pseudonode";
-    String nodeType = ""; // update the type
+    String nodeType = ""; // PNODE, QNODE, or PSEUDO_NODE
 
     static String PARTIAL = "partial";
     static String FULL = "full";
-    static String EMPTY = "EMPTY";
-    String labelType = "";
+    static String EMPTY = "empty";
+    String labelType = ""; // PARTIAL, FULL, or EMPTY
 
     PQNode circularLink_next;
     PQNode circularLink_prev;
@@ -50,16 +50,34 @@ public class PQNode {
 
     public List<PQNode> partialChildren() {
         List<PQNode> cList = new ArrayList<PQNode>();
-        for (PQNode v : this.children) {
-            if (v.labelType == PARTIAL) {
-                cList.add(v);
+
+        if(nodeType.equals(QNODE)){
+            // QNode
+            if(this.children.size() > 0){
+
+                PQNode start = this.children.get(0);
+                PQNode iter = start.circularLink_next;
+                if(start.labelType.equals(PARTIAL)) {
+                    cList.add(start);
+                }
+                while(iter != start){
+                    if(iter.labelType.equals(PARTIAL)) {
+                        cList.add(iter);
+                    }
+                    iter = iter.circularLink_next;
+                }
+            }
+
+        }
+        else {
+            // PNode
+            for (PQNode v : this.children) {
+                if (v.labelType.equals(PARTIAL)) {
+                    cList.add(v);
+                }
             }
         }
         return cList;
-    }
-
-    public void setPartialChildren(List<PQNode> list){
-
     }
 
     /*
@@ -67,7 +85,7 @@ public class PQNode {
      */
     public List<PQNode> endmostChildren(){
         try {
-            if (this.nodeType != QNODE) {
+            if (!this.nodeType.equals(QNODE)) {
 
                 throw new IllegalNodeTypeException("endmostChildren() is only valid for Q-Nodes");
             }
@@ -249,6 +267,26 @@ public class PQNode {
         else {
             return null;
         }
+    }
+
+    public List<PQNode> getChildren(){
+        if(!this.nodeType.equals(QNODE)){
+            return children;
+        }
+
+        // Qnode
+        List<PQNode> list = new ArrayList<>();
+        if(this.children.size() > 0) {
+            PQNode start = this.children.get(0);
+            PQNode iter = start.circularLink_next;
+            list.add(start);
+            while(iter != start){
+                list.add(iter);
+                iter = iter.circularLink_next;
+            }
+
+        }
+        return list;
     }
 
 
