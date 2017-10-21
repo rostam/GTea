@@ -218,45 +218,85 @@ public class PQ {
         //Setting the links again, otherwise the endmost children would point to the previous siblings (the empty ones)
         setCircularLinks(fullChildren);
 
-        return false;
+        return true;
     }
+
+    /**
+     * This case is very similiar to TEMPLATE_P2.
+     * The matching is nearly identical, the only different being that x cannot be a root.
+     */
     public boolean TEMPLATE_P3(PQNode x){
-        if (!x.labelType.equals(PQNode.FULL)) {
-            List<PQNode> emptyChildren = new ArrayList<PQNode>();
-            List<PQNode> fullChildren = new ArrayList<PQNode>();
-            for (PQNode n : x.children) {
-                if (n.labelType.equals(PQNode.FULL)) {
-                    fullChildren.add(n);
-                }
-                else {
-                    emptyChildren.add(n);
-                }
-            }
 
-            setCircularLinks(emptyChildren);
-            setCircularLinks(fullChildren);
+        //Matching Phase
 
-
-            PQNode newRoot = x;
-            newRoot.nodeType = PQNode.QNODE;
-            newRoot.labelType = PQNode.PARTIAL;
-
-            PQNode emptySubRoot = new PQNode();
-            PQNode fullSubRoot = new PQNode();
-
-            emptySubRoot.parent = newRoot;
-            fullSubRoot.parent = newRoot;
-
-            emptySubRoot.children = emptyChildren;
-            fullSubRoot.children = fullChildren;
-
-            newRoot.children = Arrays.asList(emptySubRoot, fullSubRoot);
-
-            setCircularLinks(newRoot.children);
-
+        //If root
+        if (x.parent == null) {
+            return false;
         }
 
-        return false;
+        List<PQNode> emptyChildren = new ArrayList<PQNode>();
+        List<PQNode> fullChildren = new ArrayList<PQNode>();
+
+        for (PQNode child : x.getChildren()) {
+            if (child.labelType == PQNode.FULL) {
+                fullChildren.add(child);
+            }
+            else if (child.labelType == PQNode.EMPTY) {
+                emptyChildren.add(child);
+            }
+        }
+
+        //If there are no full nodes
+        if (fullChildren.size() == 0) {
+            return false;
+        }
+        //If there are no empty nodes
+        if (emptyChildren.size() == 0) {
+            return false;
+        }
+        //If there were other nodes than full or empty
+        if ( fullChildren.size() + emptyChildren.size() != x.children.size()) {
+            return false;
+        }
+
+        //Replacement phase
+
+        x.labelType = PQNode.PARTIAL;
+        x.nodeType = PQNode.QNODE;
+        x.children = new ArrayList<PQNode>();
+
+        PQNode emptyPNode = new PQNode();
+        PQNode fullPNode = new PQNode();
+
+        x.children.add(emptyPNode);
+        x.children.add(fullPNode);
+
+        emptyPNode.nodeType = PQNode.PNODE;
+        fullPNode.nodeType = PQNode.PNODE;
+        emptyPNode.labelType = PQNode.EMPTY;
+        fullPNode.labelType = PQNode.FULL;
+
+        emptyPNode.parent = x;
+        fullPNode.parent = x;
+
+        //Adding the children to the appropriate P node
+        emptyPNode.children = emptyChildren;
+        fullPNode.children = fullChildren;
+
+
+        //Pointing the children to the appropriate P node
+        for (PQNode child : emptyChildren) {
+            child.parent = emptyPNode;
+        }
+        for (PQNode child : fullChildren) {
+            child.parent = fullPNode;
+        }
+
+        //Setting the links again, otherwise the endmost children would point to the previous siblings (the empty ones)
+        setCircularLinks(emptyChildren);
+        setCircularLinks(fullChildren);
+
+        return true;
     }
 
     public boolean TEMPLATE_P4(PQNode x){

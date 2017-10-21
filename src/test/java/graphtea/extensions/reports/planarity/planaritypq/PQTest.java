@@ -352,6 +352,8 @@ public class PQTest {
         PQ PQTree = new PQ();
         boolean rt = PQTree.TEMPLATE_P2(_root);
 
+        assertTrue(rt);
+
         assertTrue(A.parent != _root);
         assertTrue(B.parent != _root);
         assertTrue(C.parent != _root);
@@ -396,6 +398,8 @@ public class PQTest {
         PQ PQTree = new PQ();
         boolean rt = PQTree.TEMPLATE_P2(_root);
 
+        assertTrue(rt);
+
         assertTrue(A.parent != _root);
         assertTrue(B.parent != _root);
         assertTrue(C.parent != _root);
@@ -412,19 +416,23 @@ public class PQTest {
     }
 
     @Test
-    public void templateP3Test(){
+    public void templateP3Test1(){
         PQNode _root = new PQNode();
+        PQNode parent = new PQNode();
         PQNode A = new PQNode();
         PQNode B = new PQNode();
         PQNode C = new PQNode();
         PQNode D = new PQNode();
         PQNode E = new PQNode();
 
-        A.parent = _root;
-        B.parent = _root;
-        C.parent = _root;
-        D.parent = _root;
-        E.parent = _root;
+        parent.parent = _root;
+        parent.nodeType = PQNode.PNODE;
+
+        A.parent = parent;
+        B.parent = parent;
+        C.parent = parent;
+        D.parent = parent;
+        E.parent = parent;
 
         A.labelType = PQNode.FULL;
         B.labelType = PQNode.FULL;
@@ -434,18 +442,61 @@ public class PQTest {
         E.labelType = PQNode.EMPTY;
 
         List<PQNode> list = new ArrayList<>(Arrays.asList(A,B,C,D,E));
-        _root.children = list;
+        parent.children = list;
         setCircularLinks(list);
 
         PQ PQTree = new PQ();
-        boolean rt = PQTree.TEMPLATE_P3(_root);
-        assertTrue(_root.nodeType == PQNode.QNODE);
-        assertTrue(_root.labelType == PQNode.PARTIAL);
-        assertTrue(_root.children.size() == 2);
-        for (PQNode notFullChild : _root.children.get(0).children) {
+        boolean rt = PQTree.TEMPLATE_P3(parent);
+        assertTrue(parent.nodeType == PQNode.QNODE);
+        assertTrue(parent.labelType == PQNode.PARTIAL);
+        assertTrue(parent.children.size() == 2);
+        for (PQNode notFullChild : parent.children.get(0).children) {
             assertTrue(notFullChild.labelType != PQNode.FULL);
         }
-        for (PQNode fullChild : _root.children.get(1).children) {
+        for (PQNode fullChild : parent.children.get(1).children) {
+            assertTrue(fullChild.labelType == PQNode.FULL);
+        }
+    }
+
+    @Test
+    public void templateP3Test2(){
+        PQNode _root = new PQNode();
+        PQNode parent = new PQNode();
+        PQNode A = new PQNode();
+        PQNode B = new PQNode();
+        PQNode C = new PQNode();
+        PQNode D = new PQNode();
+        PQNode E = new PQNode();
+
+        parent.parent = _root;
+        parent.nodeType = PQNode.PNODE;
+
+        A.parent = parent;
+        B.parent = parent;
+        C.parent = parent;
+        D.parent = parent;
+        E.parent = parent;
+
+        A.labelType = PQNode.FULL;
+        B.labelType = PQNode.FULL;
+        C.labelType = PQNode.FULL;
+
+        D.labelType = PQNode.EMPTY;
+        E.labelType = PQNode.EMPTY;
+
+        List<PQNode> list = new ArrayList<>(Arrays.asList(C,B,A,E,D));
+        parent.children = list;
+        setCircularLinks(list);
+
+        PQ PQTree = new PQ();
+        boolean rt = PQTree.TEMPLATE_P3(parent);
+        assertTrue(parent.nodeType == PQNode.QNODE);
+        assertTrue(parent.labelType == PQNode.PARTIAL);
+        assertTrue(parent.children.size() == 2);
+        for (PQNode notFullChild : parent.children.get(0).children) {
+            assertTrue(notFullChild.labelType != PQNode.FULL);
+        }
+        for (PQNode fullChild : parent.children.get(1).children) {
             assertTrue(fullChild.labelType == PQNode.FULL);
         }
     }
