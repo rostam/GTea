@@ -497,6 +497,8 @@ public class PQTest {
     @Test
     public void templateQ2Test(){
         PQNode _root = new PQNode();
+
+        PQNode qNode = new PQNode();
         PQNode A = new PQNode();
         PQNode B = new PQNode();
         PQNode C = new PQNode();
@@ -507,20 +509,36 @@ public class PQTest {
         PQNode D = new PQNode();
         PQNode E = new PQNode();
 
-        _root.nodeType = PQNode.QNODE;
+        _root.nodeType = PQNode.PNODE;
+        _root.children = Arrays.asList(qNode);
+
+        qNode.nodeType = PQNode.QNODE;
         C.nodeType = PQNode.QNODE;
 
-        A.parent = _root;
-        B.parent = _root;
-        C.parent = _root;
+        qNode.parent = _root;
+        A.parent = qNode;
+        B.parent = qNode;
+        C.parent = qNode;
         Ca.parent = C;
         Cb.parent = C;
         Cc.parent = C;
         Cd.parent = C;
-        D.parent = _root;
-        E.parent = _root;
+        D.parent = qNode;
+        E.parent = qNode;
 
+        A.id = "A";
+        B.id = "B";
+        C.id = "C";
+        D.id = "D";
+        E.id = "E";
+        Ca.id = "Ca";
+        Cb.id = "Cb";
+        Cc.id = "Cc";
+        Cd.id = "Cd";
+        qNode.id = "qNode";
+        _root.id = "_root";
 
+        qNode.labelType = PQNode.PARTIAL;
         A.labelType = PQNode.EMPTY;
         B.labelType = PQNode.EMPTY;
         C.labelType = PQNode.PARTIAL;
@@ -531,21 +549,29 @@ public class PQTest {
         D.labelType = PQNode.FULL;
         E.labelType = PQNode.FULL;
 
+        qNode.children = Arrays.asList(A, B, C, D, E);
         setCircularLinks(Arrays.asList(A, B, C, D, E));
         setCircularLinks(Arrays.asList(Ca, Cb, Cc, Cd));
 
         PQ PQTree = new PQ();
-        boolean rt = PQTree.TEMPLATE_Q2(_root);
+        boolean rt = PQTree.TEMPLATE_Q2(qNode);
 
         assertTrue(rt);
 
+        /** Travels from left to right in the children list and counts
+         * the number of children that switch from empty to non-empty
+         * or vice versa, we call this number the 'number of flips'.
+         *
+         * This number has to be 1 to be valid. */
         int flips = 0;
         String lastState = PQNode.EMPTY;
-        for (PQNode child : _root.children) {
+        for (PQNode child : qNode.children) {
+            System.out.println(child.labelType);
             if (lastState != child.labelType) {
                 flips++;
             }
         }
+        System.out.println(flips);
         assertTrue(flips == 1);
     }
 
