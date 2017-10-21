@@ -145,7 +145,7 @@ public class PQ {
 
     public boolean TEMPLATE_L1(PQNode x){ return false; }
 
-    public boolean TEMPLATE_P1(PQNode x){
+    public boolean GENERALIZED_TEMPLATE_1(PQNode x){
         if(!x.labelType.equals(PQNode.FULL)){
             for(PQNode n : x.children){
                 if(!n.labelType.equals(PQNode.FULL)){
@@ -158,34 +158,66 @@ public class PQ {
         return false;
     }
 
-    public boolean TEMPLATE_P2(PQNode x){
-        if (!x.labelType.equals(PQNode.FULL)) {
-            List<PQNode> pNodeChildren = new LinkedList<>();
-            PQNode pNode = new PQNode();
-            List<PQNode> newChildren = new ArrayList<>();
-            for (PQNode n : x.children) {
-                if (n.labelType.equals(PQNode.FULL)) {
-                    pNodeChildren.add(n);
-                    //x.children.remove(i);
-                    n.parent = pNode;
-                } else {
-                    newChildren.add(n);
-                }
+    public boolean TEMPLATE_P1(PQNode x){
+       if (x.nodeType == PQNode.PNODE) {
+           return GENERALIZED_TEMPLATE_1(x);
+       }
+       return false;
+    }
+
+    public boolean TEMPLATE_P2(PQNode x) {
+
+        //Matching Phase
+
+        //If not root
+        if (x.parent != null) {
+            return false;
+        }
+
+        List<PQNode> emptyChildren = new ArrayList<PQNode>();
+        List<PQNode> fullChildren = new ArrayList<PQNode>();
+
+        for (PQNode child : x.getChildren()) {
+            if (child.labelType == PQNode.FULL) {
+                fullChildren.add(child);
             }
-            if (pNodeChildren.size() > 0) {
-                pNode.labelType = PQNode.FULL;
-                pNode.nodeType = PQNode.PNODE;
-                pNode.children = pNodeChildren;
-                pNode.parent = x;
-                newChildren.add(pNode);
-                x.children = newChildren;
-
-                setCircularLinks(x.children);
-                setCircularLinks(pNode.children);
-
-                return true;
+            else if (child.labelType == PQNode.EMPTY) {
+                emptyChildren.add(child);
             }
         }
+
+        //If there are no full nodes
+        if (fullChildren.size() == 0) {
+            return false;
+        }
+        //If there are no empty nodes
+        if (emptyChildren.size() == 0) {
+            return false;
+        }
+        //If there were other nodes than full or empty
+        if ( fullChildren.size() + emptyChildren.size() != x.children.size()) {
+            return false;
+        }
+
+
+        //Replacement phase
+
+        PQNode fullParent = new PQNode();
+        fullParent.nodeType = PQNode.PNODE;
+        fullParent.labelType = PQNode.FULL;
+        fullParent.parent = x;
+
+        //Adding the full children to a new P node
+        fullParent.children = fullChildren;
+
+        //Pointing the children to the new P node
+        for (PQNode child : fullChildren) {
+            child.parent = fullParent;
+        }
+
+        //Setting the links again, otherwise the endmost children would point to the previous siblings (the empty ones)
+        setCircularLinks(fullChildren);
+
         return false;
     }
     public boolean TEMPLATE_P3(PQNode x){
@@ -299,7 +331,6 @@ public class PQ {
         y.parent = x.parent;
         y.pertinentLeafCount = x.pertinentLeafCount;
         y.labelType = PQNode.PARTIAL;
-        y.parent.setPartialChildren( union(y.parent.partialChildren(), Arrays.asList(y)) );
 
         // Remove Y from the list of children of X formed by the CIRCULAR_LINK fields
         y.removeFromCircularLink();
@@ -380,7 +411,10 @@ public class PQ {
     }
 
     public boolean TEMPLATE_Q1(PQNode x){
-        return TEMPLATE_P1(x);
+       if (x.nodeType == PQNode.QNODE) {
+           return GENERALIZED_TEMPLATE_1(x);
+       }
+       return false;
     }
 
     public boolean TEMPLATE_Q2(PQNode x){
@@ -421,7 +455,6 @@ public class PQ {
         }
 
         x.labelType = PQNode.PARTIAL;
-        x.parent.setPartialChildren(union(x.parent.partialChildren(), Arrays.asList(x)));
 
         if(x.partialChildren().size() > 0){
             // TODO: Y := the unique element of PARTIAL_CHILDREN(X)

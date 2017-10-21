@@ -44,6 +44,10 @@ public class PQNode {
         parent  = null;
     }
 
+    public boolean isPertinent() {
+        return (this.labelType == PARTIAL || this.labelType == FULL);
+    }
+
     public boolean nodeType(String checkType){
         return nodeType.equals(checkType);
     }
