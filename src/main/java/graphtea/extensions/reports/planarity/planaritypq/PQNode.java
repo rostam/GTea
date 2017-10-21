@@ -27,8 +27,6 @@ public class PQNode {
 
     boolean blocked;
 
-    //boolean marked;
-
     int childCount;
 
     PQNode parent;
@@ -43,6 +41,7 @@ public class PQNode {
         circularLink_next = null;
         circularLink_prev = null;
         childCount = 0;
+        parent  = null;
     }
 
     public boolean nodeType(String checkType){
@@ -72,7 +71,8 @@ public class PQNode {
 
                 throw new IllegalNodeTypeException("endmostChildren() is only valid for Q-Nodes");
             }
-            return this.children;
+            //return this.children;
+            return Arrays.asList(this.children.get(0), this.children.get(this.children.size()-1));
         }
         catch (IllegalNodeTypeException e) {
 
