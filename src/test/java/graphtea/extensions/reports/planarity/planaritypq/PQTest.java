@@ -1,10 +1,8 @@
 package graphtea.extensions.reports.planarity.planaritypq;
 
 import org.junit.Test;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.util.*;
 
 import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.setCircularLinks;
 import static junit.framework.Assert.assertNotNull;
@@ -517,13 +515,8 @@ public class PQTest {
 
         qNode.parent = _root;
         A.parent = qNode;
-        B.parent = qNode;
-        C.parent = qNode;
         Ca.parent = C;
-        Cb.parent = C;
-        Cc.parent = C;
         Cd.parent = C;
-        D.parent = qNode;
         E.parent = qNode;
 
         A.id = "A";
@@ -549,7 +542,7 @@ public class PQTest {
         D.labelType = PQNode.FULL;
         E.labelType = PQNode.FULL;
 
-        qNode.children = Arrays.asList(A, B, C, D, E);
+        qNode.children = Arrays.asList(A, E);
         setCircularLinks(Arrays.asList(A, B, C, D, E));
         setCircularLinks(Arrays.asList(Ca, Cb, Cc, Cd));
 
@@ -558,21 +551,30 @@ public class PQTest {
 
         assertTrue(rt);
 
-        /** Travels from left to right in the children list and counts
-         * the number of children that switch from empty to non-empty
-         * or vice versa, we call this number the 'number of flips'.
-         *
-         * This number has to be 1 to be valid. */
+        Set<PQNode> nodesToCheck = new HashSet<PQNode>();
+
+        nodesToCheck.addAll(Arrays.asList(A, B, C, Ca, Cb, Cc, Cd, D, E));
+        System.out.println(nodesToCheck.size());
+
+        PQNode iterNode = qNode.children.get(0);
         int flips = 0;
-        String lastState = PQNode.EMPTY;
-        for (PQNode child : qNode.children) {
-            System.out.println(child.labelType);
-            if (lastState != child.labelType) {
+
+
+        // While we have not checked the whole circular list
+        while (iterNode.circularLink_next != qNode.children.get(0)) {
+            System.out.println(iterNode.id);
+            if (nodesToCheck.contains(iterNode)) {
+                nodesToCheck.remove(iterNode);
+            }
+            if (iterNode.circularLink_prev.labelType != iterNode.labelType) {
                 flips++;
             }
+            iterNode = iterNode.circularLink_next;
         }
-        System.out.println(flips);
-        assertTrue(flips == 1);
+        System.out.println(nodesToCheck.size());
+        assert(nodesToCheck.isEmpty());
+        assert(flips == 1);
+
     }
 
     @Test
