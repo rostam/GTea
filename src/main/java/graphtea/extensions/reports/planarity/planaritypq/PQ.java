@@ -145,7 +145,7 @@ public class PQ {
 
     public boolean TEMPLATE_L1(PQNode x){ return false; }
 
-    public boolean TEMPLATE_P1(PQNode x){
+    public boolean GENERALIZED_TEMPLATE_1(PQNode x){
         if(!x.labelType.equals(PQNode.FULL)){
             for(PQNode n : x.children){
                 if(!n.labelType.equals(PQNode.FULL)){
@@ -158,114 +158,203 @@ public class PQ {
         return false;
     }
 
-    public boolean TEMPLATE_P2(PQNode x){
-        if (!x.labelType.equals(PQNode.FULL)) {
-            List<PQNode> pNodeChildren = new LinkedList<>();
-            PQNode pNode = new PQNode();
-            List<PQNode> newChildren = new ArrayList<>();
-            for (PQNode n : x.children) {
-                if (n.labelType.equals(PQNode.FULL)) {
-                    pNodeChildren.add(n);
-                    //x.children.remove(i);
-                    n.parent = pNode;
-                } else {
-                    newChildren.add(n);
-                }
-            }
-            if (pNodeChildren.size() > 0) {
-                pNode.labelType = PQNode.FULL;
-                pNode.nodeType = PQNode.PNODE;
-                pNode.children = pNodeChildren;
-                pNode.parent = x;
-                newChildren.add(pNode);
-                x.children = newChildren;
-
-                setCircularLinks(x.children);
-                setCircularLinks(pNode.children);
-
-                return true;
-            }
-        }
-        return false;
+    public boolean TEMPLATE_P1(PQNode x){
+       if (x.nodeType == PQNode.PNODE) {
+           return GENERALIZED_TEMPLATE_1(x);
+       }
+       return false;
     }
-    public boolean TEMPLATE_P3(PQNode x){
-        if (!x.labelType.equals(PQNode.FULL)) {
-            List<PQNode> emptyChildren = new ArrayList<PQNode>();
-            List<PQNode> fullChildren = new ArrayList<PQNode>();
-            for (PQNode n : x.children) {
-                if (n.labelType.equals(PQNode.FULL)) {
-                    fullChildren.add(n);
-                }
-                else {
-                    emptyChildren.add(n);
-                }
-            }
 
-            setCircularLinks(emptyChildren);
-            setCircularLinks(fullChildren);
+    public boolean TEMPLATE_P2(PQNode x) {
 
+        //Matching Phase
 
-            PQNode newRoot = x;
-            newRoot.nodeType = PQNode.QNODE;
-            newRoot.labelType = PQNode.PARTIAL;
-
-            PQNode emptySubRoot = new PQNode();
-            PQNode fullSubRoot = new PQNode();
-
-            emptySubRoot.parent = newRoot;
-            fullSubRoot.parent = newRoot;
-
-            emptySubRoot.children = emptyChildren;
-            fullSubRoot.children = fullChildren;
-
-            newRoot.children = Arrays.asList(emptySubRoot, fullSubRoot);
-
-            setCircularLinks(newRoot.children);
-
+        //If not root
+        if (x.parent != null) {
+            return false;
         }
 
-        return false;
+        List<PQNode> emptyChildren = new ArrayList<PQNode>();
+        List<PQNode> fullChildren = new ArrayList<PQNode>();
+
+        for (PQNode child : x.getChildren()) {
+            if (child.labelType == PQNode.FULL) {
+                fullChildren.add(child);
+            }
+            else if (child.labelType == PQNode.EMPTY) {
+                emptyChildren.add(child);
+            }
+        }
+
+        //If there are no full nodes
+        if (fullChildren.size() == 0) {
+            return false;
+        }
+        //If there are no empty nodes
+        if (emptyChildren.size() == 0) {
+            return false;
+        }
+        //If there were other nodes than full or empty
+        if ( fullChildren.size() + emptyChildren.size() != x.children.size()) {
+            return false;
+        }
+
+
+        //Replacement phase
+
+        PQNode fullParent = new PQNode();
+        fullParent.nodeType = PQNode.PNODE;
+        fullParent.labelType = PQNode.FULL;
+        fullParent.parent = x;
+
+        //Adding the full children to a new P node
+        fullParent.children = fullChildren;
+
+        //Pointing the children to the new P node
+        for (PQNode child : fullChildren) {
+            child.parent = fullParent;
+        }
+
+        //Setting the links again, otherwise the endmost children would point to the previous siblings (the empty ones)
+        setCircularLinks(fullChildren);
+
+        return true;
+    }
+
+    /**
+     * This case is very similiar to TEMPLATE_P2.
+     * The matching is nearly identical, the only different being that x cannot be a root.
+     */
+    public boolean TEMPLATE_P3(PQNode x){
+
+        //Matching Phase
+
+        //If root
+        if (x.parent == null) {
+            return false;
+        }
+
+        List<PQNode> emptyChildren = new ArrayList<PQNode>();
+        List<PQNode> fullChildren = new ArrayList<PQNode>();
+
+        for (PQNode child : x.getChildren()) {
+            if (child.labelType == PQNode.FULL) {
+                fullChildren.add(child);
+            }
+            else if (child.labelType == PQNode.EMPTY) {
+                emptyChildren.add(child);
+            }
+        }
+
+        //If there are no full nodes
+        if (fullChildren.size() == 0) {
+            return false;
+        }
+        //If there are no empty nodes
+        if (emptyChildren.size() == 0) {
+            return false;
+        }
+        //If there were other nodes than full or empty
+        if ( fullChildren.size() + emptyChildren.size() != x.children.size()) {
+            return false;
+        }
+
+        //Replacement phase
+
+        x.labelType = PQNode.PARTIAL;
+        x.nodeType = PQNode.QNODE;
+        x.children = new ArrayList<PQNode>();
+
+        PQNode emptyPNode = new PQNode();
+        PQNode fullPNode = new PQNode();
+
+        x.children.add(emptyPNode);
+        x.children.add(fullPNode);
+
+        emptyPNode.nodeType = PQNode.PNODE;
+        fullPNode.nodeType = PQNode.PNODE;
+        emptyPNode.labelType = PQNode.EMPTY;
+        fullPNode.labelType = PQNode.FULL;
+
+        emptyPNode.parent = x;
+        fullPNode.parent = x;
+
+        //Adding the children to the appropriate P node
+        emptyPNode.children = emptyChildren;
+        fullPNode.children = fullChildren;
+
+
+        //Pointing the children to the appropriate P node
+        for (PQNode child : emptyChildren) {
+            child.parent = emptyPNode;
+        }
+        for (PQNode child : fullChildren) {
+            child.parent = fullPNode;
+        }
+
+        //Setting the links again, otherwise the endmost children would point to the previous siblings (the empty ones)
+        setCircularLinks(emptyChildren);
+        setCircularLinks(fullChildren);
+
+        return true;
     }
 
     public boolean TEMPLATE_P4(PQNode x){
-        if(!x.labelType.equals(PQNode.PARTIAL)){
+
+        //Matching phase
+
+        //Check if node is not root
+        if (x.parent != null) {
             return false;
         }
 
-        PQNode pNode = new PQNode();
-        pNode.nodeType = PQNode.PNODE;
-        pNode.labelType = PQNode.FULL;
-        List<PQNode> emptyChildren = new ArrayList<PQNode>();
-        List<PQNode> fullChildren = new ArrayList<PQNode>();
-        int numPartialQNodes = 0;
-        PQNode partialQNode = null;
-        for(PQNode n : x.children){
-            if(n.labelType.equals(PQNode.PARTIAL) && n.nodeType.equals(PQNode.QNODE)){
-                partialQNode = n;
-                numPartialQNodes++;
-                emptyChildren.add(n);
-            }
-            else if(n.labelType.equals(PQNode.FULL)){
-                fullChildren.add(n);
-                n.parent = pNode;
-            }
-            else {
-                emptyChildren.add(n);
-            }
+        List<PQNode> emptyChildren = x.getChildrenOfLabel(PQNode.EMPTY);
+        List<PQNode> fullChildren = x.getChildrenOfLabel(PQNode.FULL);
+        List<PQNode> partialChildren = x.getChildrenOfLabel(PQNode.PARTIAL);
 
+
+        //If there are no full nodes
+        if (fullChildren.size() == 0) {
+            return false;
         }
-
-        if(numPartialQNodes != 1){
+        //If there are no empty nodes
+        if (emptyChildren.size() == 0) {
+            return false;
+        }
+        //If there is not exactly 1 partial child
+        if (partialChildren.size() != 1) {
             return false;
         }
 
-        pNode.children = fullChildren;
-        pNode.parent = partialQNode;
-        partialQNode.children.add(pNode);
+        //If there were other nodes than full, empty or partial
+        if ( fullChildren.size() + emptyChildren.size() + partialChildren.size() != x.children.size()) {
+            return false;
+        }
 
-        setCircularLinks(fullChildren);
-        setCircularLinks(emptyChildren);
-        setCircularLinks(partialQNode.children);
+        //If partial node is not a Q node
+        if (partialChildren.get(0).nodeType != PQNode.QNODE) {
+            return false;
+        }
+
+        //Replacement phase
+
+        PQNode pNodeParent = new PQNode();
+        pNodeParent.nodeType = PQNode.PNODE;
+        pNodeParent.labelType = PQNode.FULL;
+        pNodeParent.children = fullChildren;
+        pNodeParent.parent = partialChildren.get(0);
+
+        partialChildren.get(0).children.add(pNodeParent);
+
+        for (PQNode n : fullChildren) {
+            n.parent = pNodeParent;
+        }
+
+
+        //Setting the circular links, otherwise the endmost children would still point to their former neighbours
+        setCircularLinks(partialChildren.get(0).children);
+        setCircularLinks(pNodeParent.children);
+        setCircularLinks(x.children);
 
         return true;
     }
@@ -275,12 +364,12 @@ public class PQ {
         if(x.nodeType(PQNode.PNODE)){
             return false;
         }
-        if(x.partialChildren().size() != 1){
+        if(x.getChildrenOfLabel(PQNode.PARTIAL).size() != 1){
             return false;
         }
 
         // TODO: Y := the unique element in PARTIAL_CHILDREN(X)
-        PQNode y = x.partialChildren().get(0);
+        PQNode y = x.getChildrenOfLabel(PQNode.PARTIAL).get(0);
         // TODO: EC := the unique element in ENDMOST_CHILDREN(Y) labeled "empty"
         PQNode ec = x.endmostChildren().get(0);
         // TODO: FC := the unique element in ENDMOST_CHILDREN(Y) labeled "full"
@@ -299,7 +388,6 @@ public class PQ {
         y.parent = x.parent;
         y.pertinentLeafCount = x.pertinentLeafCount;
         y.labelType = PQNode.PARTIAL;
-        y.parent.setPartialChildren( union(y.parent.partialChildren(), Arrays.asList(y)) );
 
         // Remove Y from the list of children of X formed by the CIRCULAR_LINK fields
         y.removeFromCircularLink();
@@ -353,7 +441,7 @@ public class PQ {
             y.endmostChildren().removeAll(union(Arrays.asList(fc), Arrays.asList(zf)));
         }
 
-        int numberEmpty = x.childCount - x.fullChildren().size() - x.partialChildren().size();
+        int numberEmpty = x.childCount - x.fullChildren().size() - x.getChildrenOfLabel(PQNode.PARTIAL).size();
         if(numberEmpty > 0){
             PQNode ze;
             if(numberEmpty == 1){
@@ -380,7 +468,10 @@ public class PQ {
     }
 
     public boolean TEMPLATE_Q1(PQNode x){
-        return TEMPLATE_P1(x);
+       if (x.nodeType == PQNode.QNODE) {
+           return GENERALIZED_TEMPLATE_1(x);
+       }
+       return false;
     }
 
     public boolean TEMPLATE_Q2(PQNode x){
@@ -411,21 +502,20 @@ public class PQ {
                 }
             }
 
-            if( !subset(x.partialChildren(), Arrays.asList(y)) ){
+            if( !subset(x.getChildrenOfLabel(PQNode.PARTIAL), Arrays.asList(y)) ){
                 return false;
             }
 
         }
-        else if(!subset(x.partialChildren(), x.endmostChildren())){
+        else if(!subset(x.getChildrenOfLabel(PQNode.PARTIAL), x.endmostChildren())){
             return false;
         }
 
         x.labelType = PQNode.PARTIAL;
-        x.parent.setPartialChildren(union(x.parent.partialChildren(), Arrays.asList(x)));
 
-        if(x.partialChildren().size() > 0){
+        if(x.getChildrenOfLabel(PQNode.PARTIAL).size() > 0){
             // TODO: Y := the unique element of PARTIAL_CHILDREN(X)
-            PQNode y = x.partialChildren().get(0);
+            PQNode y = x.getChildrenOfLabel(PQNode.PARTIAL).get(0);
 
             PQNode fc = y.endmostChild(PQNode.FULL);
 
