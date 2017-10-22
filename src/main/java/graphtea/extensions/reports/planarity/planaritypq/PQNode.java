@@ -52,7 +52,7 @@ public class PQNode {
         return nodeType.equals(checkType);
     }
 
-    public List<PQNode> partialChildren() {
+    public List<PQNode> getChildrenOfType(String type) {
         List<PQNode> cList = new ArrayList<PQNode>();
 
         if(nodeType.equals(QNODE)){
@@ -61,11 +61,11 @@ public class PQNode {
 
                 PQNode start = this.children.get(0);
                 PQNode iter = start.circularLink_next;
-                if(start.labelType.equals(PARTIAL)) {
+                if(start.nodeType.equals(type)) {
                     cList.add(start);
                 }
                 while(iter != start){
-                    if(iter.labelType.equals(PARTIAL)) {
+                    if(iter.nodeType.equals(type)) {
                         cList.add(iter);
                     }
                     iter = iter.circularLink_next;
@@ -76,7 +76,39 @@ public class PQNode {
         else {
             // PNode
             for (PQNode v : this.children) {
-                if (v.labelType.equals(PARTIAL)) {
+                if (v.nodeType.equals(type)) {
+                    cList.add(v);
+                }
+            }
+        }
+        return cList;
+    }
+
+    public List<PQNode> getChildrenOfLabel(String label) {
+        List<PQNode> cList = new ArrayList<PQNode>();
+
+        if(nodeType.equals(QNODE)){
+            // QNode
+            if(this.children.size() > 0){
+
+                PQNode start = this.children.get(0);
+                PQNode iter = start.circularLink_next;
+                if(start.labelType.equals(label)) {
+                    cList.add(start);
+                }
+                while(iter != start){
+                    if(iter.labelType.equals(label)) {
+                        cList.add(iter);
+                    }
+                    iter = iter.circularLink_next;
+                }
+            }
+
+        }
+        else {
+            // PNode
+            for (PQNode v : this.children) {
+                if (v.labelType.equals(label)) {
                     cList.add(v);
                 }
             }
