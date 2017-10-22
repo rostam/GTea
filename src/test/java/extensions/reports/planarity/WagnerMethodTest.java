@@ -123,7 +123,7 @@ public class WagnerMethodTest {
     /* // Runs too slow
     @Test
     public void TreeTest(){
-        TreeGenerator gen = new TreeGenerator();
+        CircularTreeGenerator gen = new CircularTreeGenerator();
         GraphModel gm = gen.generateGraph();
         WagnerMethod pc = new WagnerMethod();
         assertFalse( pc.isPlanar(gm));

@@ -188,10 +188,10 @@ public class GraphGenerator implements PluginMethods {
     }
 
     /**
-     * @see graphtea.extensions.generators.TreeGenerator#generateTree(int,int)
+     * @see graphtea.extensions.generators.CircularTreeGenerator#generateTree(int,int)
      */
     public static GraphModel generateTree(int depth, int degree) {
-        return TreeGenerator.generateTree(depth, degree);
+        return CircularTreeGenerator.generateTree(depth, degree);
     }
 
     /**

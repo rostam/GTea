@@ -22,7 +22,7 @@ import java.awt.*;
  * 
  */
 @CommandAttitude(name = "generate_helmn", abbreviation = "_g_helmn", description = "generates a Helm graph of order n")
-public class HelmGraph implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
+public class ClosedHelmGraph implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
 
 	@Parameter(name = "n")
 	public static int n = 3;
@@ -36,12 +36,12 @@ public class HelmGraph implements GraphGeneratorExtension, Parametrizable, Simpl
 
 	public String getName()
 	{
-		return "Helm Graph";
+		return "Closed Helm Graph";
 	}
 
 	public String getDescription()
 	{
-		return "Generate Helm Graph";
+		return "Generate the closed Helm graph";
 	}
 
 	Vertex[] v;
@@ -55,22 +55,22 @@ public class HelmGraph implements GraphGeneratorExtension, Parametrizable, Simpl
 		return result;
 	}
 
-	public Edge[] getEdges()
-	{
+	public Edge[] getEdges() {
 		Edge[] result;
-        result = new Edge[3*n];
-        int ecnt = 0;
-		for (int i = 0; i < n; i++)
-		{
-			result[ecnt] = new Edge(v[i], v[n+i]);
-            ecnt++;
-			result[ecnt] = new Edge(v[n+i], v[2*n]);
-            ecnt++;
-			result[ecnt] = new Edge(v[n+i],v[n+((i+1)%n)]);
-            ecnt++;
+		result = new Edge[3 * n + n];
+		int ecnt = 0;
+		for (int i = 0; i < n; i++) {
+			result[ecnt] = new Edge(v[i], v[n + i]);
+			ecnt++;
+			result[ecnt] = new Edge(v[n + i], v[2 * n]);
+			ecnt++;
+			result[ecnt] = new Edge(v[n + i], v[n + ((i + 1) % n)]);
+			ecnt++;
+			result[ecnt] = new Edge(v[i], v[((i + 1) % n)]);
+			ecnt++;
 		}
 
-        return result;
+		return result;
 	}
 
 	public Point[] getVertexPositions()
@@ -108,8 +108,8 @@ public class HelmGraph implements GraphGeneratorExtension, Parametrizable, Simpl
 	 */
 	public static GraphModel generateHelm(int n)
 	{
-		HelmGraph.n = n;
-		return GraphGenerator.getGraph(false, new HelmGraph());
+		ClosedHelmGraph.n = n;
+		return GraphGenerator.getGraph(false, new ClosedHelmGraph());
     }
 
 public static void main(String[] args) {
