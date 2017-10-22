@@ -651,15 +651,17 @@ public class PQTest {
     public void templateP5Test(){
         PQNode _root = new PQNode();
         _root.nodeType = PQNode.PNODE;
+        _root.id = "_root";
         List<PQNode> empties = new ArrayList<PQNode>();
         List<PQNode> emptyChildrenOfQNode = new ArrayList<PQNode>();
         List<PQNode> pertinentChildrenOfQNode = new ArrayList<PQNode>();
-        List<PQNode> partials = new ArrayList<PQNode>();
+        List<PQNode> fulls = new ArrayList<PQNode>();
 
         for (int i = 0; i < 4; i++) {
             PQNode empty = new PQNode();
             empty.id = "empty" + Integer.toString(i);
             empty.parent = _root;
+            empty.labelType = PQNode.EMPTY;
             empties.add(empty);
         }
 
@@ -667,6 +669,7 @@ public class PQTest {
         partialQNode.nodeType = PQNode.QNODE;
         partialQNode.labelType = PQNode.PARTIAL;
         partialQNode.id = "partialQNode";
+        partialQNode.parent = _root; // Added
 
         for (int i = 0; i < 4; i++) {
             PQNode emptyChildOfQNode = new PQNode();
@@ -678,7 +681,7 @@ public class PQTest {
 
         for (int i = 0; i < 4; i++) {
             PQNode pertinentChildOfQNode = new PQNode();
-            pertinentChildOfQNode.id = "pertinentChildOfQNode" + Integer.toString(i);
+            pertinentChildOfQNode.id = "fullChildOfQNode" + Integer.toString(i);
             pertinentChildrenOfQNode.add(pertinentChildOfQNode);
         }
         partialQNode.children.add(pertinentChildrenOfQNode.get(pertinentChildrenOfQNode.size()-1));
@@ -689,20 +692,20 @@ public class PQTest {
         setCircularLinks(combinedChildrenOfQNode);
 
         for (int i = 0; i < 4; i++) {
-            PQNode partial = new PQNode();
-            partial.id = "partial" + Integer.toString(i);
-            partial.parent = _root;
-            partials.add(partial);
+            PQNode full = new PQNode();
+            full.id = "partial" + Integer.toString(i);
+            full.parent = _root;
+            full.labelType = PQNode.FULL;
+            fulls.add(full);
         }
 
         List<PQNode> combinedChildrenOfRoot = new ArrayList<PQNode>();
         combinedChildrenOfRoot.addAll(empties);
         combinedChildrenOfRoot.add(partialQNode);
-        combinedChildrenOfRoot.addAll(partials);
+        combinedChildrenOfRoot.addAll(fulls);
         setCircularLinks(combinedChildrenOfRoot);
 
         _root.children = combinedChildrenOfRoot;
-
 
         System.out.println(_root.children.size());
         System.out.println(_root.getChildren().size());
@@ -710,6 +713,38 @@ public class PQTest {
         PQ PQTree = new PQ();
         boolean ret = PQTree.TEMPLATE_P5(_root);
         assertTrue(ret);
+
+        for(PQNode n : empties){
+            assertTrue(n.parent != _root);
+            assertTrue(n.parent.parent == _root);
+            assertTrue(n.parent.children.contains(n));
+        }
+
+        for(PQNode n : fulls){
+            assertTrue(n.parent != _root);
+            assertTrue(n.parent.parent == _root);
+            assertTrue(n.parent.children.contains(n));
+        }
+
+        PQNode leftmostPNode = (empties.get(0)).parent;
+        PQNode rightmostPNode = (fulls.get(0)).parent;
+
+        assertTrue(_root.endmostChildren().contains(leftmostPNode));
+        assertTrue(_root.endmostChildren().contains(rightmostPNode));
+
+        assertTrue(_root.endmostChildren().size() == 2);
+
+        assertTrue(_root.labelType.equals(PQNode.PARTIAL));
+        assertTrue(_root.nodeType.equals(PQNode.QNODE));
+
+        PQNode iter = leftmostPNode;
+        int countRootChildren = 1;
+        while(iter.circularLink_next != leftmostPNode){
+            countRootChildren++;
+            iter = iter.circularLink_next;
+        }
+        assertTrue(countRootChildren == 10);
+
     }
 
     @Test
