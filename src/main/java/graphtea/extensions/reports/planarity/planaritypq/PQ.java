@@ -361,6 +361,113 @@ public class PQ {
 
     public boolean TEMPLATE_P5(PQNode x){
 
+        // Check if x is _root of whole tree
+        /*if(x.parent == null){
+            return false;
+        }*/
+
+        if(!x.nodeType.equals(PQNode.PNODE)){
+            return false;
+        }
+
+        if(x.children.size() < 1){
+            return false;
+        }
+
+        PQNode qNode = null;
+        int qNodeChildCount = 0;
+        List<PQNode> emptyChildList = new ArrayList<>();
+        List<PQNode> fullChildList = new ArrayList<>();
+        for(PQNode n : x.children){
+            if(n.nodeType.equals(PQNode.QNODE)){
+                qNodeChildCount++;
+                qNode = n;
+            }
+            else if(n.labelType.equals(PQNode.EMPTY)){
+                emptyChildList.add(n);
+            }
+            else if(n.labelType.equals(PQNode.FULL)){
+                fullChildList.add(n);
+            }
+
+        }
+
+        if(emptyChildList.size() == 0 || fullChildList.size() == 0) {
+            return false;
+        }
+
+        if(qNodeChildCount > 1 || qNode == null){
+            return false;
+        }
+
+        if(!qNode.labelType.equals(PQNode.PARTIAL)){
+            return false;
+        }
+
+        PQNode leftmostChild = qNode.endmostChildren().get(0);
+        PQNode rightmostChild = qNode.endmostChildren().get(1);
+
+        PQNode newLeftmostPNode = new PQNode();
+        PQNode newRightmostPNode = new PQNode();
+
+        newLeftmostPNode.labelType = PQNode.EMPTY;
+        newLeftmostPNode.nodeType = PQNode.PNODE;
+        newRightmostPNode.labelType = PQNode.FULL;
+        newRightmostPNode.nodeType = PQNode.PNODE;
+
+        leftmostChild.circularLink_prev = newLeftmostPNode;
+        rightmostChild.circularLink_next = newRightmostPNode;
+
+        newLeftmostPNode.parent = qNode;
+        newLeftmostPNode.circularLink_next = leftmostChild;
+        newLeftmostPNode.circularLink_prev = newRightmostPNode;
+        leftmostChild.circularLink_prev = newLeftmostPNode;
+
+        newRightmostPNode.parent = qNode;
+        newRightmostPNode.circularLink_prev = rightmostChild;
+        newRightmostPNode.circularLink_next = newLeftmostPNode;
+        rightmostChild.circularLink_next = newRightmostPNode;
+
+        leftmostChild.parent = null;
+        rightmostChild.parent = null;
+
+        if(emptyChildList.size() > 0) {
+            //emptyChildList.get(0).circularLink_prev = emptyChildList.get(emptyChildList.size() - 1);
+            //emptyChildList.get(emptyChildList.size() - 1).circularLink_next = emptyChildList.get(0);
+            for (PQNode e : emptyChildList) {
+                e.parent = newLeftmostPNode;
+                newLeftmostPNode.children.add(e);
+                x.children.remove(e);
+            }
+            qNode.children.remove(0);
+            qNode.children.add(0, newLeftmostPNode);
+        }
+
+        if(fullChildList.size() > 0) {
+            //fullChildList.get(0).circularLink_prev = fullChildList.get(fullChildList.size() - 1);
+            //fullChildList.get(fullChildList.size() - 1).circularLink_next = fullChildList.get(0);
+            for (PQNode f : fullChildList) {
+                f.parent = newRightmostPNode;
+                newRightmostPNode.children.add(f);
+                x.children.remove(f);
+            }
+            qNode.children.remove(qNode.children.size()-1);
+            qNode.children.add(qNode.children.size()-1, newRightmostPNode);
+        }
+
+        newLeftmostPNode.parent = x;
+        newRightmostPNode.parent = x;
+        x.labelType = qNode.labelType;
+        x.nodeType = qNode.nodeType;
+        x.children = qNode.children;
+
+        qNode = null;
+
+        return true;
+    }
+
+    /*public boolean TEMPLATE_P5(PQNode x){
+
         if(x.nodeType(PQNode.PNODE)){
             return false;
         }
@@ -462,7 +569,7 @@ public class PQ {
             x = null;
         }
         return true;
-    }
+    }*/
     public boolean TEMPLATE_P6(PQNode x){
         return false;
     }
@@ -476,7 +583,7 @@ public class PQ {
 
     public boolean TEMPLATE_Q2(PQNode x){
 
-        if(!x.nodeType(PQNode.QNODE)){
+        /*if(!x.nodeType(PQNode.QNODE)){
             return false;
         }
         if(x.nodeType(PQNode.PSEUDO_NODE)){
@@ -542,7 +649,7 @@ public class PQ {
                 ec.parent = x;
             }
             y = null;
-        }
+        }*/
 
         return true;
     }
