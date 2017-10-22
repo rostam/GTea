@@ -169,7 +169,7 @@ public class WagnerMethodTest {
 
     @Test
     public void BananaTreeGraphTest() {
-        GearGenerator gen = new GearGenerator();
+        GearGraphGenerator gen = new GearGraphGenerator();
         for (int i = 1; i < 5; i++) {
             System.out.println("Testing for n = " + i);
             GraphModel gm = gen.generateGear(i);

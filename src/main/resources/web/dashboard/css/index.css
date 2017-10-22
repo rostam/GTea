@@ -34,6 +34,20 @@ body {
   overflow: auto;
 }
 
+.tools2 {
+    box-sizing: border-box;
+    padding: 0.25em 0.5em;
+    position: absolute;
+    left: 22.5em;
+    top: 26em;
+    bottom: 0;
+    width: 57.5em;
+    background: #ECEADF;
+    border-top: 1px solid #ddd;
+    z-index: 1;
+    overflow: auto;
+}
+
 .footer-link {
   position: absolute;
   left: 0;

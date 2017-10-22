@@ -24,7 +24,7 @@ import java.awt.*;
  */
 @CommandAttitude(name = "generate_gear", abbreviation = "_g_g"
         , description = "generate a n vertices gear graph")
-public class GearGenerator implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
+public class GearGraphGenerator implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
     private GraphModel g;
     @Parameter(name = "n")
     public static Integer n = 5;
@@ -95,8 +95,8 @@ public class GearGenerator implements GraphGeneratorExtension, Parametrizable, S
      * generates a Wheel Graph with given parameters
      */
     public static GraphModel generateGear(int n) {
-        GearGenerator.n = n;
-        return GraphGenerator.getGraph(false, new GearGenerator());
+        GearGraphGenerator.n = n;
+        return GraphGenerator.getGraph(false, new GearGraphGenerator());
     }
 
     @Override

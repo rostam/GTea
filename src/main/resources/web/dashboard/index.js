@@ -33,6 +33,13 @@ $.get(serverAddr + 'graphs/')
 
             var desc = original_data[category].desc;
             $('#tooltiptext').html(desc);
+            var linkName = category;
+            var ind = category.indexOf("Generator");
+            if(ind != -1) linkName = category.substr(0,ind);
+            ind = category.indexOf("Graph");
+            if(ind == -1) linkName += "Graph";
+            linkName += ".html";
+            $('#gen_link').attr('href','http://mathworld.wolfram.com/'+linkName);
         });
 
         var reportsSelect = $('#reports');

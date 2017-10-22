@@ -17,6 +17,10 @@
 </head>
 <body>
 <div id="canvas" class="main"></div>
+<div id="tools2" class="tools2" hidden>
+    <i class="fa fa-times" aria-hidden="true" style="float: right;" onclick="$('#tools2').hide()"></i>
+    <div id="results-body"></div>
+</div>
 <div class="tools">
     <!--<img src="icon-big.PNG" width="100px">-->
     <div style="font-size: 14px;margin: 10px;">
@@ -43,6 +47,8 @@
             <div class="tooltip"><i class="fa fa-info-circle" aria-hidden="true"></i>
                 <span id="tooltiptext" class="tooltiptext">A brief description</span>
             </div>
+            <a id="gen_link" href="" target="_blank">
+                <i class="fa fa-external-link" aria-hidden="true"></i></a>
             <div id="props">
                 <span id="props_keys">n</span> : <input type="text" id="props_vals"
                                                         placeholder="Integer">
@@ -110,7 +116,7 @@
         <div id="reportProps"></div>
         <div>Report Results:<br/>
             <textarea name="Text1" cols="35" rows="4" id="reportResults"></textarea>
-            <button id="myBtn">View Styled</button>
+            <button id="myBtn" onclick="$('#tools2').show();">View Styled</button>
             <button onclick="showOnGraph()">Show On Graph</button>
         </div>
         <hr>
@@ -134,21 +140,21 @@
 </div>
 
 <!-- The Modal -->
-<div id="myModal" class="modal">
+<!--<div id="myModal" class="modal">-->
 
-    <!-- Modal content -->
-    <div class="modal-content">
-        <div class="modal-header">
-            <span class="close">&times;</span>
-            <h5>Report results</h5>
-        </div>
-        <div class="modal-body" id="results-body">
-        </div>
-        <div class="modal-footer">
-            <h5>Modal Footer</h5>
-        </div>
-    </div>
-</div>
+    <!--&lt;!&ndash; Modal content &ndash;&gt;-->
+    <!--<div class="modal-content">-->
+        <!--<div class="modal-header">-->
+            <!--<span class="close">&times;</span>-->
+            <!--<h5>Report results</h5>-->
+        <!--</div>-->
+        <!--<div class="modal-body" id="results-body">-->
+        <!--</div>-->
+        <!--<div class="modal-footer">-->
+            <!--<h5>Modal Footer</h5>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
 <script src="cytoscape/jquery.cytoscape.js-edgehandles.js"></script>
 <script src="js/server.js"></script>
 <script src="js/cytoscape_related_functions.js"></script>
