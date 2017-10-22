@@ -26,7 +26,6 @@ var strings = {
     adjMat: "The adjacency matrix:",
     save: "Save the graph:",
     freehand: "Freehand graph drawing by mouse."
-    freehand: "Freehand graph drawing by mouse."
 };
 
 $('#strings-intro').html(strings.intro);
