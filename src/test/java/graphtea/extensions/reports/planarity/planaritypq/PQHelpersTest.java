@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 
 public class PQHelpersTest {
     @Test
-    public void setCircularLinks() throws Exception {
+    public void setCircularLinksTest() throws Exception {
         PQNode c1 = new PQNode();
         PQNode c2 = new PQNode();
         PQNode c3 = new PQNode();
@@ -28,6 +28,45 @@ public class PQHelpersTest {
         assertTrue(c2.circularLink_next == c3);
         assertTrue(c3.circularLink_prev == c2);
         assertTrue(c3.circularLink_next == c1);
+    }
+
+    @Test
+    public void checkIfConsecutiveTestPositive() throws Exception {
+        List<PQNode> nodes = new LinkedList<PQNode>();
+        for (int i = 0; i < 10; i++) {
+            PQNode n = new PQNode();
+            nodes.add(n);
+        }
+        PQHelpers.setCircularLinks(nodes);
+        assertTrue(PQHelpers.checkIfConsecutive(nodes));
+    }
+
+    @Test
+    public void checkIfConsecutiveTestNegative() throws Exception {
+        List<PQNode> nodes = new LinkedList<PQNode>();
+        for (int i = 0; i < 10; i++) {
+            PQNode n = new PQNode();
+            nodes.add(n);
+        }
+        PQHelpers.setCircularLinks(nodes);
+        nodes.get(3).circularLink_prev = nodes.get(5);
+        assertFalse(PQHelpers.checkIfConsecutive(nodes));
+    }
+
+    @Test
+    public void checkIfConsecutiveTestOneElement() throws Exception {
+        List<PQNode> nodes = new LinkedList<PQNode>();
+        PQNode n = new PQNode();
+        nodes.add(n);
+        PQHelpers.setCircularLinks(nodes);
+        assertTrue(PQHelpers.checkIfConsecutive(nodes));
+    }
+
+    @Test
+    public void checkIfConsecutiveTestEmpty() throws Exception {
+        List<PQNode> nodes = new LinkedList<PQNode>();
+        PQHelpers.setCircularLinks(nodes);
+        assertTrue(PQHelpers.checkIfConsecutive(nodes));
     }
 
     @Test

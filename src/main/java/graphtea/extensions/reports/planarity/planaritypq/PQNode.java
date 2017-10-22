@@ -131,7 +131,28 @@ public class PQNode {
         catch (IllegalNodeTypeException e) {
 
         }
-        return null;
+        return new ArrayList<PQNode>();
+    }
+
+    public List<PQNode> internalChildren() {
+        try {
+            if (!this.nodeType.equals(QNODE)) {
+
+                throw new IllegalNodeTypeException("internalChildren() is only valid for Q-Nodes");
+            }
+            //return this.children;
+            List<PQNode> internals = new ArrayList<PQNode>();
+            //Get nodes of index 1 ... (n-1)
+            List<PQNode> allChildren = this.getChildren();
+            for (int i = 1; i < allChildren.size()-1; i++) {
+                internals.add(allChildren.get(i));
+            }
+            return internals;
+        }
+        catch (IllegalNodeTypeException e) {
+
+        }
+        return new ArrayList<PQNode>();
     }
 
     public PQNode emptySibling(){

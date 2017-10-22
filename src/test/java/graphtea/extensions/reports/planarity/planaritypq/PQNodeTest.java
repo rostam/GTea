@@ -25,7 +25,50 @@ public class PQNodeTest {
     }
 
     @Test
-    public void endmostChildren() throws Exception {
+    public void endmostChildrenTest() throws Exception {
+        PQNode _root = new PQNode();
+        _root.nodeType = PQNode.QNODE;
+
+        PQNode first = new PQNode();
+        PQNode second = new PQNode();
+        PQNode third = new PQNode();
+        PQNode fourth = new PQNode();
+
+        //Setting parent links
+        first.parent = _root;
+        fourth.parent = _root;
+
+        _root.children = Arrays.asList(first, second, third, fourth);
+        PQHelpers.setCircularLinks(Arrays.asList(first, second, third, fourth));
+
+        List<PQNode> expected = Arrays.asList(first, fourth);
+        assertTrue(expected.equals(_root.endmostChildren()));
+    }
+
+    @Test
+    public void internalChildrenTest() throws Exception {
+        PQNode _root = new PQNode();
+        _root.nodeType = PQNode.QNODE;
+
+        PQNode first = new PQNode();
+        PQNode second = new PQNode();
+        PQNode third = new PQNode();
+        PQNode fourth = new PQNode();
+
+        first.id = "first";
+        second.id = "second";
+        third.id = "third";
+        fourth.id = "fourth";
+
+        //Setting parent links
+        first.parent = _root;
+        fourth.parent = _root;
+
+        _root.children = Arrays.asList(first, second, third, fourth);
+        PQHelpers.setCircularLinks(Arrays.asList(first, second, third, fourth));
+
+        List<PQNode> expected = Arrays.asList(second, third);
+        assertTrue(expected.equals(_root.internalChildren()));
     }
 
     @Test
