@@ -41,17 +41,18 @@
         <!--<button onclick="selectLoader()">Select</button>-->
         <div id="generators" class="loaders">
             <p id="strings-generator"></p>
-            <table>
-                <tr>
-                    <td><select id="categories">
-                        <option>Select</option>
-                    </select></td>
-                    <td>
+            <select id="categories">
+                <option>Select</option>
+            </select>
+            <!--<table>-->
+                <!--<tr>-->
+                    <!--<td></td>-->
+                    <!--<td>-->
                         <div id="props"><span id="props_keys">n</span> : <input type="text" id="props_vals"
                                                                                 placeholder="Integer"></div>
-                    </td>
-                </tr>
-            </table>
+                    <!--</td>-->
+                <!--</tr>-->
+            <!--</table>-->
             <p id="strings-layout"></p>
             <select id="layouts">
                 <option>Force Directed</option>
@@ -74,14 +75,14 @@
         </div>
         <div id="elformat" class="loaders">
             <p id="strings-elformat"></p>
-            Edge list in csv format: <br/><textarea id="elstring" name="Text1" cols="20" rows="5"></textarea>
+             <br/><textarea id="elstring" name="Text1" cols="20" rows="5"></textarea>
             <br/>
             <button onclick="load_graph('el',false)">Load Only</button>
             <button onclick="load_graph('el',true)">Load and Draw</button>
         </div>
         <div id="adjMatformat" class="loaders">
             <p id="strings-adjMatformat"></p>
-            <br/><textarea id="adjstring" name="Text1" cols="20" rows="5"></textarea>
+            <textarea id="adjstring" name="Text1" cols="20" rows="5"></textarea>
             <br/>
             <button onclick="load_graph('adj',false)">Load Only</button>
             <button onclick="load_graph('adj',true)">Load and Draw</button>
@@ -100,12 +101,15 @@
                 <input type="submit" value="Upload It" />
             </form>
         </div>
+        <div id="freehandformat" class="loaders">
+            <p id="strings-freehand"></p>
+        </div>
         <p id="strings-report"></p>
         <select id="reports"></select>
         <button onclick="Report()">Report</button>
         <div id="reportProps"></div>
         <div>Report Results:<br/>
-            <textarea name="Text1" cols="50" rows="6" id="reportResults"></textarea>
+            <textarea name="Text1" cols="30" rows="6" id="reportResults"></textarea>
             <button id="myBtn">View Styled</button>
             <button onclick="showOnGraph()">Show On Graph</button>
         </div>
@@ -120,7 +124,7 @@
                 <option>LaTeX</option>
             </select>
             <button onclick="do_saves()">Go</button>
-            <textarea name="Text2" cols="50" rows="6" id="outputResults"></textarea>
+            <textarea name="Text2" cols="30" rows="6" id="outputResults"></textarea>
         </div>
         <!--<button onclick="clearCanvas()">Clear</button>-->
 

@@ -146,23 +146,26 @@ cy.on('tap', function(event) {
         return;
     }
 
-    if (evtTarget === cy) {
-        addSingleVertex(event);
-    }
-    else if (evtTarget.isNode()) {
-        if (selectedNode == null) {
-            // Update the selectedNode and change the color of it
-            selectedNode = evtTarget;
-            cy.$('#'+selectedNode.data('id')).classes('selected');
-
+    var loader = $('#loaders').find('option:selected').text();
+    if(loader == "Freehand drawing") {
+        if (evtTarget === cy) {
+            addSingleVertex(event);
         }
-        else {
-            // Adds an edge between the selected node and the newly selected node.
-            // Resets the color.
-            addSingleEdge(selectedNode.data('label'), evtTarget.data('label'));
-            cy.$('#'+selectedNode.data('label')).classes('node');
+        else if (evtTarget.isNode()) {
+            if (selectedNode == null) {
+                // Update the selectedNode and change the color of it
+                selectedNode = evtTarget;
+                cy.$('#' + selectedNode.data('id')).classes('selected');
 
-            selectedNode = null;
+            }
+            else {
+                // Adds an edge between the selected node and the newly selected node.
+                // Resets the color.
+                addSingleEdge(selectedNode.data('label'), evtTarget.data('label'));
+                cy.$('#' + selectedNode.data('label')).classes('node');
+
+                selectedNode = null;
+            }
         }
     }
 });
@@ -261,6 +264,8 @@ function selectLoader() {
         case "File":
             $('#fileformat').show();
             break;
+        case "Freehand drawing":
+            $('#freehandformat').show();
     }
 }
 

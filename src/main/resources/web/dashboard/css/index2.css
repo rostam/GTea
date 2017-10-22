@@ -9,7 +9,7 @@ body {
 
 .main {
   position: absolute;
-  left: 33em;
+  left: 22em;
   top: 0;
   right: 0em;
   bottom: 0;
@@ -23,7 +23,7 @@ body {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 33em;
+  width: 22em;
   background: #fff;
   border-right: 1px solid #ddd;
   z-index: 1;

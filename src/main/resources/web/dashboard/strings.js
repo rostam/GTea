@@ -15,7 +15,10 @@ var strings = {
     "        The elements in a row are separated with a comma." +
     "        Each row comes in a new line. ",
     save: "Here, you can save the current graph to different format. The outputs" +
-            " that are textual are shown on the text area."
+            " that are textual are shown on the text area.",
+    freehand: "The graph can be drawn using mouse click. Each click on the screen" +
+    "would draw a vertex. Selecting two vertices in order would add an edge between them.",
+    elist: "Edge list in csv format. Each line contains an edge."
 };
 
 $('#strings-intro').html(strings.intro);
@@ -26,3 +29,4 @@ $("#strings-layout").html(strings.layout);
 $("#strings-report").html(strings.report);
 $("#strings-adjMatformat").html(strings.adjMat);
 $("#strings-save").html(strings.save);
+$("#strings-elformat").html(strings.elist);
