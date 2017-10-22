@@ -736,7 +736,7 @@ public class PQTest {
 
         // All children blocked
         assertTrue(!_root.labelType.equals(PQNode.FULL));
-        boolean rt = PQTree.TEMPLATE_P1(_root);
+        boolean rt = PQTree.TEMPLATE_Q1(_root);
         assertTrue(rt);
         assertTrue(_root.labelType.equals(PQNode.FULL));
 
