@@ -15,6 +15,42 @@ public class PQHelpers {
         }
     }
 
+
+    /**
+     * Checks whether the given nodes are consecutive, i.e. do they form
+     * a linked list (not necessarily circular).
+     * @return whether the nodes are consecutive or not
+     */
+    public static boolean checkIfConsecutive(List<PQNode> nodes) {
+        if (nodes.size() == 1) {
+            return true;
+        }
+        for (int i = 0; i < nodes.size(); i++) {
+            //If first node
+            if (i == 0) {
+                if (!nodes.get(i).circularLink_next.equals(nodes.get(i+1))) {
+                    return false;
+                }
+            }
+            //If last node
+            else if (i == nodes.size()-1) {
+                if (!nodes.get(i).circularLink_prev.equals(nodes.get(i-1))) {
+                    return false;
+                }
+            }
+            //General case
+            else {
+                if (!nodes.get(i).circularLink_prev.equals(nodes.get(i-1))) {
+                    return false;
+                }
+                if (!nodes.get(i).circularLink_next.equals(nodes.get(i+1))) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public static <E> boolean subset(List<E> list1, List<E> list2) {
         return list2.containsAll(list1);
     }

@@ -789,9 +789,9 @@ public class PQTest {
 
     @Test
     public void templateQ2Test(){
-
         PQNode _root = new PQNode();
-        //PQNode qNode = new PQNode();
+
+        PQNode qNode = new PQNode();
         PQNode A = new PQNode();
         PQNode B = new PQNode();
         PQNode C = new PQNode();
@@ -805,8 +805,10 @@ public class PQTest {
         _root.nodeType = PQNode.QNODE;
         _root.children = Arrays.asList();
 
+        qNode.nodeType = PQNode.QNODE;
         C.nodeType = PQNode.QNODE;
 
+        qNode.parent = _root;
         A.parent = _root;
         Ca.parent = C;
         Cd.parent = C;
@@ -821,9 +823,9 @@ public class PQTest {
         Cb.id = "Cb";
         Cc.id = "Cc";
         Cd.id = "Cd";
+        qNode.id = "qNode";
         _root.id = "_rootQ";
 
-        _root.labelType = PQNode.PARTIAL;
         A.labelType = PQNode.EMPTY;
         B.labelType = PQNode.EMPTY;
         C.labelType = PQNode.PARTIAL;
@@ -834,21 +836,22 @@ public class PQTest {
         D.labelType = PQNode.FULL;
         E.labelType = PQNode.FULL;
 
-        _root.children = Arrays.asList(A, E);
+        //Only A, E as official children, since this is a qnode
+        C.children = Arrays.asList(Ca, Cd);
+        qNode.children = Arrays.asList(A, E);
         setCircularLinks(Arrays.asList(A, B, C, D, E));
         setCircularLinks(Arrays.asList(Ca, Cb, Cc, Cd));
 
         PQ PQTree = new PQ();
-        boolean rt = PQTree.TEMPLATE_Q2(_root);
+        boolean rt = PQTree.TEMPLATE_Q2(qNode);
 
         assertTrue(rt);
 
         Set<PQNode> nodesToCheck = new HashSet<PQNode>();
 
-        nodesToCheck.addAll(Arrays.asList(A, B, C, Ca, Cb, Cc, Cd, D, E));
-        System.out.println(nodesToCheck.size());
+        nodesToCheck.addAll(Arrays.asList(A, B, Ca, Cb, Cc, Cd, D, E));
 
-        PQNode iterNode = _root.children.get(0);
+        PQNode iterNode = qNode.children.get(0);
         int flips = 0;
 
         /* Below, we travel from left to right in the children list and counts
@@ -858,18 +861,16 @@ public class PQTest {
          * This number has to be 1 to be valid. */
 
         // While we have not checked the whole circular list
-        while (iterNode.circularLink_next != _root.children.get(0)) {
-            System.out.println(iterNode.id);
-            System.out.println(iterNode.labelType);
+        do {
             if (nodesToCheck.contains(iterNode)) {
                 nodesToCheck.remove(iterNode);
             }
-            if (iterNode.circularLink_prev.labelType != iterNode.labelType) {
+            if (iterNode != qNode.children.get(0) && iterNode.circularLink_prev.labelType != iterNode.labelType) {
                 flips++;
             }
             iterNode = iterNode.circularLink_next;
-        }
-        System.out.println(nodesToCheck.size());
+        } while (iterNode != qNode.children.get(0));
+
         assert(nodesToCheck.isEmpty());
         assert(flips == 1);
 

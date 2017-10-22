@@ -583,73 +583,76 @@ public class PQ {
 
     public boolean TEMPLATE_Q2(PQNode x){
 
-        /*if(!x.nodeType(PQNode.QNODE)){
+        //Matching
+
+        //If x is not a qNode
+        if (x.nodeType != PQNode.QNODE) {
             return false;
         }
-        if(x.nodeType(PQNode.PSEUDO_NODE)){
+
+        //If empty children are not consecutive
+        if (!checkIfConsecutive(x.getChildrenOfLabel(PQNode.EMPTY))) {
             return false;
         }
 
-        if(x.fullChildren().size() > 0) {
-
-            List<PQNode> xChildren = intersection(x.fullChildren(), x.endmostChildren());
-            if (xChildren.size() != 1) {
-                return false;
-            }
-            // let Y be the unique element in FULL_CHILDREN(X) union ENDMOST_CHILDREN(X)
-            PQNode y = union(x.fullChildren(), x.endmostChildren()).get(0);
-
-            for(int i=0; i<x.fullChildren().size(); i++){
-                if(x.fullChildren().contains(y)){
-                    return false;
-                }
-                else {
-                    // Y := the next sibling in the chain of children of X
-                    y = y.circularLink_next;
-                }
-            }
-
-            if( !subset(x.getChildrenOfLabel(PQNode.PARTIAL), Arrays.asList(y)) ){
-                return false;
-            }
-
-        }
-        else if(!subset(x.getChildrenOfLabel(PQNode.PARTIAL), x.endmostChildren())){
+        //If full children are not consecutive
+        if (!checkIfConsecutive(x.getChildrenOfLabel(PQNode.FULL))) {
             return false;
         }
+
+        //Check if x is not singly partial
+        if (x.getChildrenOfLabel(PQNode.PARTIAL).size() != 1) {
+            return false;
+        }
+
+        //Check if partial node is not a qnode
+        if (x.getChildrenOfLabel(PQNode.PARTIAL).get(0).nodeType != PQNode.QNODE) {
+            return false;
+        }
+
+        //Check if the partial node's full children are not consecutive
+        if (!PQHelpers.checkIfConsecutive(x.getChildrenOfLabel(PQNode.PARTIAL).get(0).getChildrenOfLabel(PQNode.FULL))) {
+            return false;
+        }
+
+        //Check if the partial node's empty children are not consecutive
+        if (!PQHelpers.checkIfConsecutive(x.getChildrenOfLabel(PQNode.PARTIAL).get(0).getChildrenOfLabel(PQNode.EMPTY))) {
+            return false;
+        }
+
+
+
+
+        //Replacement
+
+        PQNode partialNode = x.getChildrenOfLabel(PQNode.PARTIAL).get(0);
+
 
         x.labelType = PQNode.PARTIAL;
 
-        if(x.getChildrenOfLabel(PQNode.PARTIAL).size() > 0){
-            // TODO: Y := the unique element of PARTIAL_CHILDREN(X)
-            PQNode y = x.getChildrenOfLabel(PQNode.PARTIAL).get(0);
+        //Move all children of the partial node to the root
+        List<PQNode> replacementChildren = new ArrayList<PQNode>();
+        replacementChildren.addAll(x.getChildrenOfLabel(PQNode.EMPTY));
+        replacementChildren.addAll(partialNode.getChildrenOfLabel(PQNode.EMPTY));
+        replacementChildren.addAll(partialNode.getChildrenOfLabel(PQNode.FULL));
+        replacementChildren.addAll(x.getChildrenOfLabel(PQNode.FULL));
 
-            PQNode fc = y.endmostChild(PQNode.FULL);
+        //Delete partial child
+        partialNode = null;
 
-            PQNode yFullSibling = y.getImmediateSiblingOfNodeType(PQNode.FULL);
-            if(yFullSibling != null){
-                PQNode fs = yFullSibling;
-                fs.immediateSiblings().removeAll(union(Arrays.asList(y), Arrays.asList(fc)));
-                fc.setImmediateSiblings(union(fc.immediateSiblings(), Arrays.asList(fs)));
-            }
-            else {
-                x.endmostChildren().removeAll(union(Arrays.asList(y), Arrays.asList(fc)));
-                fc.parent = x;
-            }
+        //Reset circular links
+        setCircularLinks(replacementChildren);
 
-            PQNode ec =  y.endmostChild(PQNode.EMPTY);
-            PQNode yEmptyImmSibling = y.getImmediateSiblingOfNodeType(PQNode.EMPTY);
-            if(yEmptyImmSibling != null){
-                PQNode es = yEmptyImmSibling;
-                es.immediateSiblings().removeAll(Arrays.asList(y, ec));
-                ec.setImmediateSiblings(union(ec.immediateSiblings(), Arrays.asList(es)));
-            }
-            else {
-                x.endmostChildren().removeAll(Arrays.asList(y, ec));
-                ec.parent = x;
-            }
-            y = null;
-        }*/
+        x.children = replacementChildren;
+
+        //Set parent links
+        for (PQNode n : x.endmostChildren()) {
+            n.parent = x;
+        }
+
+        for (PQNode n : x.internalChildren()) {
+            n.parent = null;
+        }
 
         return true;
     }
