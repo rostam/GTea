@@ -550,7 +550,8 @@ public class RequestHandler {
             String classSimpleName = c.getSimpleName();
             try {
                 jo.put("name",classSimpleName);
-            } catch (JSONException e) {
+                jo.put("desc", c.newInstance().getDescription());
+            } catch (JSONException | IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
             }
             graphs.add(classSimpleName);
@@ -581,7 +582,8 @@ public class RequestHandler {
             String classSimpleName = c.getSimpleName();
             try {
                 jo.put("name",classSimpleName);
-            } catch (JSONException e) {
+                jo.put("desc",c.newInstance().getDescription());
+            } catch (JSONException | IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
             }
             Field[] fs = c.getFields();

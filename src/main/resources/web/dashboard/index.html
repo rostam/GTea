@@ -1,22 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="css/normalize.css"/>
-    <link rel="stylesheet" href="css/skeleton.css"/>
     <link rel="stylesheet" href="css/font-awesome.css"/>
-    <link rel="stylesheet" href="css/open-sans.css"/>
-    <link rel="stylesheet" href="css/index2.css"/>
-    <link rel="stylesheet" href="css/tooltipster.bundle.min.css"/>
+    <link rel="stylesheet" href="css/index.css"/>
     <link rel="stylesheet" href="modal.css"/>
+    <link rel="stylesheet" href="css/jquery.qtip.min.css">
     <script src="cytoscape321.js"></script>
     <script src="cytoscape-canvas.js"></script>
     <script src="js/cola.js"></script>
     <script src="js/cytoscape-cola.js"></script>
     <script src="js/jquery-3.1.1.min.js"></script>
-    <script src="js/tooltipster.bundle.min.js"></script>
+    <script src="js/jquery.qtip.min.js"></script>
     <script src="paper-full.min.js"></script>
     <script src="drawBotanical.js"></script>
-    <!--<script src="js/index.js"></script>-->
     <title>GraphTea</title>
 </head>
 <body>
@@ -24,7 +20,7 @@
 <div class="tools">
     <!--<img src="icon-big.PNG" width="100px">-->
     <div style="font-size: 14px;margin: 10px;">
-        <h5>GraphTea</h5>
+        <h3>GraphTea</h3>
         <p id="strings-intro"></p>
         <select id="loaders" onchange="selectLoader()">
             <option>Generators</option>
@@ -44,15 +40,14 @@
             <select id="categories">
                 <option>Select</option>
             </select>
-            <!--<table>-->
-                <!--<tr>-->
-                    <!--<td></td>-->
-                    <!--<td>-->
-                        <div id="props"><span id="props_keys">n</span> : <input type="text" id="props_vals"
-                                                                                placeholder="Integer"></div>
-                    <!--</td>-->
-                <!--</tr>-->
-            <!--</table>-->
+            <div class="tooltip"><i class="fa fa-info-circle" aria-hidden="true"></i>
+                <span id="tooltiptext" class="tooltiptext">A brief description</span>
+            </div>
+            <div id="props">
+                <span id="props_keys">n</span> : <input type="text" id="props_vals"
+                                                        placeholder="Integer">
+            </div>
+
             <p id="strings-layout"></p>
             <select id="layouts">
                 <option>Force Directed</option>
@@ -75,7 +70,7 @@
         </div>
         <div id="elformat" class="loaders">
             <p id="strings-elformat"></p>
-             <br/><textarea id="elstring" name="Text1" cols="20" rows="5"></textarea>
+            <br/><textarea id="elstring" name="Text1" cols="20" rows="5"></textarea>
             <br/>
             <button onclick="load_graph('el',false)">Load Only</button>
             <button onclick="load_graph('el',true)">Load and Draw</button>
@@ -97,25 +92,30 @@
         <div id="fileformat" class="loaders">
             <p id="strings-fileformat"></p>
             <form action="upload" method="post" enctype="multipart/form-data">
-                Select a file : <input type="file" name="file" size="45" /><br/>
-                <input type="submit" value="Upload It" />
+                Select a file : <input type="file" name="file" size="45"/><br/>
+                <input type="submit" value="Upload It"/>
             </form>
         </div>
         <div id="freehandformat" class="loaders">
             <p id="strings-freehand"></p>
         </div>
+        <hr>
         <p id="strings-report"></p>
         <select id="reports"></select>
         <button onclick="Report()">Report</button>
+        <div class="tooltip"><i class="fa fa-info-circle" aria-hidden="true"></i>
+            <span id="tooltiptextReport" class="tooltiptext">A brief description</span>
+        </div>
+
         <div id="reportProps"></div>
         <div>Report Results:<br/>
-            <textarea name="Text1" cols="30" rows="6" id="reportResults"></textarea>
+            <textarea name="Text1" cols="35" rows="4" id="reportResults"></textarea>
             <button id="myBtn">View Styled</button>
             <button onclick="showOnGraph()">Show On Graph</button>
         </div>
         <hr>
         <p id="strings-save"></p>
-        <div>Save:
+        <div>
             <select id="output">
                 <option>G6 Format</option>
                 <option>Adjacency Matrix</option>
@@ -124,7 +124,7 @@
                 <option>LaTeX</option>
             </select>
             <button onclick="do_saves()">Go</button>
-            <textarea name="Text2" cols="30" rows="6" id="outputResults"></textarea>
+            <textarea name="Text2" cols="35" rows="4" id="outputResults"></textarea>
         </div>
         <!--<button onclick="clearCanvas()">Clear</button>-->
 

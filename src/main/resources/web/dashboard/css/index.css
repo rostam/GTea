@@ -1,93 +1,125 @@
-#navbarul {
-    color: white;
+html {
+    font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-#actions button {
-    font-size: 14px;
-}
-
-#canvas {
-    font-family: helvetica, sans-serif;
-    float:left;
-    /*width: 80%;*/
-    /*height: 100%;*/
-    height: 700px;
-    /*width: calc(100% - 320px);*/
-    color:red;
-    font-size:16px;
-    border: 1px solid black;
-}
-
-#tools {
-    box-sizing: border-box;
-    padding: 0.25em 0.5em;
-    /*position: absolute;*/
-    right: 0;
+body {
+    position: absolute;
+    left: 0;
     top: 0;
+    right: 0;
     bottom: 0;
-    /*width: 15em;*/
-    background: #fff;
-    border-left: 1px solid #ddd;
-    z-index: 10;
-    overflow: auto;
+    line-height: 1.5;
 }
 
-#mapid {
-    height: 650px;
+.main {
+  position: absolute;
+  left: 22em;
+  top: 0;
+  right: 0em;
+  bottom: 0;
+  z-index: 1;
 }
 
-.input-properties input {
-    width:80%;
-    font-size: 15px;
-    line-height: 1.0;
+.tools {
+  box-sizing: border-box;
+  padding: 0.25em 0.5em;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 22em;
+  background: #ECEADF;
+  border-right: 1px solid #ddd;
+  z-index: 1;
+  overflow: auto;
 }
 
-#loading {
-    margin-left:5px;
+.footer-link {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  margin: 0.25em 0.5em;
+  z-index: 2;
 }
 
-.MyQtip {
+.action-icon {
+  cursor: pointer;
+}
 
-    /** Taken from Bootstrap body */
-    font-size: 14px;
-    line-height: 20px;
-    color: #333333;
+h1 {
+  margin: 0 0.125em;
+  position: absolute;
+  pointer-events: none;
+  color: #bbb;
+}
 
-    /** Taken from Bootstrap .popover */
-    padding: 1px;
-    background-color: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
+* + h2 {
+  margin-top: 0.5em;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 150px;
+    background-color: gray;
+    color: white;
+    text-align: center;
     border-radius: 6px;
-    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding;
-    background-clip: padding-box;
-
-    max-width: 1000px;
+    padding: 10px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 1s;
 }
 
-.input-group {
-    margin: 6px;
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border: 5px solid transparent;
+    border-top-color: #555;
 }
 
-.input-group input {
-    font-size: 12px;
-    padding: 6px;
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
 }
 
-.input-group span {
-    font-size: 12px;
-    padding: 6px;
-}
-
-.nav-item a {
+select,input,button {
+    /*height: 38px;*/
+    padding: 3px; /* The 6px vertically centers text on FF, ignored by Webkit */
+    background-color: #fff;
+    border: 1px solid #D1D1D1;
+    border-radius: 4px;
+    box-shadow: none;
+    box-sizing: border-box;
     font-size: 14px;
+    margin-bottom: 5px;
 }
 
-.nav-item label {
-    font-size: 14px;
+textarea {
+    margin-bottom: 5px;
+}
+
+input {
+    width: 200px;
+}
+
+.qtip-content{
+    font-size: 12px;
+    line-height: 1.2em;
+}
+
+.qtip-title {
+    font-size: 12px;
 }

@@ -16,12 +16,12 @@ $.get(serverAddr + 'graphs/')
         var categoriesSelect = $('#categories');
         data.graphs.forEach(function (d) {
             categoriesSelect.append('<option>' + d.name + '</option>');
-            original_data[d.name] = d.properties;
+            original_data[d.name] = {desc: d.desc, props: d.properties};
         });
         categoriesSelect.on('change', function () {
             var category = getSelectedCategory();
             var keys = "", vals = "";
-            original_data[category].forEach(function (d) {
+            original_data[category].props.forEach(function (d) {
                 var propNamesTypes = d.split(":");
                 keys += propNamesTypes[0] + ", ";
                 vals += propNamesTypes[1] + ", ";
@@ -30,19 +30,22 @@ $.get(serverAddr + 'graphs/')
             vals = vals.substr(0, vals.length - 2);
             $('#props_keys').html(keys);
             $('#props_vals').val(vals);
+
+            var desc = original_data[category].desc;
+            $('#tooltiptext').html(desc);
         });
 
         var reportsSelect = $('#reports');
         data.reports.forEach(function (d) {
             reportsSelect.append('<option>' + d.name + '</option>');
-            original_data[d.name] = d.properties;
+            original_data[d.name] = {desc: d.desc, props: d.properties};
         });
         reportsSelect.on('change', function () {
             var report = getSelectedReport();
             var props = $('#reportProps');
             props.empty();
             var keys="",vals="";
-            original_data[report].forEach(function (d) {
+            original_data[report].props.forEach(function (d) {
                 var propNamesTypes = d.split(":");
                 keys+=propNamesTypes[0]+", ";vals+=propNamesTypes[1]+", ";
             });
@@ -51,6 +54,9 @@ $.get(serverAddr + 'graphs/')
             if(keys=="") props.append("No parameters<br/>");
             else props.append('<span id="reportPropsKeys">' +keys + '</span>: ' +
                 '<input id="reportPropsVals"' + 'name="' + keys + '"' + ' value="' + vals + '">');
+
+            var desc = original_data[report].desc;
+            $('#tooltiptextReport').html(desc);
         });
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
@@ -270,38 +276,38 @@ function selectLoader() {
 }
 
 function load_graph(type,isDraw) {
-    var str = $('#'+type+'string').val().replace(/\n/g,"-");
+    var str = $('#' + type + 'string').val().replace(/\n/g, "-");
     var isDirected = $('#graphType').find('option:selected').text();
-    if(type == "g6") {
+    if (type == "g6") {
         var str2 = "";
-        for(var i=0;i<str.length;i++)
-            if(str[i] == "?") str2 += "qqq";
+        for (var i = 0; i < str.length; i++)
+            if (str[i] == "?") str2 += "qqq";
             else str2 += str[i];
         str = str2;
     }
-    server(serverAddr + 'loadGraph' + '/'+ type + "--"
-    +str+"--"+isDirected+"--"+uuid,function (data) {
-            if(isDraw) {
-                cy = cytoscape({
-                    container: document.getElementById('canvas'),
-                    style: [ // the stylesheet for the graph
-                        {
-                            selector: 'node',
-                            style: {
-                                'background-color': 'lightgray',
-                                'label': 'data(id)',
-                                'text-valign': 'center'
-                            }
-                        }]
-                });
-                var nodes = data.nodes;
-                var edges = data.edges;
-                cy.elements().remove();
-                cy.add(nodes);
-                cy.add(edges);
-                cy.layout({name: 'cose'}).run();
-            }
-        });
+    server(serverAddr + 'loadGraph' + '/' + type + "--"
+        + str + "--" + isDirected + "--" + uuid, function (data) {
+        if (isDraw) {
+            cy = cytoscape({
+                container: document.getElementById('canvas'),
+                style: [ // the stylesheet for the graph
+                    {
+                        selector: 'node',
+                        style: {
+                            'background-color': 'lightgray',
+                            'label': 'data(id)',
+                            'text-valign': 'center'
+                        }
+                    }]
+            });
+            var nodes = data.nodes;
+            var edges = data.edges;
+            cy.elements().remove();
+            cy.add(nodes);
+            cy.add(edges);
+            cy.layout({name: 'cose'}).run();
+        }
+    });
 }
 
 function showOnGraph() {
@@ -315,6 +321,11 @@ function showOnGraph() {
     }
 }
 
+
+// function selectGenerator() {
+//     var desc = original_data[$('#categories').find('option:selected').text()].desc;
+//     $('#tooltiptext').html(desc);
+// }
 
 
 
