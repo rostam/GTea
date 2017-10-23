@@ -227,11 +227,6 @@ public class PQNode {
         return null;
     }
 
-    public PQNode endmostChild(String nodeType){
-        return null;
-    }
-
-
     /** todo: Check if we should be returning max{left, right}, or left union right
      *
      * Returns:
