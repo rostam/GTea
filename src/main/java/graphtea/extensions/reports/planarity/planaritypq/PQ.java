@@ -5,8 +5,27 @@ import java.util.stream.Collectors;
 
 import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.*;
 
+/**
+ * This class contains subroutines used to construct a PQ-Tree as described
+ * in the 1976 paper "Testing for Consecutive Ones Property, Interval Graphs,
+ * and Graph Planarity Using PQ-Tree Algorithms".
+ *
+ * We highly recommend reading over the paper before reading this codebase.
+ *
+ * @author Alex Cregten
+ * @author Hannes Kr. Hannesson
+ */
+
 public class PQ {
 
+    /**
+     * This subroutine determines which nodes of the PQ-Tree should be pruned
+     * with respect to the constraint sequence S.
+     *
+     * @param _root root of the tree/subtree
+     * @param S a set of nodes, describes a constraint sequence
+     * @return PQNodes which do not violate S (nor the reverse of S) and all previously applied constraint sequences.
+     */
     public PQNode bubble(PQNode _root, List<PQNode> S){
         Queue<PQNode> queue = new LinkedList<>(S);
         int blockCount = 0;
@@ -158,6 +177,26 @@ public class PQ {
         return false;
     }
 
+    /**
+     * Tries to match the tree with root x to template P1, if successful,
+     * we apply it.
+     *
+     * TEMPLATE:
+     * Case #1:           |Case #2:
+     *        (E)         |        (E)
+     *    |        |      |    |        |
+     *                    |
+     *    E  ....  E      |    F  ....  F
+     *                    |
+     * REPLACEMENT:       |
+     *        (E)         |        (F)
+     *    |        |      |    |        |
+     *                    |
+     *    E  ....  E      |    F  ....  F
+     *                    |
+     * @param x the node which represents the root of the tree/subtree
+     * @return whether or not x matches the template
+     */
     public boolean TEMPLATE_P1(PQNode x){
        if (x.nodeType == PQNode.PNODE) {
            return GENERALIZED_TEMPLATE_1(x);
@@ -574,6 +613,26 @@ public class PQ {
         return false;
     }
 
+    /**
+     * Tries to match the tree with root x to template Q1, if successful,
+     * we apply it.
+     *
+     * TEMPLATE:
+     * Case #1:           |Case #2:
+     *        [E]         |        [E]
+     *    |        |      |    |        |
+     *                    |
+     *    E  ....  E      |    F  ....  F
+     *                    |
+     * REPLACEMENT:       |
+     *        [E]         |        [F]
+     *    |        |      |    |        |
+     *                    |
+     *    E  ....  E      |    F  ....  F
+     *                    |
+     * @param x the node which represents the root of the tree/subtree
+     * @return whether or not x matches the template
+     */
     public boolean TEMPLATE_Q1(PQNode x){
        if (x.nodeType == PQNode.QNODE) {
            return GENERALIZED_TEMPLATE_1(x);
