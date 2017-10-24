@@ -750,7 +750,7 @@ public class PQ {
             }
         }
 
-        //Replacement
+        //Replacement phase
 
         x.labelType = PQNode.PARTIAL;
         List<PQNode> partials = x.getChildrenOfLabel(PQNode.PARTIAL);
