@@ -71,4 +71,53 @@ public class PQHelpers {
         return new ArrayList<>(set);
     }
 
+    public static void printChildren(PQNode x) {
+        String nodeBuf = "";
+        for (PQNode n : x.getChildren()) {
+            if (n.nodeType == PQNode.PNODE) {
+                if (n.labelType == PQNode.EMPTY) {
+                    nodeBuf += "(E)";
+                }
+                else if (n.labelType == PQNode.FULL) {
+                    nodeBuf += "(F)";
+                }
+                 else if (n.labelType == PQNode.PARTIAL) {
+                    nodeBuf += "(P)";
+                }
+                else {
+                    nodeBuf += "(.)";
+                }
+            }
+            else if (n.nodeType == PQNode.QNODE) {
+                if (n.labelType == PQNode.EMPTY) {
+                    nodeBuf += "[E]";
+                }
+                else if (n.labelType == PQNode.FULL) {
+                    nodeBuf += "[F]";
+                }
+                else if (n.labelType == PQNode.PARTIAL) {
+                    nodeBuf += "[P]";
+                }
+                else {
+                    nodeBuf += "[.]";
+                }
+            }
+            else {
+                if (n.labelType == PQNode.EMPTY) {
+                    nodeBuf += " E ";
+                }
+                else if (n.labelType == PQNode.FULL) {
+                    nodeBuf += " F ";
+                }
+                else if (n.labelType == PQNode.PARTIAL) {
+                    nodeBuf += " P ";
+                }
+                else {
+                    nodeBuf += " . ";
+                }
+            }
+        }
+        System.out.println(nodeBuf);
+    }
+
 }
