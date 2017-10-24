@@ -120,4 +120,20 @@ public class PQHelpers {
         System.out.println(nodeBuf);
     }
 
+    public static List<PQNode> frontier(PQNode x) {
+        List<PQNode> frontier = new ArrayList<PQNode>();
+        frontierHelper(x, frontier);
+        return frontier;
+    }
+
+    public static void frontierHelper(PQNode x, List<PQNode> frontier) {
+        if (x.children.size() != 0) {
+            for (PQNode n : x.children) {
+                frontierHelper(n, frontier);
+            }
+        }
+        else {
+            frontier.add(x);
+        }
+    }
 }

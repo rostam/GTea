@@ -44,6 +44,18 @@ public class PQNode {
         parent  = null;
     }
 
+    public PQNode(String id){
+        blocked = false;
+        //marked = false;
+        pertinentChildCount = 0;
+        pertinentLeafCount = 0;
+        queued = false;
+        circularLink_next = null;
+        circularLink_prev = null;
+        childCount = 0;
+        parent  = null;
+        this.id = id;
+    }
     public boolean isPertinent() {
         return (this.labelType == PARTIAL || this.labelType == FULL);
     }

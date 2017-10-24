@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.printChildren;
 import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.setCircularLinks;
 import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.union;
 import static junit.framework.Assert.assertNotNull;
@@ -1025,6 +1026,129 @@ public class PQTest {
         boolean rt = PQTree.TEMPLATE_Q2(qNode);
 
         assertFalse(rt);
+    }
+
+    @Test
+    public void templateQ3Test() {
+        PQNode _root = new PQNode();
+        PQNode mainQNode = new PQNode();
+        PQNode partialLeftQNode = new PQNode();
+        PQNode partialRightQNode = new PQNode();
+
+        mainQNode.nodeType = PQNode.QNODE;
+        partialLeftQNode.nodeType = PQNode.QNODE;
+        partialRightQNode.nodeType = PQNode.QNODE;
+        partialLeftQNode.labelType = PQNode.PARTIAL;
+        partialRightQNode.labelType = PQNode.PARTIAL;
+
+        List<PQNode> emptyLeft = new ArrayList<PQNode>();
+        List<PQNode> partialLeft = new ArrayList<PQNode>();
+        List<PQNode> fullMid = new ArrayList<PQNode>();
+        List<PQNode> partialRight = new ArrayList<PQNode>();
+        List<PQNode> emptyRight = new ArrayList<PQNode>();
+
+        //Populating emptyLeft
+        for (int i = 0; i < 4; i++) {
+            PQNode tmp = new PQNode();
+            tmp.labelType = PQNode.EMPTY;
+            tmp.id = "emptyLeft" + Integer.toString(i);
+            tmp.parent = mainQNode;
+            emptyLeft.add(tmp);
+        }
+
+        //Populating partialLeft
+        for (int i = 0; i < 4; i++) {
+            PQNode tmp = new PQNode();
+            tmp.labelType = PQNode.EMPTY;
+            if (i == 0) {
+                tmp.parent = partialLeftQNode;
+            }
+            tmp.id = "partialLeft" + Integer.toString(i);
+            partialLeft.add(tmp);
+        }
+        for (int i = 0; i < 4; i++) {
+            PQNode tmp = new PQNode();
+            tmp.labelType = PQNode.FULL;
+            if (i == 3) {
+                tmp.parent = partialLeftQNode;
+            }
+            tmp.id = "partialLeft" + Integer.toString(i);
+            partialLeft.add(tmp);
+        }
+
+        //Populating fullMid
+        for (int i = 0; i < 4; i++) {
+            PQNode tmp = new PQNode();
+            tmp.labelType = PQNode.FULL;
+            tmp.id = "fullMid" + Integer.toString(i);
+            tmp.parent = mainQNode;
+            fullMid.add(tmp);
+        }
+
+
+        //Populating partialRight
+        for (int i = 0; i < 4; i++) {
+            PQNode tmp = new PQNode();
+            tmp.labelType = PQNode.EMPTY;
+            if (i == 0) {
+                tmp.parent = partialRightQNode;
+            }
+
+            tmp.id = "partialRight" + Integer.toString(i);
+            partialRight.add(tmp);
+        }
+        for (int i = 0; i < 4; i++) {
+            PQNode tmp = new PQNode();
+            tmp.labelType = PQNode.FULL;
+            if (i == 3) {
+                tmp.parent = partialRightQNode;
+            }
+            tmp.id = "partialRight" + Integer.toString(i);
+            partialRight.add(tmp);
+        }
+
+        //Populating emptyRight
+        for (int i = 0; i < 4; i++) {
+            PQNode tmp = new PQNode();
+            tmp.labelType = PQNode.EMPTY;
+            tmp.id = "emptyRight" + Integer.toString(i);
+            emptyRight.add(tmp);
+        }
+
+        //Constructing temporary list for the purpose of setting circular links
+        List<PQNode> circular = new ArrayList<PQNode>();
+        circular.addAll(emptyLeft);
+        circular.add(partialLeftQNode);
+        circular.addAll(fullMid);
+        circular.add(partialRightQNode);
+        circular.addAll(emptyRight);
+
+
+        setCircularLinks(partialLeft);
+        setCircularLinks(partialRight);
+
+        setCircularLinks(circular);
+
+        //Using same list as before to set the children
+        mainQNode.children = Arrays.asList(circular.get(0), circular.get(circular.size()-1));
+        partialLeftQNode.children = Arrays.asList(partialLeft.get(0), partialLeft.get(partialLeft.size()-1));
+        partialRightQNode.children = Arrays.asList(partialRight.get(0), partialRight.get(partialRight.size()-1));
+
+        List<PQNode> alLChildren = mainQNode.getChildren();
+        PQ PQTree = new PQ();
+        boolean rt = PQTree.TEMPLATE_Q3(mainQNode);
+        assertTrue(rt);
+        int sumOfParts = emptyLeft.size() + partialLeft.size() + fullMid.size() + partialRight.size() + emptyRight.size();
+        assertTrue(mainQNode.getChildren().size() == sumOfParts);
+        List<PQNode> parts = new ArrayList<PQNode>();
+        parts.addAll(emptyLeft);
+        parts.addAll(partialLeft);
+        parts.addAll(fullMid);
+        parts.addAll(partialRight);
+        parts.addAll(emptyRight);
+        assertTrue(mainQNode.getChildren().equals(parts));
+
+
     }
 
     @Test

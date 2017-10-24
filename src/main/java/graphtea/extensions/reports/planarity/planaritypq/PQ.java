@@ -656,8 +656,118 @@ public class PQ {
 
         return true;
     }
+
     public boolean TEMPLATE_Q3(PQNode x){
-        return false;
+
+        //Matching phase
+
+        //Check if not qnode
+        if (x.nodeType != PQNode.QNODE) {
+            return false;
+        }
+
+        //Check if x is not doubly partial
+        if (x.getChildrenOfLabel(PQNode.PARTIAL).size() != 2) {
+            return false;
+        }
+
+        //Check if partial nodes are not qnodes
+        if (x.getChildrenOfLabel(PQNode.PARTIAL).get(0).nodeType != PQNode.QNODE) {
+            return false;
+        }
+        if (x.getChildrenOfLabel(PQNode.PARTIAL).get(1).nodeType != PQNode.QNODE) {
+            return false;
+        }
+
+        //Check if the partial node's full children are not consecutive
+        if (!PQHelpers.checkIfConsecutive(x.getChildrenOfLabel(PQNode.PARTIAL).get(0).getChildrenOfLabel(PQNode.FULL))) {
+            return false;
+        }
+        if (!PQHelpers.checkIfConsecutive(x.getChildrenOfLabel(PQNode.PARTIAL).get(1).getChildrenOfLabel(PQNode.FULL))) {
+            return false;
+        }
+
+        //Check if the partial node's empty children are not consecutive
+        if (!PQHelpers.checkIfConsecutive(x.getChildrenOfLabel(PQNode.PARTIAL).get(0).getChildrenOfLabel(PQNode.EMPTY))) {
+            return false;
+        }
+        if (!PQHelpers.checkIfConsecutive(x.getChildrenOfLabel(PQNode.PARTIAL).get(1).getChildrenOfLabel(PQNode.EMPTY))) {
+            return false;
+        }
+
+        List<PQNode> leftEmpties = new ArrayList<PQNode>();
+        List<PQNode> rightEmpties = new ArrayList<PQNode>();
+
+        int flips = 0;
+        int cntr = 0;
+        for (PQNode n : x.getChildren()) {
+            cntr++;
+            if (flips == 0) {
+                if (n.labelType == PQNode.PARTIAL) {
+                    flips++;
+                }
+                else if (n.labelType != PQNode.EMPTY) {
+                    return false;
+                }
+                //If empty
+                else {
+                   leftEmpties.add(n);
+                }
+            }
+            else if (flips == 1) {
+                if (n.labelType == PQNode.FULL) {
+                    flips++;
+                }
+                else if (n.labelType != PQNode.PARTIAL) {
+                    return false;
+                }
+            }
+            else if (flips == 2) {
+                if (n.labelType == PQNode.PARTIAL) {
+                    flips++;
+                }
+                else if (n.labelType != PQNode.FULL) {
+                    return false;
+                }
+            }
+            else if (flips == 3) {
+                if (n.labelType == PQNode.EMPTY) {
+                    flips++;
+                    rightEmpties.add(n);
+                }
+                else if (n.labelType != PQNode.PARTIAL) {
+                    return false;
+                }
+            }
+            else {
+                if (n.labelType != PQNode.EMPTY) {
+                    return false;
+                }
+                //If empty
+                else {
+                    rightEmpties.add(n);
+                }
+            }
+        }
+
+        //Replacement
+
+        x.labelType = PQNode.PARTIAL;
+        List<PQNode> partials = x.getChildrenOfLabel(PQNode.PARTIAL);
+
+        List<PQNode> replacementChildren = new ArrayList<PQNode>();
+        replacementChildren.addAll(leftEmpties);
+        replacementChildren.addAll(partials.get(0).getChildren());
+        replacementChildren.addAll(x.getChildrenOfLabel(PQNode.FULL));
+        replacementChildren.addAll(partials.get(1).getChildren());
+        replacementChildren.addAll(rightEmpties);
+
+        leftEmpties.get(0).parent = x;
+        rightEmpties.get(rightEmpties.size()-1).parent = x;
+        x.children = replacementChildren;
+        setCircularLinks(replacementChildren);
+
+        return true;
     }
 
 }
