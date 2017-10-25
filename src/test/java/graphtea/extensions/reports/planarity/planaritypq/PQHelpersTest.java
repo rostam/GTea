@@ -9,6 +9,7 @@ import java.util.List;
 
 import graphtea.extensions.reports.planarity.planaritypq.PQHelpers;
 
+import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.reverseCircularLinks;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.*;
 
@@ -157,4 +158,59 @@ public class PQHelpersTest {
 
     }
 
+
+    @Test
+    public void reverseCircularLinksTest() {
+        List<PQNode> list = new ArrayList<>();
+        int listSize = 10;
+        for(int i=0; i<listSize; i++){
+            PQNode n = new PQNode();
+            n.id = ""+i;
+            list.add(n);
+        }
+        PQNode leftMost = list.get(0);
+        PQNode rightMost = list.get(list.size()-1);
+
+        leftMost.circularLink_prev = rightMost;
+        leftMost.circularLink_next = list.get(1);
+
+        rightMost.circularLink_next = leftMost;
+        rightMost.circularLink_prev = list.get( list.size()-2 );
+
+        for(int i=1; i<listSize-1; i++){
+            list.get(i).circularLink_next = list.get(i+1);
+            list.get(i).circularLink_prev = list.get(i-1);
+        }
+
+        for(PQNode n : list){
+            assertNotNull(n.circularLink_next);
+            assertNotNull(n.circularLink_prev);
+        }
+
+        assertTrue(leftMost.circularLink_next == list.get(1));
+        assertTrue(leftMost.circularLink_prev == rightMost);
+
+        assertTrue(rightMost.circularLink_next == leftMost);
+        assertTrue(rightMost.circularLink_prev == list.get(list.size()-2));
+
+        /** Function we are testing */
+        reverseCircularLinks(list.get(0));
+
+        assertTrue(leftMost.circularLink_next == rightMost);
+        assertTrue(leftMost.circularLink_prev == list.get(1));
+
+        assertTrue(rightMost.circularLink_next == list.get(list.size()-2));
+        assertTrue(rightMost.circularLink_prev == leftMost);
+
+        PQNode iter = leftMost;
+
+        while(iter.circularLink_next != leftMost){
+            assertNotNull(iter);
+            iter = iter.circularLink_next;
+        }
+
+
+    }
+
 }
+

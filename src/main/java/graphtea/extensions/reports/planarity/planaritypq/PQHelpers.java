@@ -150,4 +150,20 @@ public class PQHelpers {
             iter = iter.circularLink_next;
         }
     }
+
+    public static void reverseCircularLinks(PQNode node){
+        if(node == null)
+            return;
+
+        PQNode iter = node;
+        while(iter.circularLink_next != node){
+            PQNode tmp = iter.circularLink_next;
+            iter.circularLink_next = iter.circularLink_prev;
+            iter.circularLink_prev = tmp;
+            iter = tmp;
+        }
+        iter.circularLink_next = iter.circularLink_prev;
+        iter.circularLink_prev = node;
+    }
+
 }
