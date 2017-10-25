@@ -136,4 +136,18 @@ public class PQHelpers {
             frontier.add(x);
         }
     }
+
+    public static void gatherQNodeChildren(List<PQNode> emptyChildren, List<PQNode> fullChildren, PQNode qNode){
+        PQNode leftMost = qNode.getChildren().get(0);
+        PQNode iter = leftMost;
+        while(iter.circularLink_next != leftMost){
+            if(iter.labelType.equals(PQNode.EMPTY)){
+                emptyChildren.add(iter);
+            }
+            else if(iter.labelType.equals(PQNode.FULL)){
+                fullChildren.add(iter);
+            }
+            iter = iter.circularLink_next;
+        }
+    }
 }
