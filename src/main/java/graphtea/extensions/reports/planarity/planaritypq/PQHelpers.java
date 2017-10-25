@@ -2,6 +2,7 @@ package graphtea.extensions.reports.planarity.planaritypq;
 
 import java.lang.Math;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import graphtea.extensions.reports.planarity.planaritypq.PQNode;
@@ -151,7 +152,7 @@ public class PQHelpers {
         }
     }
 
-    public static void reverseCircularLinks(PQNode node){
+    static void reverseCircularLinks(PQNode node){
         if(node == null)
             return;
 
@@ -164,6 +165,12 @@ public class PQHelpers {
         }
         iter.circularLink_next = iter.circularLink_prev;
         iter.circularLink_prev = node;
+
+    }
+
+    public static void rotateQNode(PQNode qNode){
+        reverseCircularLinks(qNode.endmostChildren().get(0));
+        Collections.reverse(qNode.children);
     }
 
 }

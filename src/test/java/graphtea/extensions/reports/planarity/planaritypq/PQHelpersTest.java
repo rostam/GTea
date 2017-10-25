@@ -10,6 +10,7 @@ import java.util.List;
 import graphtea.extensions.reports.planarity.planaritypq.PQHelpers;
 
 import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.reverseCircularLinks;
+import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.rotateQNode;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.*;
 
@@ -187,19 +188,24 @@ public class PQHelpersTest {
             assertNotNull(n.circularLink_prev);
         }
 
-        assertTrue(leftMost.circularLink_next == list.get(1));
+        PQNode nodeSecond = list.get(1);
+        PQNode nodeSecondLast = list.get(list.size() - 2);
+
+        assertTrue(leftMost.circularLink_next == nodeSecond);
         assertTrue(leftMost.circularLink_prev == rightMost);
 
         assertTrue(rightMost.circularLink_next == leftMost);
-        assertTrue(rightMost.circularLink_prev == list.get(list.size()-2));
+        assertTrue(rightMost.circularLink_prev == nodeSecondLast);
+
+        List<PQNode> saveList = new ArrayList<>(list);
 
         /** Function we are testing */
         reverseCircularLinks(list.get(0));
 
         assertTrue(leftMost.circularLink_next == rightMost);
-        assertTrue(leftMost.circularLink_prev == list.get(1));
+        assertTrue(leftMost.circularLink_prev == nodeSecond);
 
-        assertTrue(rightMost.circularLink_next == list.get(list.size()-2));
+        assertTrue(rightMost.circularLink_next == nodeSecondLast);
         assertTrue(rightMost.circularLink_prev == leftMost);
 
         PQNode iter = leftMost;
@@ -208,9 +214,47 @@ public class PQHelpersTest {
             assertNotNull(iter);
             iter = iter.circularLink_next;
         }
+    }
 
+    @Test
+    public void rotateQNodeTest(){
+        PQNode qNode = new PQNode();
+        qNode.nodeType = PQNode.QNODE;
+
+        PQNode leftMost = new PQNode();
+        PQNode interior = new PQNode();
+        PQNode rightMost = new PQNode();
+
+        leftMost.id = "A";
+        interior.id = "B";
+        interior.id = "C";
+
+        leftMost.parent = qNode;
+        rightMost.parent = qNode;
+
+        leftMost.circularLink_prev = rightMost;
+        leftMost.circularLink_next = interior;
+
+        interior.circularLink_prev = leftMost;
+        interior.circularLink_next = rightMost;
+
+        rightMost.circularLink_prev = interior;
+        rightMost.circularLink_next = leftMost;
+
+        List<PQNode> children = new ArrayList<>();
+        children.add(leftMost);
+        children.add(interior);
+        children.add(rightMost);
+
+        qNode.children = children;
+
+        rotateQNode(qNode);
+
+        assertTrue(qNode.endmostChildren().get(0) == rightMost);
+        assertTrue(qNode.endmostChildren().get(1) == leftMost);
 
     }
+
 
 }
 
