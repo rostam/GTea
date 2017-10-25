@@ -8,7 +8,7 @@ import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.*;
 /**
  * This class contains subroutines used to construct a PQ-Tree as described
  * in the 1976 paper "Testing for Consecutive Ones Property, Interval Graphs,
- * and Graph Planarity Using PQ-Tree Algorithms".
+ * and Graph Planarity Using PQ-Tree Algorithms" by Kellogg S. Booth and George S. Lueker.
  *
  * We highly recommend reading over the paper before reading this codebase.
  *
@@ -24,7 +24,7 @@ public class PQ {
      *
      * @param _root root of the tree/subtree
      * @param S a set of nodes, describes a constraint sequence
-     * @return PQNodes which do not violate S (nor the reverse of S) and all previously applied constraint sequences.
+     * @return a tree rooted at _root which do not violate S (nor the reverse of S) nor previously applied constraint sequences.
      */
     public PQNode bubble(PQNode _root, List<PQNode> S){
         Queue<PQNode> queue = new LinkedList<>(S);
@@ -102,6 +102,14 @@ public class PQ {
         return _root;
     }
 
+    /**
+     * This subroutine does the actual reduction on the tree, such that the resulting tree adheres to the constraint S.
+     * This is done by matching the tree to "templates", which are essentially types of trees.
+     * After matching the tree to a template, we can replace it with the template's replacement.
+     * @param T root of the tree/subtree to reduce
+     * @param S a set of nodes, describes a constraint sequence
+     * @return a tree rooted at _root which do not violate S (nor the reverse of S) nor previously applied constraint sequences.
+     */
     public PQNode reduce(PQNode T, List<PQNode> S){
         Queue<PQNode> queue = new LinkedList<>(S);
         for(PQNode x : S){
@@ -178,7 +186,7 @@ public class PQ {
     }
 
     /**
-     * Tries to match the tree with root x to template P1, if successful,
+     * Tries to match the tree/subtree at x to template P1, if successful,
      * we apply it.
      *
      * TEMPLATE:
@@ -204,6 +212,29 @@ public class PQ {
        return false;
     }
 
+    /**
+     * Tries to match the tree at x (x must be the root of the entire tree) to template P2, if successful,
+     * we apply it.
+     *
+     * TEMPLATE:
+     *
+     *    -------------(P)------------
+     *    |        |        |        |
+     *
+     *    E  ....  E        F  ....  F
+     *
+     * REPLACEMENT:
+     *    -------------(P)--------
+     *    |        |             |
+     *
+     *    E  ....  E            (F)
+     *                      |        |
+     *
+     *                      F  ....  F
+     *
+     * @param x the node which represents the root of the tree/subtree
+     * @return whether or not x matches the template
+     */
     public boolean TEMPLATE_P2(PQNode x) {
 
         //Matching Phase
@@ -261,8 +292,30 @@ public class PQ {
     }
 
     /**
-     * This case is very similiar to TEMPLATE_P2.
-     * The matching is nearly identical, the only different being that x cannot be a root.
+     * Tries to match the subtree at x (x must NOT be the root of the entire tree) to template P3, if successful,
+     * we apply it.
+     *
+     * Note: This case is very similiar to TEMPLATE_P2.
+     *       The matching is nearly identical, the only different being that x cannot be a root.
+     *
+     * TEMPLATE:
+     *
+     *    -------------(P)------------
+     *    |        |        |        |
+     *
+     *    E  ....  E        F  ....  F
+     *
+     * REPLACEMENT:
+     *       ---------[P]---------
+     *       |                   |
+     *
+     *  ----(E)---          ----(F)---
+     *  |        |          |        |
+     *
+     *  F  ....  F          F  ....  F
+     *
+     * @param x the node which represents the root of the tree/subtree
+     * @return whether or not x matches the template
      */
     public boolean TEMPLATE_P3(PQNode x){
 
@@ -338,6 +391,35 @@ public class PQ {
         return true;
     }
 
+    /**
+     * Tries to match the tree at x (x must be the root of the entire tree) to template P4, if successful,
+     * we apply it.
+     *
+     * TEMPLATE:
+     *
+     *    -----------------------(P)-----------------------
+     *    |      |                |                |      |
+     *
+     *    E .... E       --------[P]--------       F .... F
+     *                   |      |   |      |
+     *
+     *                   E .... E   F .... F
+     *
+     * REPLACEMENT:
+     *    ----------------------(P)----------------
+     *    |        |                              |
+     *
+     *    E  ....  E               ---------------[P]----------------
+     *                             |        |   |        |          |
+     *
+     *                             E  ....  E   F  ....  F     ----(F)---
+     *                                                         |        |
+     *
+     *                                                         F  ....  F
+     *
+     * @param x the node which represents the root of the tree/subtree
+     * @return whether or not x matches the template
+     */
     public boolean TEMPLATE_P4(PQNode x){
 
         //Matching phase
@@ -398,6 +480,33 @@ public class PQ {
         return true;
     }
 
+    /**
+     * Tries to match the subtree at x (x must NOT be the root of the entire tree) to template P5, if successful,
+     * we apply it.
+     * Note: This case is very similiar to TEMPLATE_P4.
+     *       The matching is nearly identical, the only different being that x cannot be a root.
+     * TEMPLATE:
+     *
+     *    -----------------------(P)-----------------------
+     *    |      |                |                |      |
+     *
+     *    E .... E       --------[P]--------       F .... F
+     *                   |      |   |      |
+     *
+     *                   E .... E   F .... F
+     *
+     * REPLACEMENT:
+     *    -----------------------[P]-------------------
+     *       |           |      |   |       |         |
+     *
+     *   ---(E)--        E .... E   F .... F      ---(F)--
+     *   |      |                                 |      |
+     *
+     *   E .... E                                 F .... F
+     *
+     * @param x the node which represents the root of the tree/subtree
+     * @return whether or not x matches the template
+     */
     public boolean TEMPLATE_P5(PQNode x){
 
         if(!x.nodeType.equals(PQNode.PNODE)){
@@ -498,6 +607,36 @@ public class PQ {
 
         return true;
     }
+
+    /**
+     * Tries to match the tree at x (x must be the root of the entire tree) to template P6, if successful,
+     * we apply it.
+     *
+     * TEMPLATE:
+     *
+     *    --------------------------------(P)---------------------------------
+     *    |      |                |                |      |                  |
+     *
+     *    E .... E       --------[P]--------       F .... F         --------[P]--------
+     *                   |      |   |      |                        |      |   |      |
+     *
+     *                   E .... E   F .... F                        F .... F   E .... E
+     *
+     * REPLACEMENT:
+     *    --------------------------------(P)-----------
+     *    |      |                                     |
+     *
+     *    E .... E       -----------------------------[P]------------------------------
+     *                   |      |   |      |           |            |      |   |      |
+     *
+     *                   E .... E   F .... F       ---(F)--        F .... F   E .... E
+     *                                             |      |
+     *
+     *                                             F .... F
+     *
+     * @param x the node which represents the root of the tree/subtree
+     * @return whether or not x matches the template
+     */
 
     public boolean TEMPLATE_P6(PQNode x){
 
@@ -673,6 +812,29 @@ public class PQ {
        return false;
     }
 
+    /**
+     * Tries to match the tree/subtree at x to template Q2, if successful,
+     * we apply it.
+     *
+     * TEMPLATE:
+     *
+     *    -----------------------[P]-----------------------
+     *    |      |                |                |      |
+     *
+     *    E .... E       --------[P]--------       F .... F
+     *                   |      |   |      |
+     *
+     *                   E .... E   F .... F
+     *
+     * REPLACEMENT:
+     *    -----------------------[P]------------------------
+     *    |      |       |      |   |       |       |      |
+     *
+     *    E .... E       E .... E   F .... F        F .... F
+     *
+     * @param x the node which represents the root of the tree/subtree
+     * @return whether or not x matches the template
+     */
     public boolean TEMPLATE_Q2(PQNode x){
 
         //Matching
@@ -749,6 +911,30 @@ public class PQ {
         return true;
     }
 
+    /**
+     * Tries to match the tree at x (x must be the root of the entire tree) to template P6, if successful,
+     * we apply it.
+     *
+     * TEMPLATE:
+     *
+     *    --------------------------------------------[P]-----------------------------------------------
+     *    |      |                |                |      |                  |                  |      |
+     *
+     *    E .... E       --------[P]--------       F .... F         --------[P]--------         E .... E
+     *                   |      |   |      |                        |      |   |      |
+     *
+     *                   E .... E   F .... F                        F .... F   E .... E
+     *
+     * REPLACEMENT:
+     *
+     *    --------------------------------------------[P]--------------------------------------------------
+     *    |      |       |      |       |      |      |      |       |      |       |      |       |      |
+     *
+     *    E .... E       E .... E       F .... F      F .... F       F .... F       E .... E       E .... E
+     *
+     * @param x the node which represents the root of the tree/subtree
+     * @return whether or not x matches the template
+     */
     public boolean TEMPLATE_Q3(PQNode x){
 
         //Matching phase
