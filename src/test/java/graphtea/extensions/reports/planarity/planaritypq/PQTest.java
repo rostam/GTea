@@ -709,8 +709,8 @@ public class PQTest {
 
         _root.children = combinedChildrenOfRoot;
 
-        System.out.println(_root.children.size());
-        System.out.println(_root.getChildren().size());
+        //System.out.println(_root.children.size());
+        //System.out.println(_root.getChildren().size());
 
         PQ PQTree = new PQ();
         boolean ret = PQTree.TEMPLATE_P5(_root);
@@ -751,7 +751,155 @@ public class PQTest {
 
     @Test
     public void templateP6Test(){
+        PQNode _root = new PQNode();
+        _root.nodeType = PQNode.PNODE;
+        _root.id = "_root";
+        List<PQNode> empties = new ArrayList<PQNode>();
+        List<PQNode> emptyChildrenOfQNode1 = new ArrayList<PQNode>();
+        List<PQNode> pertinentChildrenOfQNode1 = new ArrayList<PQNode>();
+        List<PQNode> emptyChildrenOfQNode2 = new ArrayList<PQNode>();
+        List<PQNode> pertinentChildrenOfQNode2 = new ArrayList<PQNode>();
+        List<PQNode> fulls = new ArrayList<PQNode>();
 
+        // QNode 1
+        PQNode partialQNode1 = new PQNode();
+        partialQNode1.nodeType = PQNode.QNODE;
+        partialQNode1.labelType = PQNode.PARTIAL;
+        partialQNode1.id = "partialQNode";
+        partialQNode1.parent = _root; // Added
+        for (int i = 0; i < 4; i++) {
+            PQNode emptyChildOfQNode = new PQNode();
+            emptyChildOfQNode.id = "emptyChildOfQNode" + Integer.toString(i);
+            emptyChildrenOfQNode1.add(emptyChildOfQNode);
+        }
+        partialQNode1.children.add(emptyChildrenOfQNode1.get(0));
+        for (int i = 0; i < 4; i++) {
+            PQNode pertinentChildOfQNode = new PQNode();
+            pertinentChildOfQNode.id = "fullChildOfQNode" + Integer.toString(i);
+            pertinentChildrenOfQNode1.add(pertinentChildOfQNode);
+        }
+        partialQNode1.children.add(pertinentChildrenOfQNode1.get(pertinentChildrenOfQNode1.size()-1));
+
+        List<PQNode> combinedChildrenOfQNode1 = new ArrayList<PQNode>();
+        combinedChildrenOfQNode1.addAll(emptyChildrenOfQNode1);
+        combinedChildrenOfQNode1.addAll(pertinentChildrenOfQNode1);
+        setCircularLinks(combinedChildrenOfQNode1);
+        // Finished setting up QNode 1
+
+        // QNode 2
+        PQNode partialQNode2 = new PQNode();
+        partialQNode2.nodeType = PQNode.QNODE;
+        partialQNode2.labelType = PQNode.PARTIAL;
+        partialQNode2.id = "partialQNode";
+        partialQNode2.parent = _root; // Added
+        for (int i = 0; i < 4; i++) {
+            PQNode emptyChildOfQNode = new PQNode();
+            emptyChildOfQNode.id = "emptyChildOfQNode" + Integer.toString(i);
+            emptyChildrenOfQNode2.add(emptyChildOfQNode);
+        }
+        partialQNode2.children.add(emptyChildrenOfQNode2.get(0));
+        for (int i = 0; i < 4; i++) {
+            PQNode pertinentChildOfQNode = new PQNode();
+            pertinentChildOfQNode.id = "fullChildOfQNode" + Integer.toString(i);
+            pertinentChildrenOfQNode2.add(pertinentChildOfQNode);
+        }
+        partialQNode2.children.add(pertinentChildrenOfQNode2.get(pertinentChildrenOfQNode2.size()-1));
+
+        List<PQNode> combinedChildrenOfQNode2 = new ArrayList<PQNode>();
+        combinedChildrenOfQNode2.addAll(emptyChildrenOfQNode2);
+        combinedChildrenOfQNode2.addAll(pertinentChildrenOfQNode2);
+        setCircularLinks(combinedChildrenOfQNode2);
+        // Finished setting up QNode 2
+
+        // PNode (root)
+        for (int i = 0; i < 4; i++) {
+            PQNode empty = new PQNode();
+            empty.id = "empty" + Integer.toString(i);
+            empty.parent = _root;
+            empty.labelType = PQNode.EMPTY;
+            empties.add(empty);
+        }
+        for (int i = 0; i < 4; i++) {
+            PQNode full = new PQNode();
+            full.id = "partial" + Integer.toString(i);
+            full.parent = _root;
+            full.labelType = PQNode.FULL;
+            fulls.add(full);
+        }
+        List<PQNode> combinedChildrenOfRoot = new ArrayList<PQNode>();
+        combinedChildrenOfRoot.addAll(empties);
+        combinedChildrenOfRoot.add(partialQNode1);
+        combinedChildrenOfRoot.addAll(fulls);
+        combinedChildrenOfRoot.add(partialQNode2);
+        setCircularLinks(combinedChildrenOfRoot);
+        _root.children = combinedChildrenOfRoot;
+        // Finished setting up PNode (root)
+
+        // Begin Testing
+        PQ PQTree = new PQ();
+        boolean ret = PQTree.TEMPLATE_P5(_root);
+        assertTrue(ret);
+
+        for(PQNode n : empties){
+            assertTrue(n.parent == _root);
+        }
+
+        for(PQNode n : fulls){
+            assertTrue(n.parent != _root);
+            assertTrue(n.parent.parent == _root);
+            assertTrue(n.parent.children.contains(n));
+        }
+
+        assertTrue(_root.children.size() == empties.size() + 1);
+        assertTrue(_root.nodeType.equals(PQNode.PNODE));
+
+        int qNodeCount = 0;
+        PQNode qNode = null;
+        for(PQNode n : _root.children){
+            if(n.nodeType.equals(PQNode.QNODE)){
+                qNodeCount++;
+                qNode = n;
+            }
+        }
+        assertTrue(qNodeCount == 1);
+        assertTrue(qNode.labelType.equals(PQNode.PARTIAL));
+        assertTrue(qNode.endmostChildren().size() == 2);
+        PQNode iter = qNode.endmostChildren().get(0);
+        PQNode leftMostNode = iter;
+        int nodeIndex = 0;
+        int interiorPNodeCount = 0;
+        PQNode interiorPNode = null;
+        while(iter.circularLink_next != leftMostNode){
+
+            // Asserts first 4 nodes are EMPTY
+            if(nodeIndex < 4) {
+                assertTrue(iter.labelType.equals(PQNode.EMPTY));
+            }
+            // Asserts node indices between 4 and 13 and partial/full
+            else if(4 < nodeIndex && nodeIndex < 13){
+                // Asserts if singular interior pNode is full
+                if(iter.nodeType.equals(PQNode.PNODE)){
+                    assertTrue(iter.labelType.equals(PQNode.FULL));
+                    interiorPNode = iter;
+                    interiorPNodeCount++;
+                } else {
+                    assertTrue(iter.labelType.equals(PQNode.PARTIAL));
+                }
+            }
+            else {
+                assertTrue(iter.labelType.equals(PQNode.EMPTY));
+            }
+
+            nodeIndex++;
+            iter = iter.circularLink_next;
+        }
+
+        assertTrue(interiorPNodeCount == 1);
+        assertTrue(interiorPNode.children.size() == 4);
+        for(PQNode n : interiorPNode.children){
+            assertTrue(n.labelType.equals(PQNode.FULL));
+        }
+        // Finished testing
     }
 
 
