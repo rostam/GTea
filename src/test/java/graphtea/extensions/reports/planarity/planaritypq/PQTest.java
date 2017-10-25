@@ -4,9 +4,11 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.printChildren;
 import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.setCircularLinks;
 import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.union;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
 
@@ -873,6 +875,279 @@ public class PQTest {
 
         assert(nodesToCheck.isEmpty());
         assert(flips == 1);
+
+    }
+
+    @Test
+    public void templateQ2TestRearranged(){
+        PQNode _root = new PQNode();
+
+        PQNode qNode = new PQNode();
+        PQNode A = new PQNode();
+        PQNode B = new PQNode();
+        PQNode C = new PQNode();
+        PQNode Ca = new PQNode();
+        PQNode Cb = new PQNode();
+        PQNode Cc = new PQNode();
+        PQNode Cd = new PQNode();
+        PQNode D = new PQNode();
+        PQNode E = new PQNode();
+
+        _root.nodeType = PQNode.PNODE;
+        _root.children = Arrays.asList(qNode);
+
+        qNode.nodeType = PQNode.QNODE;
+        C.nodeType = PQNode.QNODE;
+
+        qNode.parent = _root;
+        A.parent = qNode;
+        Ca.parent = C;
+        Cd.parent = C;
+        E.parent = qNode;
+
+        A.id = "A";
+        B.id = "B";
+        C.id = "C";
+        D.id = "D";
+        E.id = "E";
+        Ca.id = "Ca";
+        Cb.id = "Cb";
+        Cc.id = "Cc";
+        Cd.id = "Cd";
+        qNode.id = "qNode";
+        _root.id = "_root";
+
+        A.labelType = PQNode.EMPTY;
+        B.labelType = PQNode.EMPTY;
+        C.labelType = PQNode.PARTIAL;
+        Ca.labelType = PQNode.EMPTY;
+        Cb.labelType = PQNode.EMPTY;
+        Cc.labelType = PQNode.FULL;
+        Cd.labelType = PQNode.FULL;
+        D.labelType = PQNode.FULL;
+        E.labelType = PQNode.FULL;
+
+        //Only A, E as official children, since this is a qnode
+        C.children = Arrays.asList(Ca, Cd);
+        qNode.children = Arrays.asList(E, A);
+        setCircularLinks(Arrays.asList(E, D, C, B, A));
+        setCircularLinks(Arrays.asList(Ca, Cb, Cc, Cd));
+
+        PQ PQTree = new PQ();
+        boolean rt = PQTree.TEMPLATE_Q2(qNode);
+
+        assertTrue(rt);
+
+        Set<PQNode> nodesToCheck = new HashSet<PQNode>();
+
+        nodesToCheck.addAll(Arrays.asList(A, B, Ca, Cb, Cc, Cd, D, E));
+
+        PQNode iterNode = qNode.children.get(0);
+        int flips = 0;
+
+        /* Below, we travel from left to right in the children list and counts
+         * the number of children whose siblings's labels are different from theirs.
+         * We call this number the 'number of flips'.
+         *
+         * This number has to be 1 to be valid. */
+
+        // While we have not checked the whole circular list
+        do {
+            if (nodesToCheck.contains(iterNode)) {
+                nodesToCheck.remove(iterNode);
+            }
+            if (iterNode != qNode.children.get(0) && iterNode.circularLink_prev.labelType != iterNode.labelType) {
+                flips++;
+            }
+            iterNode = iterNode.circularLink_next;
+        } while (iterNode != qNode.children.get(0));
+
+        assert(nodesToCheck.isEmpty());
+        assert(flips == 1);
+
+    }
+
+    @Test
+    public void templateQ2TestTwoPartials(){
+        PQNode _root = new PQNode();
+
+        PQNode qNode = new PQNode();
+        PQNode A = new PQNode();
+        PQNode B = new PQNode();
+        PQNode C = new PQNode();
+        PQNode Ca = new PQNode();
+        PQNode Cb = new PQNode();
+        PQNode Cc = new PQNode();
+        PQNode Cd = new PQNode();
+        PQNode D = new PQNode();
+        PQNode E = new PQNode();
+
+        _root.nodeType = PQNode.PNODE;
+        _root.children = Arrays.asList(qNode);
+
+        qNode.nodeType = PQNode.QNODE;
+        C.nodeType = PQNode.QNODE;
+
+        qNode.parent = _root;
+        A.parent = qNode;
+        Ca.parent = C;
+        Cd.parent = C;
+        E.parent = qNode;
+
+        A.id = "A";
+        B.id = "B";
+        C.id = "C";
+        D.id = "D";
+        E.id = "E";
+        Ca.id = "Ca";
+        Cb.id = "Cb";
+        Cc.id = "Cc";
+        Cd.id = "Cd";
+        qNode.id = "qNode";
+        _root.id = "_root";
+
+        A.labelType = PQNode.EMPTY;
+        B.labelType = PQNode.PARTIAL;
+        C.labelType = PQNode.PARTIAL;
+        Ca.labelType = PQNode.EMPTY;
+        Cb.labelType = PQNode.EMPTY;
+        Cc.labelType = PQNode.FULL;
+        Cd.labelType = PQNode.FULL;
+        D.labelType = PQNode.FULL;
+        E.labelType = PQNode.FULL;
+
+        //Only A, E as official children, since this is a qnode
+        C.children = Arrays.asList(Ca, Cd);
+        qNode.children = Arrays.asList(E, A);
+        setCircularLinks(Arrays.asList(E, D, C, B, A));
+        setCircularLinks(Arrays.asList(Ca, Cb, Cc, Cd));
+
+        PQ PQTree = new PQ();
+        boolean rt = PQTree.TEMPLATE_Q2(qNode);
+
+        assertFalse(rt);
+    }
+
+    @Test
+    public void templateQ3Test() {
+        PQNode _root = new PQNode();
+        PQNode mainQNode = new PQNode();
+        PQNode partialLeftQNode = new PQNode();
+        PQNode partialRightQNode = new PQNode();
+
+        mainQNode.nodeType = PQNode.QNODE;
+        partialLeftQNode.nodeType = PQNode.QNODE;
+        partialRightQNode.nodeType = PQNode.QNODE;
+        partialLeftQNode.labelType = PQNode.PARTIAL;
+        partialRightQNode.labelType = PQNode.PARTIAL;
+
+        List<PQNode> emptyLeft = new ArrayList<PQNode>();
+        List<PQNode> partialLeft = new ArrayList<PQNode>();
+        List<PQNode> fullMid = new ArrayList<PQNode>();
+        List<PQNode> partialRight = new ArrayList<PQNode>();
+        List<PQNode> emptyRight = new ArrayList<PQNode>();
+
+        //Populating emptyLeft
+        for (int i = 0; i < 4; i++) {
+            PQNode tmp = new PQNode();
+            tmp.labelType = PQNode.EMPTY;
+            tmp.id = "emptyLeft" + Integer.toString(i);
+            tmp.parent = mainQNode;
+            emptyLeft.add(tmp);
+        }
+
+        //Populating partialLeft
+        for (int i = 0; i < 4; i++) {
+            PQNode tmp = new PQNode();
+            tmp.labelType = PQNode.EMPTY;
+            if (i == 0) {
+                tmp.parent = partialLeftQNode;
+            }
+            tmp.id = "partialLeft" + Integer.toString(i);
+            partialLeft.add(tmp);
+        }
+        for (int i = 0; i < 4; i++) {
+            PQNode tmp = new PQNode();
+            tmp.labelType = PQNode.FULL;
+            if (i == 3) {
+                tmp.parent = partialLeftQNode;
+            }
+            tmp.id = "partialLeft" + Integer.toString(i);
+            partialLeft.add(tmp);
+        }
+
+        //Populating fullMid
+        for (int i = 0; i < 4; i++) {
+            PQNode tmp = new PQNode();
+            tmp.labelType = PQNode.FULL;
+            tmp.id = "fullMid" + Integer.toString(i);
+            tmp.parent = mainQNode;
+            fullMid.add(tmp);
+        }
+
+
+        //Populating partialRight
+        for (int i = 0; i < 4; i++) {
+            PQNode tmp = new PQNode();
+            tmp.labelType = PQNode.EMPTY;
+            if (i == 0) {
+                tmp.parent = partialRightQNode;
+            }
+
+            tmp.id = "partialRight" + Integer.toString(i);
+            partialRight.add(tmp);
+        }
+        for (int i = 0; i < 4; i++) {
+            PQNode tmp = new PQNode();
+            tmp.labelType = PQNode.FULL;
+            if (i == 3) {
+                tmp.parent = partialRightQNode;
+            }
+            tmp.id = "partialRight" + Integer.toString(i);
+            partialRight.add(tmp);
+        }
+
+        //Populating emptyRight
+        for (int i = 0; i < 4; i++) {
+            PQNode tmp = new PQNode();
+            tmp.labelType = PQNode.EMPTY;
+            tmp.id = "emptyRight" + Integer.toString(i);
+            emptyRight.add(tmp);
+        }
+
+        //Constructing temporary list for the purpose of setting circular links
+        List<PQNode> circular = new ArrayList<PQNode>();
+        circular.addAll(emptyLeft);
+        circular.add(partialLeftQNode);
+        circular.addAll(fullMid);
+        circular.add(partialRightQNode);
+        circular.addAll(emptyRight);
+
+
+        setCircularLinks(partialLeft);
+        setCircularLinks(partialRight);
+
+        setCircularLinks(circular);
+
+        //Using same list as before to set the children
+        mainQNode.children = Arrays.asList(circular.get(0), circular.get(circular.size()-1));
+        partialLeftQNode.children = Arrays.asList(partialLeft.get(0), partialLeft.get(partialLeft.size()-1));
+        partialRightQNode.children = Arrays.asList(partialRight.get(0), partialRight.get(partialRight.size()-1));
+
+        List<PQNode> alLChildren = mainQNode.getChildren();
+        PQ PQTree = new PQ();
+        boolean rt = PQTree.TEMPLATE_Q3(mainQNode);
+        assertTrue(rt);
+        int sumOfParts = emptyLeft.size() + partialLeft.size() + fullMid.size() + partialRight.size() + emptyRight.size();
+        assertTrue(mainQNode.getChildren().size() == sumOfParts);
+        List<PQNode> parts = new ArrayList<PQNode>();
+        parts.addAll(emptyLeft);
+        parts.addAll(partialLeft);
+        parts.addAll(fullMid);
+        parts.addAll(partialRight);
+        parts.addAll(emptyRight);
+        assertTrue(mainQNode.getChildren().equals(parts));
+
 
     }
 

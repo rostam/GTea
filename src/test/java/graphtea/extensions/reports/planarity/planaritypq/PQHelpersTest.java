@@ -3,6 +3,7 @@ package graphtea.extensions.reports.planarity.planaritypq;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -114,6 +115,45 @@ public class PQHelpersTest {
 
         assertTrue(PQHelpers.subset(list1, list2));
         assertTrue(!PQHelpers.subset(list2, list1));
+
+    }
+
+    @Test
+    public void frontierTestPath() {
+        PQNode _root = new PQNode("_root");
+        PQNode child1 = new PQNode("child1");
+        PQNode child2 = new PQNode("child2");
+        PQNode child3 = new PQNode("child3");
+
+        _root.children.add(child1);
+        child1.children.add(child2);
+        child2.children.add(child3);
+
+        List<PQNode> front = PQHelpers.frontier(_root);
+        assertTrue(PQHelpers.frontier(_root).equals(Arrays.asList(child3)));
+    }
+
+    @Test
+    public void frontierTestSimpleBinaryTree() {
+        PQNode _root = new PQNode("_root");
+        PQNode childL = new PQNode("childL");
+        PQNode childR = new PQNode("childR");
+        PQNode childLL = new PQNode("childLL");
+        PQNode childLR= new PQNode("childLR");
+        PQNode childLLL = new PQNode("childLLL");
+        PQNode childLLR = new PQNode("childLLR");
+
+        _root.children.add(childL);
+        _root.children.add(childR);
+
+        childL.children.add(childLL);
+        childL.children.add(childLR);
+
+        childLL.children.add(childLLL);
+        childLL.children.add(childLLR);
+
+        List<PQNode> front = PQHelpers.frontier(_root);
+        assertTrue(PQHelpers.frontier(_root).equals(Arrays.asList(childLLL, childLLR, childLR, childR)));
 
     }
 

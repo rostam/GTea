@@ -5,8 +5,27 @@ import java.util.stream.Collectors;
 
 import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.*;
 
+/**
+ * This class contains subroutines used to construct a PQ-Tree as described
+ * in the 1976 paper "Testing for Consecutive Ones Property, Interval Graphs,
+ * and Graph Planarity Using PQ-Tree Algorithms".
+ *
+ * We highly recommend reading over the paper before reading this codebase.
+ *
+ * @author Alex Cregten
+ * @author Hannes Kr. Hannesson
+ */
+
 public class PQ {
 
+    /**
+     * This subroutine determines which nodes of the PQ-Tree should be pruned
+     * with respect to the constraint sequence S.
+     *
+     * @param _root root of the tree/subtree
+     * @param S a set of nodes, describes a constraint sequence
+     * @return PQNodes which do not violate S (nor the reverse of S) and all previously applied constraint sequences.
+     */
     public PQNode bubble(PQNode _root, List<PQNode> S){
         Queue<PQNode> queue = new LinkedList<>(S);
         int blockCount = 0;
@@ -158,6 +177,26 @@ public class PQ {
         return false;
     }
 
+    /**
+     * Tries to match the tree with root x to template P1, if successful,
+     * we apply it.
+     *
+     * TEMPLATE:
+     * Case #1:           |Case #2:
+     *        (E)         |        (E)
+     *    |        |      |    |        |
+     *                    |
+     *    E  ....  E      |    F  ....  F
+     *                    |
+     * REPLACEMENT:       |
+     *        (E)         |        (F)
+     *    |        |      |    |        |
+     *                    |
+     *    E  ....  E      |    F  ....  F
+     *                    |
+     * @param x the node which represents the root of the tree/subtree
+     * @return whether or not x matches the template
+     */
     public boolean TEMPLATE_P1(PQNode x){
        if (x.nodeType == PQNode.PNODE) {
            return GENERALIZED_TEMPLATE_1(x);
@@ -471,6 +510,26 @@ public class PQ {
         return false;
     }
 
+    /**
+     * Tries to match the tree with root x to template Q1, if successful,
+     * we apply it.
+     *
+     * TEMPLATE:
+     * Case #1:           |Case #2:
+     *        [E]         |        [E]
+     *    |        |      |    |        |
+     *                    |
+     *    E  ....  E      |    F  ....  F
+     *                    |
+     * REPLACEMENT:       |
+     *        [E]         |        [F]
+     *    |        |      |    |        |
+     *                    |
+     *    E  ....  E      |    F  ....  F
+     *                    |
+     * @param x the node which represents the root of the tree/subtree
+     * @return whether or not x matches the template
+     */
     public boolean TEMPLATE_Q1(PQNode x){
        if (x.nodeType == PQNode.QNODE) {
            return GENERALIZED_TEMPLATE_1(x);
@@ -553,8 +612,118 @@ public class PQ {
 
         return true;
     }
+
     public boolean TEMPLATE_Q3(PQNode x){
-        return false;
+
+        //Matching phase
+
+        //Check if not qnode
+        if (x.nodeType != PQNode.QNODE) {
+            return false;
+        }
+
+        //Check if x is not doubly partial
+        if (x.getChildrenOfLabel(PQNode.PARTIAL).size() != 2) {
+            return false;
+        }
+
+        //Check if partial nodes are not qnodes
+        if (x.getChildrenOfLabel(PQNode.PARTIAL).get(0).nodeType != PQNode.QNODE) {
+            return false;
+        }
+        if (x.getChildrenOfLabel(PQNode.PARTIAL).get(1).nodeType != PQNode.QNODE) {
+            return false;
+        }
+
+        //Check if the partial node's full children are not consecutive
+        if (!PQHelpers.checkIfConsecutive(x.getChildrenOfLabel(PQNode.PARTIAL).get(0).getChildrenOfLabel(PQNode.FULL))) {
+            return false;
+        }
+        if (!PQHelpers.checkIfConsecutive(x.getChildrenOfLabel(PQNode.PARTIAL).get(1).getChildrenOfLabel(PQNode.FULL))) {
+            return false;
+        }
+
+        //Check if the partial node's empty children are not consecutive
+        if (!PQHelpers.checkIfConsecutive(x.getChildrenOfLabel(PQNode.PARTIAL).get(0).getChildrenOfLabel(PQNode.EMPTY))) {
+            return false;
+        }
+        if (!PQHelpers.checkIfConsecutive(x.getChildrenOfLabel(PQNode.PARTIAL).get(1).getChildrenOfLabel(PQNode.EMPTY))) {
+            return false;
+        }
+
+        List<PQNode> leftEmpties = new ArrayList<PQNode>();
+        List<PQNode> rightEmpties = new ArrayList<PQNode>();
+
+        int flips = 0;
+        int cntr = 0;
+        for (PQNode n : x.getChildren()) {
+            cntr++;
+            if (flips == 0) {
+                if (n.labelType == PQNode.PARTIAL) {
+                    flips++;
+                }
+                else if (n.labelType != PQNode.EMPTY) {
+                    return false;
+                }
+                //If empty
+                else {
+                   leftEmpties.add(n);
+                }
+            }
+            else if (flips == 1) {
+                if (n.labelType == PQNode.FULL) {
+                    flips++;
+                }
+                else if (n.labelType != PQNode.PARTIAL) {
+                    return false;
+                }
+            }
+            else if (flips == 2) {
+                if (n.labelType == PQNode.PARTIAL) {
+                    flips++;
+                }
+                else if (n.labelType != PQNode.FULL) {
+                    return false;
+                }
+            }
+            else if (flips == 3) {
+                if (n.labelType == PQNode.EMPTY) {
+                    flips++;
+                    rightEmpties.add(n);
+                }
+                else if (n.labelType != PQNode.PARTIAL) {
+                    return false;
+                }
+            }
+            else {
+                if (n.labelType != PQNode.EMPTY) {
+                    return false;
+                }
+                //If empty
+                else {
+                    rightEmpties.add(n);
+                }
+            }
+        }
+
+        //Replacement phase
+
+        x.labelType = PQNode.PARTIAL;
+        List<PQNode> partials = x.getChildrenOfLabel(PQNode.PARTIAL);
+
+        List<PQNode> replacementChildren = new ArrayList<PQNode>();
+        replacementChildren.addAll(leftEmpties);
+        replacementChildren.addAll(partials.get(0).getChildren());
+        replacementChildren.addAll(x.getChildrenOfLabel(PQNode.FULL));
+        replacementChildren.addAll(partials.get(1).getChildren());
+        replacementChildren.addAll(rightEmpties);
+
+        leftEmpties.get(0).parent = x;
+        rightEmpties.get(rightEmpties.size()-1).parent = x;
+        x.children = replacementChildren;
+        setCircularLinks(replacementChildren);
+
+        return true;
     }
 
 }

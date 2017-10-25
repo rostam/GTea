@@ -71,4 +71,69 @@ public class PQHelpers {
         return new ArrayList<>(set);
     }
 
+    public static void printChildren(PQNode x) {
+        String nodeBuf = "";
+        for (PQNode n : x.getChildren()) {
+            if (n.nodeType == PQNode.PNODE) {
+                if (n.labelType == PQNode.EMPTY) {
+                    nodeBuf += "(E)";
+                }
+                else if (n.labelType == PQNode.FULL) {
+                    nodeBuf += "(F)";
+                }
+                 else if (n.labelType == PQNode.PARTIAL) {
+                    nodeBuf += "(P)";
+                }
+                else {
+                    nodeBuf += "(.)";
+                }
+            }
+            else if (n.nodeType == PQNode.QNODE) {
+                if (n.labelType == PQNode.EMPTY) {
+                    nodeBuf += "[E]";
+                }
+                else if (n.labelType == PQNode.FULL) {
+                    nodeBuf += "[F]";
+                }
+                else if (n.labelType == PQNode.PARTIAL) {
+                    nodeBuf += "[P]";
+                }
+                else {
+                    nodeBuf += "[.]";
+                }
+            }
+            else {
+                if (n.labelType == PQNode.EMPTY) {
+                    nodeBuf += " E ";
+                }
+                else if (n.labelType == PQNode.FULL) {
+                    nodeBuf += " F ";
+                }
+                else if (n.labelType == PQNode.PARTIAL) {
+                    nodeBuf += " P ";
+                }
+                else {
+                    nodeBuf += " . ";
+                }
+            }
+        }
+        System.out.println(nodeBuf);
+    }
+
+    public static List<PQNode> frontier(PQNode x) {
+        List<PQNode> frontier = new ArrayList<PQNode>();
+        frontierHelper(x, frontier);
+        return frontier;
+    }
+
+    public static void frontierHelper(PQNode x, List<PQNode> frontier) {
+        if (x.children.size() != 0) {
+            for (PQNode n : x.children) {
+                frontierHelper(n, frontier);
+            }
+        }
+        else {
+            frontier.add(x);
+        }
+    }
 }
