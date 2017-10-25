@@ -1,5 +1,6 @@
 package graphtea.extensions.reports.planarity.planaritypq;
 
+import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.setCircularLinks;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class PQNodeTest {
         fourth.parent = _root;
 
         _root.children = Arrays.asList(first, second, third, fourth);
-        PQHelpers.setCircularLinks(Arrays.asList(first, second, third, fourth));
+        setCircularLinks(Arrays.asList(first, second, third, fourth));
 
         List<PQNode> expected = Arrays.asList(first, fourth);
         assertTrue(expected.equals(_root.endmostChildren()));
@@ -65,7 +66,7 @@ public class PQNodeTest {
         fourth.parent = _root;
 
         _root.children = Arrays.asList(first, second, third, fourth);
-        PQHelpers.setCircularLinks(Arrays.asList(first, second, third, fourth));
+        setCircularLinks(Arrays.asList(first, second, third, fourth));
 
         List<PQNode> expected = Arrays.asList(second, third);
         assertTrue(expected.equals(_root.internalChildren()));
@@ -246,5 +247,29 @@ public class PQNodeTest {
         Set<PQNode> results = c4.maximalConsecutiveSetOfSiblingsAdjacent(true);
         assertTrue(results.contains(c5) && results.contains(c6) && results.contains(c7));
     }
+
+    @Test
+    public void setQNodeEndmostChildrenTest(){
+        PQNode qNode = new PQNode();
+        qNode.nodeType = PQNode.QNODE;
+
+        PQNode A = new PQNode();
+        PQNode B = new PQNode();
+        PQNode C = new PQNode();
+        PQNode D = new PQNode();
+
+        List<PQNode> children = Arrays.asList(A, B, C, D);
+        setCircularLinks(children);
+
+        qNode.children = children;
+
+        qNode.setQNodeEndmostChildren(D, A);
+
+        assertTrue(qNode.endmostChildren().get(0) == D);
+        assertTrue(qNode.endmostChildren().get(1) == A);
+
+
+    }
+
 
 }

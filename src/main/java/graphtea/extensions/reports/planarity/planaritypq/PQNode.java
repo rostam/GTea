@@ -211,8 +211,21 @@ public class PQNode {
         // x is replaced by y
     }
 
-    public void setEndmostChildren(List<PQNode> list){
+    public void setQNodeEndmostChildren(PQNode leftMost, PQNode rightMost){
+        try {
+            if (!this.nodeType.equals(QNODE)) {
+                throw new IllegalNodeTypeException("endmostChildren() is only valid for Q-Nodes");
+            }
 
+            //this.children = null;
+            this.children = new ArrayList<>();
+            this.children.add(leftMost);
+            this.children.add(rightMost);
+
+        }
+        catch (IllegalNodeTypeException e) {
+
+        }
     }
 
     public List<PQNode> fullChildren(){
