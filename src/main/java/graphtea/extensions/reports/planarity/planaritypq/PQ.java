@@ -277,10 +277,10 @@ public class PQ {
         List<PQNode> fullChildren = new ArrayList<PQNode>();
 
         for (PQNode child : x.getChildren()) {
-            if (child.labelType == PQNode.FULL) {
+            if (child.labelType.equals(PQNode.FULL)) {
                 fullChildren.add(child);
             }
-            else if (child.labelType == PQNode.EMPTY) {
+            else if (child.labelType.equals(PQNode.EMPTY)) {
                 emptyChildren.add(child);
             }
         }
@@ -400,26 +400,21 @@ public class PQ {
 
     public boolean TEMPLATE_P5(PQNode x){
 
-        // Check if x is _root of whole tree
-        /*if(x.parent == null){
-            return false;
-        }*/
-
         if(!x.nodeType.equals(PQNode.PNODE)){
             return false;
         }
 
-        if(x.children.size() < 1){
+        if(x.children.size() == 0){
             return false;
         }
 
         PQNode qNode = null;
-        int qNodeChildCount = 0;
+        int qNodeCount = 0;
         List<PQNode> emptyChildList = new ArrayList<>();
         List<PQNode> fullChildList = new ArrayList<>();
         for(PQNode n : x.children){
             if(n.nodeType.equals(PQNode.QNODE)){
-                qNodeChildCount++;
+                qNodeCount++;
                 qNode = n;
             }
             else if(n.labelType.equals(PQNode.EMPTY)){
@@ -428,14 +423,13 @@ public class PQ {
             else if(n.labelType.equals(PQNode.FULL)){
                 fullChildList.add(n);
             }
-
         }
 
         if(emptyChildList.size() == 0 || fullChildList.size() == 0) {
             return false;
         }
 
-        if(qNodeChildCount > 1 || qNode == null){
+        if(qNodeCount > 1 || qNode == null){
             return false;
         }
 
@@ -507,8 +501,150 @@ public class PQ {
 
     public boolean TEMPLATE_P6(PQNode x){
 
-        return false;
+        /** Matching the template */
+        if(!x.nodeType.equals(PQNode.PNODE)){
+            return false;
+        }
+
+        if(x.children.size() == 0){
+            return false;
+        }
+
+        /** Gather root children */
+        PQNode qNode1 = null;
+        PQNode qNode2 = null;
+        int qNodeCount = 0;
+        List<PQNode> emptyRootChildList = new ArrayList<>();
+        List<PQNode> fullRootChildList = new ArrayList<>();
+        for(PQNode n : x.children){
+            if(n.nodeType.equals(PQNode.QNODE)){
+                if(qNodeCount == 0){
+                    qNode1 = n;
+                    qNodeCount++;
+                }
+                else if(qNodeCount == 1){
+                    qNode2 = n;
+                    qNodeCount++;
+                }
+                else {
+                    return false;
+                }
+            }
+            else if(n.labelType.equals(PQNode.EMPTY)){
+                emptyRootChildList.add(n);
+            }
+            else if(n.labelType.equals(PQNode.FULL)){
+                fullRootChildList.add(n);
+            }
+        }
+
+        if(qNode1 == null || qNode2 == null){
+            return false;
+        }
+        if(!qNode1.labelType.equals(PQNode.PARTIAL) || !qNode2.labelType.equals(PQNode.PARTIAL)){
+            return false;
+        }
+        if(qNode1.endmostChildren().size() != 2 || qNode2.endmostChildren().size() != 2){
+            return false;
+        }
+
+        /** Gather qNode1 children */
+        List<PQNode> emptyQNodeChildList1 = new ArrayList<>();  //todo: loses emptyChildOfQNode0 labeltype before here
+        List<PQNode> fullQNodeChildList1 = new ArrayList<>();
+        gatherQNodeChildren(emptyQNodeChildList1, fullQNodeChildList1, qNode1);
+
+        //If empty children are not consecutive
+        if (!checkIfConsecutive( emptyQNodeChildList1 )) {
+            return false;
+        }
+
+        //If full children are not consecutive
+        if (!checkIfConsecutive(fullQNodeChildList1)) {
+            return false;
+        }
+
+        /** Gather qNode2 children */
+        List<PQNode> emptyQNodeChildList2 = new ArrayList<>();
+        List<PQNode> fullQNodeChildList2 = new ArrayList<>();
+        gatherQNodeChildren(emptyQNodeChildList2, fullQNodeChildList2, qNode2);
+
+        //If empty children are not consecutive
+        if (!checkIfConsecutive( emptyQNodeChildList2 )) {
+            return false;
+        }
+
+        //If full children are not consecutive
+        if (!checkIfConsecutive(fullQNodeChildList2)) {
+            return false;
+        }
+
+
+        /**
+         *  Applying the template
+         * */
+
+        /** Setup PNode */
+        PQNode pNode = new PQNode();
+        pNode.labelType = PQNode.FULL;
+        pNode.nodeType = PQNode.PNODE;
+
+        setCircularLinks(fullRootChildList);
+        fullRootChildList.forEach(n -> n.parent = pNode);
+        /*for(PQNode n : fullRootChildList){
+             n.parent = pNode;
+        }*/
+        pNode.children = fullRootChildList;
+
+        /** Reconfigure qNode1 */
+        PQNode leftMost1 = qNode1.endmostChildren().get(0);
+        PQNode rightMost1 = qNode1.endmostChildren().get(1);
+        if(leftMost1.labelType.equals(PQNode.FULL) && rightMost1.labelType.equals(PQNode.EMPTY)){
+            rotateQNode(qNode1);
+            leftMost1 = qNode1.endmostChildren().get(0);
+            rightMost1 = qNode1.endmostChildren().get(1);
+        }
+
+        /** Reconfigure qNode2 */
+        PQNode leftMost2 = qNode2.endmostChildren().get(0);
+        PQNode rightMost2 = qNode2.endmostChildren().get(1);
+        if(leftMost2.labelType.equals(PQNode.EMPTY) && rightMost2.labelType.equals(PQNode.FULL)){
+            rotateQNode(qNode2);
+            leftMost2 = qNode2.endmostChildren().get(0);
+            rightMost2 = qNode2.endmostChildren().get(1);
+        }
+
+        /** Reconfigure circular links for qNode1, pNode, qNode2
+         * Could use setCircularLinks in  in PQHelper, but there is no need
+         * to set all of the links. */
+        rightMost1.circularLink_next = pNode;
+        pNode.circularLink_next = leftMost2;
+        rightMost2.circularLink_next = leftMost1;
+
+        leftMost1.circularLink_prev = rightMost2;
+        leftMost2.circularLink_prev = pNode;
+        pNode.circularLink_prev = rightMost1;
+
+        /** Reconfigure qNode1, qNode2 parents */
+        rightMost1.parent = null;
+        leftMost2.parent = null;
+
+        /** Setup merging QNode */
+        PQNode mergingQNode = new PQNode();
+        mergingQNode.labelType = PQNode.PARTIAL;
+        mergingQNode.nodeType = PQNode.QNODE;
+        mergingQNode.parent = x;
+
+        mergingQNode.setQNodeEndmostChildren(leftMost1, rightMost2);
+
+        /** Reconfigure root */
+        x.children.removeAll(fullRootChildList);
+        x.children.remove(qNode1);
+        x.children.remove(qNode2);
+        x.children.add(mergingQNode);
+
+        return true;
     }
+
 
     /**
      * Tries to match the tree with root x to template Q1, if successful,
