@@ -2,6 +2,7 @@ package graphtea.extensions.reports.planarity.planaritypq;
 
 import org.junit.Test;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.printChildren;
@@ -291,8 +292,7 @@ public class PQTest {
 
     }
 
-    @Test
-    public void templateP1Test(){
+    private List<PQNode> templateP1Tree(){
         PQNode _root = new PQNode();
         PQNode A = new PQNode();
         PQNode B = new PQNode();
@@ -304,6 +304,16 @@ public class PQTest {
         _root.nodeType = PQNode.PNODE;
         A.labelType = PQNode.FULL;
         B.labelType = PQNode.FULL;
+
+        return Arrays.asList(_root, A, B);
+    }
+
+    @Test
+    public void templateP1Test(){
+        List<PQNode> nodes = new ArrayList<>(templateP1Tree());
+        PQNode _root = nodes.get(0);
+        PQNode A = nodes.get(1);
+        PQNode B = nodes.get(2);
 
         PQ PQTree = new PQ();
 
@@ -325,8 +335,7 @@ public class PQTest {
         assertTrue(!_root.labelType.equals(PQNode.FULL));
     }
 
-    @Test
-    public void templateP2Test1(){
+    private List<PQNode> templateP2Tree(int treeNum){
         PQNode _root = new PQNode();
         PQNode A = new PQNode();
         PQNode B = new PQNode();
@@ -347,9 +356,33 @@ public class PQTest {
         D.labelType = PQNode.EMPTY;
         E.labelType = PQNode.EMPTY;
 
-        List<PQNode> list = new ArrayList<>(Arrays.asList(A,B,C,D,E));
+        List<PQNode> list;
+        if(treeNum == 1) {
+            list = new ArrayList<>(Arrays.asList(A, B, C, D, E));
+        }
+        else if(treeNum == 2) {
+            list = new ArrayList<>(Arrays.asList(A,C,E,D,B));
+        }
+        else {
+            System.out.println("treeNum not set!");
+            return null;
+        }
+
         _root.children = list;
         setCircularLinks(list);
+
+        return Arrays.asList(_root, A, B, C, D, E);
+    }
+
+    @Test
+    public void templateP2Test1(){
+        List<PQNode> nodes = new ArrayList<>(templateP2Tree(1));
+        PQNode _root = nodes.get(0);
+        PQNode A = nodes.get(1);
+        PQNode B = nodes.get(2);
+        PQNode C = nodes.get(3);
+        PQNode D = nodes.get(4);
+        PQNode E = nodes.get(5);
 
         PQ PQTree = new PQ();
         boolean rt = PQTree.TEMPLATE_P2(_root);
@@ -373,29 +406,14 @@ public class PQTest {
 
     @Test
     public void templateP2Test2(){
-        PQNode _root = new PQNode();
-        PQNode A = new PQNode();
-        PQNode B = new PQNode();
-        PQNode C = new PQNode();
-        PQNode D = new PQNode();
-        PQNode E = new PQNode();
 
-        A.parent = _root;
-        B.parent = _root;
-        C.parent = _root;
-        D.parent = _root;
-        E.parent = _root;
-
-        A.labelType = PQNode.FULL;
-        B.labelType = PQNode.FULL;
-        C.labelType = PQNode.FULL;
-
-        D.labelType = PQNode.EMPTY;
-        E.labelType = PQNode.EMPTY;
-
-        List<PQNode> list = new ArrayList<>(Arrays.asList(A,C,E,D,B));
-        _root.children = list;
-        setCircularLinks(list);
+        List<PQNode> nodes = new ArrayList<>(templateP2Tree(2));
+        PQNode _root = nodes.get(0);
+        PQNode A = nodes.get(1);
+        PQNode B = nodes.get(2);
+        PQNode C = nodes.get(3);
+        PQNode D = nodes.get(4);
+        PQNode E = nodes.get(5);
 
         PQ PQTree = new PQ();
         boolean rt = PQTree.TEMPLATE_P2(_root);
@@ -417,8 +435,7 @@ public class PQTest {
 
     }
 
-    @Test
-    public void templateP3Test1(){
+    private List<PQNode> templateP3Tree(int treeNum){
         PQNode _root = new PQNode();
         PQNode parent = new PQNode();
         PQNode A = new PQNode();
@@ -443,9 +460,34 @@ public class PQTest {
         D.labelType = PQNode.EMPTY;
         E.labelType = PQNode.EMPTY;
 
-        List<PQNode> list = new ArrayList<>(Arrays.asList(A,B,C,D,E));
+
+        List<PQNode> list;
+        if(treeNum == 1) {
+                list = new ArrayList<>(Arrays.asList(A, B, C, D, E));
+        }
+        else if(treeNum == 2){
+            list = new ArrayList<>(Arrays.asList(C,B,A,E,D));
+        }
+        else {
+            System.out.println("treeNum not set!");
+            return null;
+        }
         parent.children = list;
         setCircularLinks(list);
+
+        return Arrays.asList(_root, parent, A, B, C, D, E);
+    }
+
+    @Test
+    public void templateP3Test1(){
+        List<PQNode> nodes = new ArrayList<>(templateP3Tree(1));
+        PQNode _root = nodes.get(0);
+        PQNode parent = nodes.get(1);
+        PQNode A = nodes.get(2);
+        PQNode B = nodes.get(3);
+        PQNode C = nodes.get(4);
+        PQNode D = nodes.get(5);
+        PQNode E = nodes.get(6);
 
         PQ PQTree = new PQ();
         boolean rt = PQTree.TEMPLATE_P3(parent);
@@ -462,33 +504,15 @@ public class PQTest {
 
     @Test
     public void templateP3Test2(){
-        PQNode _root = new PQNode();
-        PQNode parent = new PQNode();
-        PQNode A = new PQNode();
-        PQNode B = new PQNode();
-        PQNode C = new PQNode();
-        PQNode D = new PQNode();
-        PQNode E = new PQNode();
 
-        parent.parent = _root;
-        parent.nodeType = PQNode.PNODE;
-
-        A.parent = parent;
-        B.parent = parent;
-        C.parent = parent;
-        D.parent = parent;
-        E.parent = parent;
-
-        A.labelType = PQNode.FULL;
-        B.labelType = PQNode.FULL;
-        C.labelType = PQNode.FULL;
-
-        D.labelType = PQNode.EMPTY;
-        E.labelType = PQNode.EMPTY;
-
-        List<PQNode> list = new ArrayList<>(Arrays.asList(C,B,A,E,D));
-        parent.children = list;
-        setCircularLinks(list);
+        List<PQNode> nodes = new ArrayList<>(templateP3Tree(2));
+        PQNode _root = nodes.get(0);
+        PQNode parent = nodes.get(1);
+        PQNode A = nodes.get(2);
+        PQNode B = nodes.get(3);
+        PQNode C = nodes.get(4);
+        PQNode D = nodes.get(5);
+        PQNode E = nodes.get(6);
 
         PQ PQTree = new PQ();
         boolean rt = PQTree.TEMPLATE_P3(parent);
@@ -503,8 +527,7 @@ public class PQTest {
         }
     }
 
-    @Test
-    public void templateP4Test1(){
+    private List<PQNode> templateP4Tree(int treeNum){
         PQNode _root = new PQNode();
         PQNode A = new PQNode();
         PQNode B = new PQNode();
@@ -544,12 +567,42 @@ public class PQTest {
         qNode.nodeType = PQNode.QNODE;
         _root.nodeType = PQNode.PNODE;
 
-        List<PQNode> rootChildren = new ArrayList<>(Arrays.asList(A,B,qNode,C,D));
-        List<PQNode> qNodeChildren = new ArrayList<>(Arrays.asList(E,F,G,H));
+        List<PQNode> rootChildren;
+        List<PQNode> qNodeChildren;
+        if(treeNum == 1) {
+            rootChildren = new ArrayList<>(Arrays.asList(A, B, qNode, C, D));
+            qNodeChildren = new ArrayList<>(Arrays.asList(E, F, G, H));
+        }
+        else if(treeNum == 2){
+            rootChildren = new ArrayList<>(Arrays.asList(qNode,B,C,D,A));
+            qNodeChildren = new ArrayList<>(Arrays.asList(F,G,H,E));
+        }
+        else{
+            System.out.println("treeNum not set!");
+            return null;
+        }
+
         setCircularLinks(rootChildren);
         setCircularLinks(qNodeChildren);
         _root.children = rootChildren;
         qNode.children = qNodeChildren;
+
+        return Arrays.asList(_root, qNode, A, B, C, D, E, F, G, H);
+    }
+
+    @Test
+    public void templateP4Test1(){
+        List<PQNode> nodes = new ArrayList<>(templateP4Tree(1));
+        PQNode _root = nodes.get(0);
+        PQNode qNode = nodes.get(1);
+        PQNode A = nodes.get(2);
+        PQNode B = nodes.get(3);
+        PQNode C = nodes.get(4);
+        PQNode D = nodes.get(5);
+        PQNode E = nodes.get(6);
+        PQNode F = nodes.get(7);
+        PQNode G = nodes.get(8);
+        PQNode H = nodes.get(9);
 
         PQ PQTree = new PQ();
         boolean rt = PQTree.TEMPLATE_P4(_root);
@@ -578,51 +631,17 @@ public class PQTest {
 
     @Test
     public void templateP4Test2(){
-        PQNode _root = new PQNode();
-        PQNode A = new PQNode();
-        PQNode B = new PQNode();
-        PQNode C = new PQNode();
-        PQNode D = new PQNode();
-
-        PQNode qNode = new PQNode();
-        PQNode E = new PQNode();
-        PQNode F = new PQNode();
-        PQNode G = new PQNode();
-        PQNode H = new PQNode();
-
-        A.parent = _root;
-        B.parent = _root;
-        C.parent = _root;
-        D.parent = _root;
-
-        qNode.parent = _root;
-        E.parent = qNode;
-        F.parent = qNode;
-        G.parent = qNode;
-        H.parent = qNode;
-
-        A.labelType = PQNode.EMPTY;
-        B.labelType = PQNode.EMPTY;
-        C.labelType = PQNode.FULL;
-        D.labelType = PQNode.FULL;
-
-        qNode.labelType = PQNode.PARTIAL;
-        E.labelType = PQNode.EMPTY;
-        F.labelType = PQNode.EMPTY;
-        G.labelType = PQNode.FULL;
-        H.labelType = PQNode.FULL;
-
-        _root.labelType = PQNode.PARTIAL;
-
-        qNode.nodeType = PQNode.QNODE;
-        _root.nodeType = PQNode.PNODE;
-
-        List<PQNode> rootChildren = new ArrayList<>(Arrays.asList(qNode,B,C,D,A));
-        List<PQNode> qNodeChildren = new ArrayList<>(Arrays.asList(F,G,H,E));
-        setCircularLinks(rootChildren);
-        setCircularLinks(qNodeChildren);
-        _root.children = rootChildren;
-        qNode.children = qNodeChildren;
+        List<PQNode> nodes = new ArrayList<>(templateP4Tree(2));
+        PQNode _root = nodes.get(0);
+        PQNode qNode = nodes.get(1);
+        PQNode A = nodes.get(2);
+        PQNode B = nodes.get(3);
+        PQNode C = nodes.get(4);
+        PQNode D = nodes.get(5);
+        PQNode E = nodes.get(6);
+        PQNode F = nodes.get(7);
+        PQNode G = nodes.get(8);
+        PQNode H = nodes.get(9);
 
         PQ PQTree = new PQ();
         boolean rt = PQTree.TEMPLATE_P4(_root);
@@ -649,8 +668,7 @@ public class PQTest {
 
     }
 
-    @Test
-    public void templateP5Test(){
+    private List<PQNode> templateP5Tree(){
         PQNode _root = new PQNode();
         _root.nodeType = PQNode.PNODE;
         _root.id = "_root";
@@ -709,8 +727,26 @@ public class PQTest {
 
         _root.children = combinedChildrenOfRoot;
 
-        //System.out.println(_root.children.size());
-        //System.out.println(_root.getChildren().size());
+        List<PQNode> retList = new ArrayList<>();
+        retList.add(_root);
+        retList.addAll(empties);
+        retList.addAll(fulls);
+        return retList;
+    }
+
+    @Test
+    public void templateP5Test(){
+        List<PQNode> nodes = new ArrayList<>(templateP5Tree());
+        PQNode _root = nodes.get(0);
+        List<PQNode> empties = new ArrayList<>();
+        for(int i=1; i<5; i++){
+            empties.add(nodes.get(i));
+        }
+        List<PQNode> fulls = new ArrayList<>();
+        for(int i=5; i<9; i++){
+            fulls.add(nodes.get(i));
+        }
+
 
         PQ PQTree = new PQ();
         boolean ret = PQTree.TEMPLATE_P5(_root);
@@ -749,8 +785,7 @@ public class PQTest {
 
     }
 
-    @Test
-    public void templateP6Test(){
+    private List<List<PQNode>> templateP6Tree(){
         PQNode _root = new PQNode();
         _root.nodeType = PQNode.PNODE;
         _root.id = "_root";
@@ -840,6 +875,22 @@ public class PQTest {
         _root.children = combinedChildrenOfRoot;
         // Finished setting up PNode (root)
 
+        List<List<PQNode>> retList = new ArrayList<>();
+        retList.add(Arrays.asList(_root));
+        retList.add(empties);
+        retList.add(fulls);
+        return retList;
+    }
+
+    @Test
+    public void templateP6Test(){
+
+        List<List<PQNode>> nodesList = new ArrayList<>(templateP6Tree());
+
+        PQNode _root = nodesList.get(0).get(0);
+        List<PQNode> empties = new ArrayList<>(nodesList.get(1));
+        List<PQNode> fulls = new ArrayList<>(nodesList.get(2));
+
         // Begin Testing
         PQ PQTree = new PQ();
         boolean ret = PQTree.TEMPLATE_P6(_root);
@@ -911,8 +962,7 @@ public class PQTest {
     }
 
 
-    @Test
-    public void templateQ1Test(){
+    private List<PQNode> templateQ1Tree(){
         PQNode _root = new PQNode();
         PQNode A = new PQNode();
         PQNode B = new PQNode();
@@ -924,6 +974,16 @@ public class PQTest {
         _root.nodeType = PQNode.QNODE;
         A.labelType = PQNode.FULL;
         B.labelType = PQNode.FULL;
+
+        return Arrays.asList(_root, A, B);
+    }
+
+    @Test
+    public void templateQ1Test(){
+        List<PQNode> nodes = new ArrayList<>(templateQ1Tree());
+        PQNode _root = nodes.get(0);
+        PQNode A = nodes.get(1);
+        PQNode B = nodes.get(2);
 
         PQ PQTree = new PQ();
 
@@ -945,8 +1005,7 @@ public class PQTest {
         assertTrue(!_root.labelType.equals(PQNode.FULL));
     }
 
-    @Test
-    public void templateQ2Test(){
+    private List<PQNode> templateQ2Tree(int treeNum){
         PQNode _root = new PQNode();
 
         PQNode qNode = new PQNode();
@@ -995,10 +1054,39 @@ public class PQTest {
         E.labelType = PQNode.FULL;
 
         //Only A, E as official children, since this is a qnode
-        C.children = Arrays.asList(Ca, Cd);
-        qNode.children = Arrays.asList(A, E);
-        setCircularLinks(Arrays.asList(A, B, C, D, E));
-        setCircularLinks(Arrays.asList(Ca, Cb, Cc, Cd));
+        if(treeNum == 1) {
+            C.children = Arrays.asList(Ca, Cd);
+            qNode.children = Arrays.asList(A, E);
+            setCircularLinks(Arrays.asList(A, B, C, D, E));
+            setCircularLinks(Arrays.asList(Ca, Cb, Cc, Cd));
+        }
+        else if(treeNum == 2){
+            C.children = Arrays.asList(Ca, Cd);
+            qNode.children = Arrays.asList(E, A);
+            setCircularLinks(Arrays.asList(E, D, C, B, A));
+            setCircularLinks(Arrays.asList(Ca, Cb, Cc, Cd));
+        }
+        else {
+            System.out.println("treeNum not set!");
+        }
+
+        return Arrays.asList(_root, qNode, A, B, C, Ca, Cb, Cc, Cd, D, E);
+    }
+
+    @Test
+    public void templateQ2Test(){
+        List<PQNode> nodes = new ArrayList<>(templateQ2Tree(1));
+        PQNode _root = nodes.get(0);
+        PQNode qNode = nodes.get(1);
+        PQNode A = nodes.get(2);
+        PQNode B = nodes.get(3);
+        PQNode C = nodes.get(4);
+        PQNode Ca = nodes.get(5);
+        PQNode Cb = nodes.get(6);
+        PQNode Cc = nodes.get(7);
+        PQNode Cd = nodes.get(8);
+        PQNode D = nodes.get(9);
+        PQNode E = nodes.get(10);
 
         PQ PQTree = new PQ();
         boolean rt = PQTree.TEMPLATE_Q2(qNode);
@@ -1036,58 +1124,18 @@ public class PQTest {
 
     @Test
     public void templateQ2TestRearranged(){
-        PQNode _root = new PQNode();
-
-        PQNode qNode = new PQNode();
-        PQNode A = new PQNode();
-        PQNode B = new PQNode();
-        PQNode C = new PQNode();
-        PQNode Ca = new PQNode();
-        PQNode Cb = new PQNode();
-        PQNode Cc = new PQNode();
-        PQNode Cd = new PQNode();
-        PQNode D = new PQNode();
-        PQNode E = new PQNode();
-
-        _root.nodeType = PQNode.PNODE;
-        _root.children = Arrays.asList(qNode);
-
-        qNode.nodeType = PQNode.QNODE;
-        C.nodeType = PQNode.QNODE;
-
-        qNode.parent = _root;
-        A.parent = qNode;
-        Ca.parent = C;
-        Cd.parent = C;
-        E.parent = qNode;
-
-        A.id = "A";
-        B.id = "B";
-        C.id = "C";
-        D.id = "D";
-        E.id = "E";
-        Ca.id = "Ca";
-        Cb.id = "Cb";
-        Cc.id = "Cc";
-        Cd.id = "Cd";
-        qNode.id = "qNode";
-        _root.id = "_root";
-
-        A.labelType = PQNode.EMPTY;
-        B.labelType = PQNode.EMPTY;
-        C.labelType = PQNode.PARTIAL;
-        Ca.labelType = PQNode.EMPTY;
-        Cb.labelType = PQNode.EMPTY;
-        Cc.labelType = PQNode.FULL;
-        Cd.labelType = PQNode.FULL;
-        D.labelType = PQNode.FULL;
-        E.labelType = PQNode.FULL;
-
-        //Only A, E as official children, since this is a qnode
-        C.children = Arrays.asList(Ca, Cd);
-        qNode.children = Arrays.asList(E, A);
-        setCircularLinks(Arrays.asList(E, D, C, B, A));
-        setCircularLinks(Arrays.asList(Ca, Cb, Cc, Cd));
+        List<PQNode> nodes = new ArrayList<>(templateQ2Tree(2));
+        PQNode _root = nodes.get(0);
+        PQNode qNode = nodes.get(1);
+        PQNode A = nodes.get(2);
+        PQNode B = nodes.get(3);
+        PQNode C = nodes.get(4);
+        PQNode Ca = nodes.get(5);
+        PQNode Cb = nodes.get(6);
+        PQNode Cc = nodes.get(7);
+        PQNode Cd = nodes.get(8);
+        PQNode D = nodes.get(9);
+        PQNode E = nodes.get(10);
 
         PQ PQTree = new PQ();
         boolean rt = PQTree.TEMPLATE_Q2(qNode);
@@ -1184,8 +1232,7 @@ public class PQTest {
         assertFalse(rt);
     }
 
-    @Test
-    public void templateQ3Test() {
+    private List<List<PQNode>> templateQ3Tree(){
         PQNode _root = new PQNode();
         PQNode mainQNode = new PQNode();
         PQNode partialLeftQNode = new PQNode();
@@ -1290,7 +1337,29 @@ public class PQTest {
         partialLeftQNode.children = Arrays.asList(partialLeft.get(0), partialLeft.get(partialLeft.size()-1));
         partialRightQNode.children = Arrays.asList(partialRight.get(0), partialRight.get(partialRight.size()-1));
 
-        List<PQNode> alLChildren = mainQNode.getChildren();
+        List<PQNode> allChildren = mainQNode.getChildren();
+
+        List<List<PQNode>> retList = new ArrayList<>();
+
+        retList.add(Arrays.asList(mainQNode));
+        retList.add(emptyLeft);
+        retList.add(partialLeft);
+        retList.add(fullMid);
+        retList.add(partialRight);
+        retList.add(emptyRight);
+        return retList;
+    }
+
+    @Test
+    public void templateQ3Test() {
+        List<List<PQNode>> nodesList = new ArrayList<>(templateQ3Tree());
+        PQNode mainQNode = nodesList.get(0).get(0);
+        List<PQNode> emptyLeft = new ArrayList<>(nodesList.get(1));
+        List<PQNode> partialLeft = new ArrayList<>(nodesList.get(2));
+        List<PQNode> fullMid = new ArrayList<>(nodesList.get(3));
+        List<PQNode> partialRight = new ArrayList<>(nodesList.get(4));
+        List<PQNode> emptyRight = new ArrayList<>(nodesList.get(5));
+
         PQ PQTree = new PQ();
         boolean rt = PQTree.TEMPLATE_Q3(mainQNode);
         assertTrue(rt);
