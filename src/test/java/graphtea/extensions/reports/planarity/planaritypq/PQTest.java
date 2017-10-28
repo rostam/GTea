@@ -493,6 +493,82 @@ public class PQTest {
     // Todo: test reduce with P6
     @Test
     public void reduceTemplateP6Test() {
+        List<List<PQNode>> nodesList = new ArrayList<>(templateP6Tree());
+
+        PQNode _root = nodesList.get(0).get(0);
+        List<PQNode> empties = new ArrayList<>(nodesList.get(1));
+        List<PQNode> fulls = new ArrayList<>(nodesList.get(2));
+
+        List<PQNode> S = new ArrayList<>(nodesList.get(3));
+
+        // Begin Testing
+        PQ PQTree = new PQ();
+        PQNode rt = PQTree.reduce(_root, S);
+
+        for(PQNode n : empties){
+            assertTrue(n.parent == _root);
+        }
+
+        for(PQNode n : fulls){
+            assertTrue(n.parent != _root);
+            assertTrue(n.parent.parent != _root);
+            assertTrue(n.parent.children.contains(n));
+        }
+
+        assertTrue(_root.children.size() == empties.size() + 1);
+        assertTrue(_root.nodeType.equals(PQNode.PNODE));
+
+        int qNodeCount = 0;
+        PQNode mergingQNode = null;
+        for(PQNode n : _root.children){
+            if(n.nodeType.equals(PQNode.QNODE)){
+                qNodeCount++;
+                mergingQNode = n;
+            }
+        }
+        assertTrue(qNodeCount == 1);
+        assertTrue(mergingQNode.labelType.equals(PQNode.PARTIAL));
+        assertTrue(mergingQNode.endmostChildren().size() == 2);
+
+        PQNode iter = mergingQNode.endmostChildren().get(0);
+        PQNode leftMostNode = iter;
+        int nodeIndex = 0;
+        int interiorPNodeCount = 0;
+        PQNode interiorPNode = null;
+        while(iter.circularLink_next != leftMostNode){
+
+            // Asserts first 4 nodes are EMPTY
+            if(nodeIndex < 4) {
+                assertTrue(iter.labelType.equals(PQNode.EMPTY));
+            }
+            // Asserts node indices between 4 and 13 and PARTIAL/FULL
+            else if(4 <= nodeIndex && nodeIndex <= 12){
+                // Asserts if singular interior pNode is FULL
+                if(iter.nodeType.equals(PQNode.PNODE)){
+                    assertTrue(iter.labelType.equals(PQNode.FULL));
+                    interiorPNode = iter;
+                    interiorPNodeCount++;
+                }
+                // Asserts if non-PNodes are full
+                else {
+                    assertTrue(iter.labelType.equals(PQNode.FULL));
+                }
+            }
+            else {
+                assertTrue(iter.labelType.equals(PQNode.EMPTY));
+            }
+
+            nodeIndex++;
+            iter = iter.circularLink_next;
+        }
+
+        assertTrue(interiorPNodeCount == 1);
+        assertTrue(interiorPNode.children.size() == 4);
+        for(PQNode n : interiorPNode.children){
+            assertTrue(n.labelType.equals(PQNode.FULL));
+        }
+        // Finished testing
+
 
     }
     // Todo: test reduce with Q1
@@ -1071,6 +1147,7 @@ public class PQTest {
         List<PQNode> emptyChildrenOfQNode2 = new ArrayList<PQNode>();
         List<PQNode> pertinentChildrenOfQNode2 = new ArrayList<PQNode>();
         List<PQNode> fulls = new ArrayList<PQNode>();
+        List<PQNode> S = new ArrayList<PQNode>();
 
         // QNode 1
         PQNode partialQNode1 = new PQNode();
@@ -1090,6 +1167,7 @@ public class PQTest {
             PQNode pertinentChildOfQNode = new PQNode();
             pertinentChildOfQNode.id = "fullChildOfQNode1" + Integer.toString(i);
             pertinentChildOfQNode.labelType = PQNode.FULL;
+            S.add(pertinentChildOfQNode);
             pertinentChildrenOfQNode1.add(pertinentChildOfQNode);
         }
         partialQNode1.children.add(pertinentChildrenOfQNode1.get(pertinentChildrenOfQNode1.size()-1));
@@ -1098,6 +1176,9 @@ public class PQTest {
         combinedChildrenOfQNode1.addAll(emptyChildrenOfQNode1);
         combinedChildrenOfQNode1.addAll(pertinentChildrenOfQNode1);
         setCircularLinks(combinedChildrenOfQNode1);
+        combinedChildrenOfQNode1.get(0).parent = partialQNode1;
+        combinedChildrenOfQNode1.get(combinedChildrenOfQNode1.size()-1).parent = partialQNode1;
+        partialQNode1.pertinentChildCount = pertinentChildrenOfQNode1.size();
         // Finished setting up QNode 1
 
         // QNode 2
@@ -1118,6 +1199,7 @@ public class PQTest {
             pertinentChildOfQNode.id = "fullChildOfQNode2" + Integer.toString(i);
             pertinentChildOfQNode.labelType = PQNode.FULL;
             pertinentChildrenOfQNode2.add(pertinentChildOfQNode);
+            S.add(pertinentChildOfQNode);
         }
         partialQNode2.children.add(pertinentChildrenOfQNode2.get(pertinentChildrenOfQNode2.size()-1));
 
@@ -1125,7 +1207,11 @@ public class PQTest {
         combinedChildrenOfQNode2.addAll(emptyChildrenOfQNode2);
         combinedChildrenOfQNode2.addAll(pertinentChildrenOfQNode2);
         setCircularLinks(combinedChildrenOfQNode2);
+        combinedChildrenOfQNode2.get(0).parent = partialQNode2;
+        combinedChildrenOfQNode2.get(combinedChildrenOfQNode2.size()-1).parent = partialQNode2;
+        partialQNode2.pertinentChildCount = pertinentChildrenOfQNode2.size();
         // Finished setting up QNode 2
+
 
         // PNode (root)
         for (int i = 0; i < 4; i++) {
@@ -1140,6 +1226,7 @@ public class PQTest {
             full.id = "partial" + Integer.toString(i);
             full.parent = _root;
             full.labelType = PQNode.FULL;
+            S.add(full);
             fulls.add(full);
         }
         List<PQNode> combinedChildrenOfRoot = new ArrayList<>();
@@ -1149,12 +1236,15 @@ public class PQTest {
         combinedChildrenOfRoot.add(partialQNode2);
         setCircularLinks(combinedChildrenOfRoot);
         _root.children = combinedChildrenOfRoot;
+        _root.pertinentChildCount = fulls.size() + 2;
         // Finished setting up PNode (root)
+
 
         List<List<PQNode>> retList = new ArrayList<>();
         retList.add(Arrays.asList(_root));
         retList.add(empties);
         retList.add(fulls);
+        retList.add(S);
         return retList;
     }
 
