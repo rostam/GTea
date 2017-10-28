@@ -403,6 +403,9 @@ public class PQTest {
         D.id = "D";
         E.id = "E";
 
+        _root.pertinentChildCount = 3;
+        _root.nodeType = PQNode.PNODE;
+
         A.parent = _root;
         B.parent = _root;
         C.parent = _root;
@@ -461,6 +464,8 @@ public class PQTest {
         assertTrue(C.parent.nodeType.equals(PQNode.PNODE));
 
         assertTrue(A.parent.labelType.equals(PQNode.FULL));
+
+        assertTrue(_root.getChildren().size() == 3);
 
     }
 
