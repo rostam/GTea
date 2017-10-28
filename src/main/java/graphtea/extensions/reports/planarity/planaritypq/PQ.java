@@ -108,7 +108,8 @@ public class PQ {
      * After matching the tree to a template, we can replace it with the template's replacement.
      * @param T root of the tree/subtree to reduce
      * @param S a set of nodes, describes a constraint sequence
-     * @return a tree rooted at _root which do not violate S (nor the reverse of S) nor previously applied constraint sequences.
+     * @return a tree rooted at _root which do not violate S (nor the reverse of S) nor previously applied constraint sequences, if a matching
+     * does not exist, returns the null tree.
      */
     public PQNode reduce(PQNode T, List<PQNode> S){
         Queue<PQNode> queue = new LinkedList<>(S);
@@ -126,6 +127,7 @@ public class PQ {
                 if(y.pertinentChildCount == 0){
                     queue.add(y);
                 }
+
                 if(TEMPLATE_L1(x)) break;
                 if(TEMPLATE_P1(x)) break;
                 if(TEMPLATE_P3(x)) break;
