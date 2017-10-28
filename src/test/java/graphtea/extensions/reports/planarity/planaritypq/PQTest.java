@@ -617,6 +617,55 @@ public class PQTest {
     // Todo: test reduce with Q2
     @Test
     public void reduceTemplateQ2Test() {
+        List<PQNode> nodes = new ArrayList<>(templateQ2Tree(1));
+        PQNode _root = nodes.get(0);
+        PQNode qNode = nodes.get(1);
+        PQNode A = nodes.get(2);
+        PQNode B = nodes.get(3);
+        PQNode C = nodes.get(4);
+        PQNode Ca = nodes.get(5);
+        PQNode Cb = nodes.get(6);
+        PQNode Cc = nodes.get(7);
+        PQNode Cd = nodes.get(8);
+        PQNode D = nodes.get(9);
+        PQNode E = nodes.get(10);
+
+        PQNode extraSNode = new PQNode();
+        extraSNode.parent = _root;
+        _root.children.add(extraSNode);
+
+        List<PQNode> S = new ArrayList<>(Arrays.asList(Cc, Cd, D, E, extraSNode));
+
+        PQ PQTree = new PQ();
+        PQNode rt = PQTree.reduce(qNode, S);
+
+        Set<PQNode> nodesToCheck = new HashSet<PQNode>();
+
+        nodesToCheck.addAll(Arrays.asList(A, B, Ca, Cb, Cc, Cd, D, E));
+
+        PQNode iterNode = qNode.children.get(0);
+        int flips = 0;
+
+        /* Below, we travel from left to right in the children list and counts
+         * the number of children whose siblings's labels are different from theirs.
+         * We call this number the 'number of flips'.
+         *
+         * This number has to be 1 to be valid. */
+
+        // While we have not checked the whole circular list
+        do {
+            if (nodesToCheck.contains(iterNode)) {
+                nodesToCheck.remove(iterNode);
+            }
+            if (iterNode != qNode.children.get(0) && iterNode.circularLink_prev.labelType != iterNode.labelType) {
+                flips++;
+            }
+            iterNode = iterNode.circularLink_next;
+        } while (iterNode != qNode.children.get(0));
+
+        assert(nodesToCheck.isEmpty());
+        assert(flips == 1);
+
 
     }
     // Todo: test reduce with Q3
@@ -1425,17 +1474,17 @@ public class PQTest {
         PQNode D = new PQNode();
         PQNode E = new PQNode();
 
-        _root.nodeType = PQNode.QNODE;
-        _root.children = Arrays.asList();
+        _root.nodeType = PQNode.PNODE;
+        _root.children.add(qNode);
 
         qNode.nodeType = PQNode.QNODE;
         C.nodeType = PQNode.QNODE;
 
         qNode.parent = _root;
-        A.parent = _root;
+        A.parent = qNode;
         Ca.parent = C;
         Cd.parent = C;
-        E.parent = _root;
+        E.parent = qNode;
 
         A.id = "A";
         B.id = "B";
@@ -1458,6 +1507,10 @@ public class PQTest {
         Cd.labelType = PQNode.FULL;
         D.labelType = PQNode.FULL;
         E.labelType = PQNode.FULL;
+
+        C.pertinentChildCount = 2;
+        qNode.pertinentChildCount = 1;
+        _root.pertinentChildCount = 2;
 
         //Only A, E as official children, since this is a qnode
         if(treeNum == 1) {
