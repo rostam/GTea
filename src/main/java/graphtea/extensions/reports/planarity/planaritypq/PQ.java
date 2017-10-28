@@ -118,7 +118,7 @@ public class PQ {
         }
         while(queue.size() > 0){
             PQNode x = queue.remove();
-            System.out.println("pertinentLeafCount of x: " + x.pertinentLeafCount);
+            //System.out.println("pertinentLeafCount of x: " + x.pertinentLeafCount);
             if(x.pertinentLeafCount < S.size()){
                 // X is not ROOT(T, S)
 
@@ -335,7 +335,11 @@ public class PQ {
         //Matching Phase
 
         //If root
-        if (x.parent == null) {
+        //if (x.parent == null) {
+        //    return false;
+        //}
+
+        if(!x.nodeType.equals(PQNode.PNODE)){
             return false;
         }
 
@@ -438,9 +442,9 @@ public class PQ {
         //Matching phase
 
         //Check if node is not root
-        if (x.parent != null) {
-            return false;
-        }
+        //if (x.parent != null) {
+        //    return false;
+        //}
 
         List<PQNode> emptyChildren = x.getChildrenOfLabel(PQNode.EMPTY);
         List<PQNode> fullChildren = x.getChildrenOfLabel(PQNode.FULL);
@@ -819,7 +823,7 @@ public class PQ {
      * @return whether or not x matches the template
      */
     public boolean TEMPLATE_Q1(PQNode x){
-       if (x.nodeType == PQNode.QNODE) {
+       if (x.nodeType.equals(PQNode.QNODE)) {
            return GENERALIZED_TEMPLATE_1(x);
        }
        return false;
@@ -868,23 +872,29 @@ public class PQ {
         }
 
         //Check if x is not singly partial
-        if (x.getChildrenOfLabel(PQNode.PARTIAL).size() != 1) {
+        if (x.getChildrenOfLabel(PQNode.PARTIAL).size() > 1) {
             return false;
         }
 
-        //Check if partial node is not a qnode
-        if (x.getChildrenOfLabel(PQNode.PARTIAL).get(0).nodeType != PQNode.QNODE) {
-            return false;
-        }
+        if(x.getChildrenOfLabel(PQNode.PARTIAL).size() == 1) {
+            //Check if partial node is not a qnode
+            if (x.getChildrenOfLabel(PQNode.PARTIAL).get(0).nodeType != PQNode.QNODE) {
+                return false;
+            }
 
-        //Check if the partial node's full children are not consecutive
-        if (!PQHelpers.checkIfConsecutive(x.getChildrenOfLabel(PQNode.PARTIAL).get(0).getChildrenOfLabel(PQNode.FULL))) {
-            return false;
-        }
+            //Check if the partial node's full children are not consecutive
+            if (!PQHelpers.checkIfConsecutive(x.getChildrenOfLabel(PQNode.PARTIAL).get(0).getChildrenOfLabel(PQNode.FULL))) {
+                return false;
+            }
 
-        //Check if the partial node's empty children are not consecutive
-        if (!PQHelpers.checkIfConsecutive(x.getChildrenOfLabel(PQNode.PARTIAL).get(0).getChildrenOfLabel(PQNode.EMPTY))) {
-            return false;
+            //Check if the partial node's empty children are not consecutive
+            if (!PQHelpers.checkIfConsecutive(x.getChildrenOfLabel(PQNode.PARTIAL).get(0).getChildrenOfLabel(PQNode.EMPTY))) {
+                return false;
+            }
+        }
+        else {
+            // No reduction needed
+            return true;
         }
 
 
@@ -892,8 +902,9 @@ public class PQ {
 
         //Replacement
 
-        PQNode partialNode = x.getChildrenOfLabel(PQNode.PARTIAL).get(0);
+        // No reduction needed
 
+        PQNode partialNode = x.getChildrenOfLabel(PQNode.PARTIAL).get(0);
 
         x.labelType = PQNode.PARTIAL;
 
