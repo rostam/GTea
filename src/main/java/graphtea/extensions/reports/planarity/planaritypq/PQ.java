@@ -128,12 +128,12 @@ public class PQ {
                     queue.add(y);
                 }
 
-                if(TEMPLATE_L1(x)) break;
-                if(TEMPLATE_P1(x)) break;
-                if(TEMPLATE_P3(x)) break;
-                if(TEMPLATE_P5(x)) break;
-                if(TEMPLATE_Q1(x)) break;
-                if(TEMPLATE_Q2(x)) break;
+                if(TEMPLATE_L1(x)) continue;
+                if(TEMPLATE_P1(x)) continue;
+                if(TEMPLATE_P3(x)) continue;
+                if(TEMPLATE_P5(x)) continue;
+                if(TEMPLATE_Q1(x)) continue;
+                if(TEMPLATE_Q2(x)) continue;
 
                 // If all templates fail, return null tree
                 return null;
@@ -141,14 +141,14 @@ public class PQ {
             else {
                 // X is ROOT(T, S)
 
-                if(TEMPLATE_L1(x)) break;
-                if(TEMPLATE_P1(x)) break;
-                if(TEMPLATE_P2(x)) break;
-                if(TEMPLATE_P4(x)) break;
-                if(TEMPLATE_P6(x)) break;
-                if(TEMPLATE_Q1(x)) break;
-                if(TEMPLATE_Q2(x)) break;
-                if(TEMPLATE_Q3(x)) break;
+                if(TEMPLATE_L1(x)) continue;
+                if(TEMPLATE_P1(x)) continue;
+                if(TEMPLATE_P2(x)) continue;
+                if(TEMPLATE_P4(x)) continue;
+                if(TEMPLATE_P6(x)) continue;
+                if(TEMPLATE_Q1(x)) continue;
+                if(TEMPLATE_Q2(x)) continue;
+                if(TEMPLATE_Q3(x)) continue;
 
                 // If all templates fail, return null tree
                 return null;
@@ -172,7 +172,12 @@ public class PQ {
     * TEMPLATES
     * */
 
-    public boolean TEMPLATE_L1(PQNode x){ return false; }
+    public boolean TEMPLATE_L1(PQNode x){
+        if(x.nodeType.equals(PQNode.PNODE) || x.nodeType.equals(PQNode.QNODE)){
+            return false;
+        }
+        return true;
+    }
 
     public boolean GENERALIZED_TEMPLATE_1(PQNode x){
         if(!x.labelType.equals(PQNode.FULL)){
