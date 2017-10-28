@@ -1,5 +1,6 @@
 package graphtea.extensions.reports.planarity;
 
+import graphtea.extensions.reports.planarity.planaritypq.PQMethod;
 import graphtea.graph.graph.GraphModel;
 import graphtea.library.algorithms.Algorithm;
 import graphtea.plugins.reports.extension.GraphReportExtension;
@@ -23,8 +24,10 @@ public class Planarity extends Algorithm implements GraphReportExtension {
 	}
 
 	public Object calculate(GraphModel g) {
-		WagnerMethod wm = new WagnerMethod();
-        return wm.isPlanar(g);
+		//WagnerMethod wm = new WagnerMethod();
+        //return wm.isPlanar(g);
+		PQMethod pq = new PQMethod();
+		return pq.isPlanar(g);
         //return doAlgorithm();
 	}
 
