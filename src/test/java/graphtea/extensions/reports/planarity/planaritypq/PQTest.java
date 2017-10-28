@@ -386,7 +386,7 @@ public class PQTest {
 
     @Test
     public void reduceTemplateP4Test(){
-        /*List<PQNode> nodes = new ArrayList<>(templateP4Tree(1));
+        List<PQNode> nodes = templateP4Tree(1);
         PQNode _root = nodes.get(0);
         PQNode qNode = nodes.get(1);
         PQNode A = nodes.get(2);
@@ -399,9 +399,53 @@ public class PQTest {
         PQNode H = nodes.get(9);
 
         PQ PQTree = new PQ();
-        List<PQNode> S = new ArrayList<>(Arrays.asList());
-        boolean rt = PQTree.reduce(_root, S);*/
+        List<PQNode> S = new ArrayList<>(Arrays.asList(C, D, G, H));
+        PQNode rt = PQTree.reduce(_root, S);
 
+        assertTrue(A.parent == _root);
+        assertTrue(B.parent == _root);
+        assertTrue(qNode.parent == _root);
+
+        assertTrue(C.parent != qNode && C.parent != _root);
+        assertTrue(D.parent != qNode && D.parent != _root);
+
+        assertTrue(E.parent == qNode);
+        assertTrue(F.parent == qNode);
+        assertTrue(G.parent == qNode);
+        assertTrue(H.parent == qNode);
+        assertTrue(C.parent == D.parent);
+        assertTrue(C.parent.parent == qNode);
+        assertTrue(qNode.children.contains(C.parent));
+        assertTrue(_root.children.contains(qNode));
+        assertTrue(C.parent.nodeType(PQNode.PNODE));
+        assertTrue(C.parent.labelType.equals(PQNode.FULL));
+        assertTrue(qNode.labelType.equals(PQNode.PARTIAL));
+
+    }
+
+    // Todo: test reduce with P5
+    @Test
+    public void reduceTemplateP5Test() {
+
+    }
+    // Todo: test reduce with P6
+    @Test
+    public void reduceTemplateP6Test() {
+
+    }
+    // Todo: test reduce with Q1
+    @Test
+    public void reduceTemplateQ1Test() {
+
+    }
+    // Todo: test reduce with Q2
+    @Test
+    public void reduceTemplateQ2Test() {
+
+    }
+    // Todo: test reduce with Q3
+    @Test
+    public void reduceTemplateQ3Test() {
 
     }
 
@@ -682,6 +726,17 @@ public class PQTest {
         PQNode G = new PQNode();
         PQNode H = new PQNode();
 
+        _root.id = "_root";
+        A.id = "A";
+        B.id = "B";
+        C.id = "C";
+        D.id = "D";
+        qNode.id = "qNode";
+        E.id = "E";
+        F.id = "F";
+        G.id = "G";
+        H.id = "H";
+
         A.parent = _root;
         B.parent = _root;
         C.parent = _root;
@@ -703,6 +758,9 @@ public class PQTest {
         F.labelType = PQNode.EMPTY;
         G.labelType = PQNode.FULL;
         H.labelType = PQNode.FULL;
+
+        _root.pertinentChildCount = 3;
+        qNode.pertinentChildCount = 2;
 
         _root.labelType = PQNode.PARTIAL;
 
