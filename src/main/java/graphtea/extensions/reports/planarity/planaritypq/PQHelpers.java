@@ -1,10 +1,8 @@
 package graphtea.extensions.reports.planarity.planaritypq;
 
 import java.lang.Math;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+
 import graphtea.extensions.reports.planarity.planaritypq.PQNode;
 
 public class PQHelpers {
@@ -171,6 +169,26 @@ public class PQHelpers {
     public static void rotateQNode(PQNode qNode){
         reverseCircularLinks(qNode.endmostChildren().get(0));
         Collections.reverse(qNode.children);
+    }
+
+    public static boolean equalTrees(PQNode a, PQNode b) {
+        return preorder(a).equals(preorder(b));
+    }
+
+    public static List<PQNode> preorder(PQNode _root) {
+       List<PQNode> S = new ArrayList<PQNode>();
+       List<PQNode> output = new ArrayList<PQNode>();
+       S.add(_root);
+       output.add(_root);
+       while (S.isEmpty() == false) {
+           PQNode curNode = S.get(0);
+           S.remove(0);
+           for (PQNode child : curNode.getChildren()) {
+               S.add(child);
+               output.add(child);
+           }
+       }
+       return output;
     }
 
 }

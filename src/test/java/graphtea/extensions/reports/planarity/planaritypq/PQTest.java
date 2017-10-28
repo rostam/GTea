@@ -9,6 +9,7 @@ import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.printC
 import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.setCircularLinks;
 import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.union;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
@@ -45,9 +46,15 @@ public class PQTest {
         // Constraint set S := {B,C}
         List<PQNode> S = new ArrayList<>();
 
+        //Get preorder before
+        List<PQNode> preorderBefore = PQHelpers.preorder(_root);
+
         // Test PQTree
         PQ PQTree = new PQ();
         PQNode tree = PQTree.bubble(_root, S);
+
+        //Get preorder afterwards
+        List<PQNode> preorderAfter = PQHelpers.preorder(_root);
 
         // todo: Check if the output tree is the same as the input tree
         assertTrue(tree == _root);
@@ -81,9 +88,15 @@ public class PQTest {
         // Constraint set S := {B,C}
         List<PQNode> S = Arrays.asList(B, C);
 
+        //Get preorder before
+        List<PQNode> preorderBefore = PQHelpers.preorder(_root);
+
         // Test PQTree
         PQ PQTree = new PQ();
         PQNode r = PQTree.bubble(_root, S);
+
+        //Get preorder afterwards
+        List<PQNode> preorderAfter = PQHelpers.preorder(_root);
 
         // ASSERT
         assertTrue(r.children.contains(A));
