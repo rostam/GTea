@@ -339,6 +339,59 @@ public class PQTest {
         }
     }
 
+    @Test
+    public void reduceTemplateP3Test(){
+        List<PQNode> nodes = new ArrayList<>(templateP3Tree(1));
+        PQNode _root = nodes.get(0);
+        PQNode parent = nodes.get(1);
+        PQNode A = nodes.get(2);
+        PQNode B = nodes.get(3);
+        PQNode C = nodes.get(4);
+        PQNode D = nodes.get(5);
+        PQNode E = nodes.get(6);
+
+        PQNode extraNode = new PQNode();
+        extraNode.labelType.equals(PQNode.FULL);
+        extraNode.parent = _root;
+        _root.children.add(extraNode);
+
+        PQ PQTree = new PQ();
+
+        List<PQNode> S = new ArrayList<PQNode>(Arrays.asList(A, B, C, extraNode));
+        PQNode rt = PQTree.reduce(_root, S);
+
+        assertTrue(parent.nodeType.equals(PQNode.QNODE));
+        assertTrue(parent.labelType.equals(PQNode.PARTIAL));
+        assertTrue(parent.children.size() == 2);
+        for (PQNode notFullChild : parent.children.get(0).children) {
+            assertTrue(!notFullChild.labelType.equals(PQNode.FULL));
+        }
+        for (PQNode fullChild : parent.children.get(1).children) {
+            assertTrue(fullChild.labelType.equals(PQNode.FULL));
+        }
+    }
+
+    @Test
+    public void reduceTemplateP4Test(){
+        /*List<PQNode> nodes = new ArrayList<>(templateP4Tree(1));
+        PQNode _root = nodes.get(0);
+        PQNode qNode = nodes.get(1);
+        PQNode A = nodes.get(2);
+        PQNode B = nodes.get(3);
+        PQNode C = nodes.get(4);
+        PQNode D = nodes.get(5);
+        PQNode E = nodes.get(6);
+        PQNode F = nodes.get(7);
+        PQNode G = nodes.get(8);
+        PQNode H = nodes.get(9);
+
+        PQ PQTree = new PQ();
+        List<PQNode> S = new ArrayList<>(Arrays.asList());
+        boolean rt = PQTree.reduce(_root, S);*/
+
+
+    }
+
     private List<PQNode> templateP1Tree(){
         PQNode _root = new PQNode();
         PQNode A = new PQNode();
@@ -509,8 +562,19 @@ public class PQTest {
         PQNode D = new PQNode();
         PQNode E = new PQNode();
 
+        _root.id = "_root";
+        parent.id = "parent";
+        A.id = "A";
+        B.id = "B";
+        C.id = "C";
+        D.id = "D";
+        E.id = "E";
+
+        _root.children.add(parent);
         parent.parent = _root;
         parent.nodeType = PQNode.PNODE;
+
+        parent.pertinentChildCount = 3;
 
         A.parent = parent;
         B.parent = parent;
