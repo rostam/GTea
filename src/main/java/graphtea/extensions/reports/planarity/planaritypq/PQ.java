@@ -222,7 +222,7 @@ public class PQ {
     }
 
     /**
-     * Tries to match the tree at x (x must be the root of the entire tree) to template P2, if successful,
+     * Tries to match the tree at x (x must be the root of the pertinent subtree) to template P2, if successful,
      * we apply it.
      *
      * TEMPLATE:
@@ -306,7 +306,7 @@ public class PQ {
     }
 
     /**
-     * Tries to match the subtree at x (x must NOT be the root of the entire tree) to template P3, if successful,
+     * Tries to match the subtree at x (x must NOT be the root of the pertinent subtree) to template P3, if successful,
      * we apply it.
      *
      * Note: This case is very similiar to TEMPLATE_P2.
@@ -410,7 +410,7 @@ public class PQ {
     }
 
     /**
-     * Tries to match the tree at x (x must be the root of the entire tree) to template P4, if successful,
+     * Tries to match the tree at x (x must be the root of the pertinent subtree) to template P4, if successful,
      * we apply it.
      *
      * TEMPLATE:
@@ -499,7 +499,7 @@ public class PQ {
     }
 
     /**
-     * Tries to match the subtree at x (x must NOT be the root of the entire tree) to template P5, if successful,
+     * Tries to match the subtree at x (x must NOT be the root of the pertinent subtree) to template P5, if successful,
      * we apply it.
      * Note: This case is very similiar to TEMPLATE_P4.
      *       The matching is nearly identical, the only different being that x cannot be a root.
@@ -627,7 +627,7 @@ public class PQ {
     }
 
     /**
-     * Tries to match the tree at x (x must be the root of the entire tree) to template P6, if successful,
+     * Tries to match the tree at x (x must be the root of the pertinent subtree) to template P6, if successful,
      * we apply it.
      *
      * TEMPLATE:
@@ -934,7 +934,7 @@ public class PQ {
     }
 
     /**
-     * Tries to match the tree at x (x must be the root of the entire tree) to template P6, if successful,
+     * Tries to match the tree at x (x must be the root of the pertinent subtree) to template P6, if successful,
      * we apply it.
      *
      * TEMPLATE:
