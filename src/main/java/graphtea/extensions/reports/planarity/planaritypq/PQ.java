@@ -255,10 +255,10 @@ public class PQ {
         List<PQNode> fullChildren = new ArrayList<PQNode>();
 
         for (PQNode child : x.getChildren()) {
-            if (child.labelType == PQNode.FULL) {
+            if (child.labelType.equals(PQNode.FULL)) {
                 fullChildren.add(child);
             }
-            else if (child.labelType == PQNode.EMPTY) {
+            else if (child.labelType.equals(PQNode.EMPTY)) {
                 emptyChildren.add(child);
             }
         }
@@ -284,8 +284,13 @@ public class PQ {
         fullParent.labelType = PQNode.FULL;
         fullParent.parent = x;
 
+        //Add new pNode to root children list
+        x.children.add(fullParent);
+
         //Adding the full children to a new P node
         fullParent.children = fullChildren;
+        x.children.removeAll(fullChildren);
+
 
         //Pointing the children to the new P node
         for (PQNode child : fullChildren) {
