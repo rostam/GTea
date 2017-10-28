@@ -255,6 +255,54 @@ public class PQHelpersTest {
 
     }
 
+    @Test
+    public void equalTreesTestIdentical1() {
+        PQNode root = new PQNode();
 
+        for (int i = 0; i < 10; i++) {
+            PQNode child = new PQNode();
+            child.parent = root;
+            root.children.add(child);
+        }
+
+        assertTrue(PQHelpers.equalTrees(root, root));
+    }
+
+    @Test
+    public void equalTreesTestDifferent1() {
+        PQNode rootA = new PQNode();
+        PQNode rootB = new PQNode();
+
+        for (int i = 0; i < 10; i++) {
+            PQNode child = new PQNode();
+            child.parent = rootA;
+            rootA.children.add(child);
+        }
+        for (int i = 0; i < 10; i++) {
+            PQNode child = new PQNode();
+            child.parent = rootB;
+            rootB.children.add(child);
+        }
+
+        assertFalse(PQHelpers.equalTrees(rootA, rootB));
+    }
+
+    @Test
+    public void equalTreesTestDifferent2() {
+        PQNode root = new PQNode();
+
+        for (int i = 0; i < 10; i++) {
+            PQNode child = new PQNode();
+            child.parent = root;
+            root.children.add(child);
+        }
+
+        PQNode rootCopy = new PQNode();
+        for (int i = 0; i < 10; i++) {
+            rootCopy.children.add(root.children.get(i));
+        }
+        rootCopy.children.add(new PQNode());
+        assertFalse(PQHelpers.equalTrees(root, rootCopy));
+    }
 }
 
