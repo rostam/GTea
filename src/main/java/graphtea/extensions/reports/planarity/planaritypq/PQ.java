@@ -126,12 +126,12 @@ public class PQ {
                 if(y.pertinentChildCount == 0){
                     queue.add(y);
                 }
-                //if(TEMPLATE_L1(x)) break;
+                if(TEMPLATE_L1(x)) break;
                 if(TEMPLATE_P1(x)) break;
-                //if(TEMPLATE_P3(x)) break;
-                //if(TEMPLATE_P5(x)) break;
-                //if(TEMPLATE_Q1(x)) break;
-                //if(TEMPLATE_Q2(x)) break;
+                if(TEMPLATE_P3(x)) break;
+                if(TEMPLATE_P5(x)) break;
+                if(TEMPLATE_Q1(x)) break;
+                if(TEMPLATE_Q2(x)) break;
 
                 // If all templates fail, return null tree
                 return null;
@@ -139,14 +139,14 @@ public class PQ {
             else {
                 // X is ROOT(T, S)
 
-                //if(TEMPLATE_L1(x)) break;
+                if(TEMPLATE_L1(x)) break;
                 if(TEMPLATE_P1(x)) break;
-                //if(TEMPLATE_P2(x)) break;
-                //if(TEMPLATE_P4(x)) break;
-                //if(TEMPLATE_P6(x)) break;
-                //if(TEMPLATE_Q1(x)) break;
-                //if(TEMPLATE_Q2(x)) break;
-                //if(TEMPLATE_Q3(x)) break;
+                if(TEMPLATE_P2(x)) break;
+                if(TEMPLATE_P4(x)) break;
+                if(TEMPLATE_P6(x)) break;
+                if(TEMPLATE_Q1(x)) break;
+                if(TEMPLATE_Q2(x)) break;
+                if(TEMPLATE_Q3(x)) break;
 
                 // If all templates fail, return null tree
                 return null;
@@ -206,7 +206,7 @@ public class PQ {
      * @return whether or not x matches the template
      */
     public boolean TEMPLATE_P1(PQNode x){
-       if (x.nodeType == PQNode.PNODE) {
+       if (x.nodeType.equals(PQNode.PNODE)) {
            return GENERALIZED_TEMPLATE_1(x);
        }
        return false;
@@ -688,7 +688,7 @@ public class PQ {
         }
 
         /** Gather qNode1 children */
-        List<PQNode> emptyQNodeChildList1 = new ArrayList<>();  //todo: loses emptyChildOfQNode0 labeltype before here
+        List<PQNode> emptyQNodeChildList1 = new ArrayList<>();
         List<PQNode> fullQNodeChildList1 = new ArrayList<>();
         gatherQNodeChildren(emptyQNodeChildList1, fullQNodeChildList1, qNode1);
 
