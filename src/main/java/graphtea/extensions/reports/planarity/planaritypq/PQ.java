@@ -118,6 +118,7 @@ public class PQ {
         }
         while(queue.size() > 0){
             PQNode x = queue.remove();
+            System.out.println("pertinentLeafCount of x: " + x.pertinentLeafCount);
             if(x.pertinentLeafCount < S.size()){
                 // X is not ROOT(T, S)
 
@@ -239,7 +240,7 @@ public class PQ {
      *
      *                      F  ....  F
      *
-     * @param x the node which represents the root of the tree/subtree
+     * @param x the node which represents the root of the subtree
      * @return whether or not x matches the template
      */
     public boolean TEMPLATE_P2(PQNode x) {
@@ -247,9 +248,9 @@ public class PQ {
         //Matching Phase
 
         //If not root
-        if (x.parent != null) {
-            return false;
-        }
+        //if (x.parent != null) {
+        //    return false;
+        //}
 
         List<PQNode> emptyChildren = new ArrayList<PQNode>();
         List<PQNode> fullChildren = new ArrayList<PQNode>();
