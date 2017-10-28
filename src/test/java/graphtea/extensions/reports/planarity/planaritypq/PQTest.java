@@ -289,13 +289,66 @@ public class PQTest {
         PQNode r = PQTree.reduce(_root, S);
 
         assertTrue(r != null);
+    }
 
+    @Test
+    public void reduceTemplateP1Test(){
+        List<PQNode> nodes = new ArrayList<>(templateP1Tree());
+        PQNode _root = nodes.get(0);
+        PQNode A = nodes.get(1);
+        PQNode B = nodes.get(2);
+
+        PQ PQTree = new PQ();
+        List<PQNode> S = new ArrayList<>(Arrays.asList(A, B));
+        PQNode rt = PQTree.reduce(_root, S);
+
+        assertTrue(rt != null);
+        assertTrue(rt == _root);
+        assertTrue(_root.labelType.equals(PQNode.FULL));
+        assertTrue(A.labelType.equals(PQNode.FULL));
+        assertTrue(B.labelType.equals(PQNode.FULL));
+        assertTrue(_root.getChildren().size() == 2);
+        assertTrue(A.parent == _root);
+        assertTrue(B.parent == _root);
+    }
+
+    @Test
+    public void reduceTemplateP2Test(){
+        List<PQNode> nodes = new ArrayList<>(templateP2Tree(1));
+        PQNode _root = nodes.get(0);
+        PQNode A = nodes.get(1);
+        PQNode B = nodes.get(2);
+        PQNode C = nodes.get(3);
+        PQNode D = nodes.get(4);
+        PQNode E = nodes.get(5);
+
+        PQ PQTree = new PQ();
+        List<PQNode> S = new ArrayList<>(Arrays.asList(A, B, C));
+        PQNode rt = PQTree.reduce(_root, S);
+
+        assertTrue(rt != null);
+        assertTrue(rt == _root);
+        assertTrue(_root.getChildren().size() == 3);
+        assertTrue(_root.fullChildren().size() == 1);
+        PQNode pNode = _root.fullChildren().get(0);
+        assertTrue(pNode.nodeType.equals(PQNode.PNODE));
+        assertTrue(pNode.getChildren().size() == 3);
+        for(PQNode n : pNode.getChildren()){
+            assertTrue(n.parent == pNode);
+            assertTrue(n.labelType.equals(PQNode.FULL));
+        }
     }
 
     private List<PQNode> templateP1Tree(){
         PQNode _root = new PQNode();
         PQNode A = new PQNode();
         PQNode B = new PQNode();
+
+        _root.id="_root";
+        A.id = "A";
+        B.id = "B";
+
+        _root.pertinentChildCount = 2;
 
         _root.children = Arrays.asList(A,B);
         A.parent = _root;
@@ -342,6 +395,13 @@ public class PQTest {
         PQNode C = new PQNode();
         PQNode D = new PQNode();
         PQNode E = new PQNode();
+
+        _root.id = "root";
+        A.id = "A";
+        B.id = "B";
+        C.id = "C";
+        D.id = "D";
+        E.id = "E";
 
         A.parent = _root;
         B.parent = _root;
