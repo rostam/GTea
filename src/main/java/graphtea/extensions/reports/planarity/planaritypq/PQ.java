@@ -122,7 +122,8 @@ public class PQ {
             if(x.pertinentLeafCount < S.size()){
                 // X is not ROOT(T, S)
 
-                PQNode y = x.parent;
+                //PQNode y = x.parent;
+                PQNode y = x.getParent();
                 y.pertinentLeafCount = y.pertinentLeafCount + x.pertinentLeafCount;
                 y.pertinentChildCount = y.pertinentChildCount - 1;
                 if(y.pertinentChildCount == 0){
@@ -901,9 +902,6 @@ public class PQ {
 
 
         //Replacement
-
-        // No reduction needed
-
         PQNode partialNode = x.getChildrenOfLabel(PQNode.PARTIAL).get(0);
 
         x.labelType = PQNode.PARTIAL;

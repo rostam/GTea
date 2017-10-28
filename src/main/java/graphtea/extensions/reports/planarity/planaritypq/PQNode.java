@@ -366,5 +366,20 @@ public class PQNode {
         return list;
     }
 
+    public PQNode getParent(){
+        if(this.parent == null){
+            PQNode iter = this;
+            while(iter.circularLink_next != this){
+                if(iter.parent != null){
+                    return iter.parent;
+                }
+                iter = iter.circularLink_next;
+            }
+        }
+        else {
+            return parent;
+        }
+        return null;
+    }
 
 }
