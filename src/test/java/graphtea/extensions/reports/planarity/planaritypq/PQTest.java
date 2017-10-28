@@ -574,7 +574,45 @@ public class PQTest {
     // Todo: test reduce with Q1
     @Test
     public void reduceTemplateQ1Test() {
+        List<PQNode> nodes = new ArrayList<>(templateQ1Tree());
+        PQNode _root = nodes.get(0);
+        PQNode A = nodes.get(1);
+        PQNode B = nodes.get(2);
 
+        // Extra nodes so Q1 is not ROOT(T, S)
+        PQNode extraPNode = new PQNode();
+        extraPNode.nodeType = PQNode.PNODE;
+        extraPNode.children.add(_root);
+        _root.parent = extraPNode;
+
+        PQNode extraSNode = new PQNode();
+        extraSNode.parent = extraPNode;
+        extraPNode.children.add(extraSNode);
+        // end of extra nodes
+
+        List<PQNode> S = new ArrayList<>();
+        S.add(A);
+        S.add(B);
+        S.add(extraSNode);
+
+        PQ PQTree = new PQ();
+
+        // All children blocked
+        assertTrue(!_root.labelType.equals(PQNode.FULL));
+        PQNode rt = PQTree.reduce(_root, S);
+
+        assertTrue(_root.labelType.equals(PQNode.FULL));
+
+        // One child not blocked
+        PQNode C = new PQNode();
+        C.parent = _root;
+        _root.labelType = PQNode.EMPTY;
+        C.labelType = PQNode.EMPTY;
+
+        _root.children = Arrays.asList(A,B,C);
+        rt = PQTree.reduce(_root, S);
+        assertTrue(rt == null);
+        assertTrue(!_root.labelType.equals(PQNode.FULL));
     }
     // Todo: test reduce with Q2
     @Test
@@ -1340,6 +1378,8 @@ public class PQTest {
         _root.nodeType = PQNode.QNODE;
         A.labelType = PQNode.FULL;
         B.labelType = PQNode.FULL;
+
+        _root.pertinentChildCount = 2;
 
         return Arrays.asList(_root, A, B);
     }
