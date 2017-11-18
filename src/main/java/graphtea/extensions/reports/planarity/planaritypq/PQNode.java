@@ -44,6 +44,21 @@ public class PQNode {
         parent  = null;
     }
 
+    public PQNode(String nodeType, String labelType){
+        blocked = false;
+        //marked = false;
+        pertinentChildCount = 0;
+        pertinentLeafCount = 0;
+        queued = false;
+        circularLink_next = null;
+        circularLink_prev = null;
+        childCount = 0;
+        parent  = null;
+
+        this.labelType = labelType;
+        this.nodeType = nodeType;
+    }
+
     public PQNode(String id){
         blocked = false;
         //marked = false;
