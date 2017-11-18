@@ -579,6 +579,10 @@ public class PQTest {
         PQNode A = nodes.get(1);
         PQNode B = nodes.get(2);
 
+        _root.id = "_root";
+        A.id = "A";
+        B.id = "B";
+
         // Extra nodes so Q1 is not ROOT(T, S)
         PQNode extraPNode = new PQNode();
         extraPNode.nodeType = PQNode.PNODE;
@@ -588,6 +592,10 @@ public class PQTest {
         PQNode extraSNode = new PQNode();
         extraSNode.parent = extraPNode;
         extraPNode.children.add(extraSNode);
+        extraSNode.labelType = PQNode.FULL;
+
+        extraPNode.id = "extraPNode";
+        extraSNode.id = "extraSNode";
         // end of extra nodes
 
         List<PQNode> S = new ArrayList<>();
@@ -600,7 +608,6 @@ public class PQTest {
         // All children blocked
         assertTrue(!_root.labelType.equals(PQNode.FULL));
         PQNode rt = PQTree.reduce(_root, S);
-
         assertTrue(_root.labelType.equals(PQNode.FULL));
 
         // One child not blocked
@@ -608,10 +615,15 @@ public class PQTest {
         C.parent = _root;
         _root.labelType = PQNode.EMPTY;
         C.labelType = PQNode.EMPTY;
+        C.id = "C";
 
-        _root.children = Arrays.asList(A,B,C);
+        _root.children = Arrays.asList(A,C);
+        B.parent = null;
+        setCircularLinks(Arrays.asList(A,B,C));
+
         rt = PQTree.reduce(_root, S);
-        assertTrue(rt == null);
+        assertTrue(rt != null);
+        //assertTrue(rt.labelType.equals(PQNode.EMPTY));
         assertTrue(!_root.labelType.equals(PQNode.FULL));
     }
     // Todo: test reduce with Q2
@@ -1429,6 +1441,8 @@ public class PQTest {
         B.labelType = PQNode.FULL;
 
         _root.pertinentChildCount = 2;
+
+        setCircularLinks(Arrays.asList(A, B));
 
         return Arrays.asList(_root, A, B);
     }
