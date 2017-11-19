@@ -165,9 +165,56 @@ public class PQ {
 
     }
 
+    /**
+     * For each element s in S, s_i's ancestors are traversed up to a maximum of T.
+     * If, for some j, ANCESTOR(s_i) in ANCESTORS(s_j), s_i's traversal stops because that ancestor has already been found.
+     * For each s_i, s_j that has a common ancestor, that ancestor is added to a list.  That list then calculates
+     * the lowest depth ancestor which will be returned.
+     *
+     * @param T describes the root of the entire tree
+     * @param S is the list of nodes that must be legally reachable
+     * @return the root of the subtree that can reach all of S */
     public PQNode root(PQNode T, List<PQNode> S){
+        if(S.size() == 1){
+            return S.get(0);
+        }
 
-        return null;
+        List<PQNode> nodesReached = new ArrayList<>();
+        List<PQNode> nodesSame = new ArrayList<>();
+
+        for(PQNode s : S){
+            PQNode traversal = s;
+            while(traversal != T){
+                traversal = traversal.getParent();
+                if(nodesReached.contains(traversal)){
+                    nodesSame.add(traversal);
+                    break;
+                }
+                nodesReached.add(traversal);
+            }
+        }
+
+        PQNode lowestDepthNode = null;
+        int lowestDepth = 0;
+        for(PQNode n : nodesSame){
+            PQNode traversal = n;
+            int curNodeLowestDepth = 0;
+            while(traversal != T){
+                traversal = traversal.getParent();
+                lowestDepth++;
+            }
+            if(lowestDepth > curNodeLowestDepth){
+                lowestDepthNode = n;
+            }
+        }
+
+        if(lowestDepthNode == null){
+            return nodesSame.get(0);
+        }
+        else {
+            return lowestDepthNode;
+        }
+
     }
 
     /**
