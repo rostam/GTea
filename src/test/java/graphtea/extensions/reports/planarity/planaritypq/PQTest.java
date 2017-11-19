@@ -63,7 +63,8 @@ public class PQTest {
     /** Tests bubbling up
      * Checks:
      * - All nodes processed
-     * - Marks all nodes in PRUNED(T,S)*/
+     * - Marks all nodes in PRUNED(T,S)
+     * Increments pertinentChildCount */
     @Test
     public void bubbleTest1_PNode(){
 
@@ -105,6 +106,8 @@ public class PQTest {
         assertTrue(r.nodeType(PQNode.PNODE));
         assertTrue(!B.blocked);
         assertTrue(!C.blocked);
+
+        assertTrue(_root.pertinentChildCount == 2);
     }
 
     @Test
@@ -1851,6 +1854,50 @@ public class PQTest {
 
     @Test
     public void templateL1Test(){
+
+    }
+
+    @Test
+    public void rootTest1(){
+        PQNode z = new PQNode(PQNode.PNODE, PQNode.EMPTY);
+        PQNode x = new PQNode("X");
+        PQNode a = new PQNode(PQNode.PNODE, PQNode.EMPTY);
+        PQNode b = new PQNode(PQNode.PNODE, PQNode.PARTIAL);
+        PQNode c = new PQNode(PQNode.PNODE, PQNode.FULL);
+        PQNode d = new PQNode("D");
+        PQNode e = new PQNode("E");
+        PQNode f = new PQNode(PQNode.PNODE, PQNode.PARTIAL);
+        PQNode g = new PQNode("G");
+        PQNode h = new PQNode("H");
+        PQNode i = new PQNode("I");
+
+        z.children.addAll(Arrays.asList(x, a));
+        x.parent = z;
+        a.parent = z;
+
+        a.children.addAll(Arrays.asList(b, f));
+
+        b.parent = a;
+        f.parent = a;
+        b.children.addAll(Arrays.asList(c, e));
+        c.parent = b;
+        e.parent = b;
+        c.children.add(d);
+        d.parent = c;
+
+        f.parent = a;
+        f.children.addAll(Arrays.asList(g, h, i));
+        g.parent = f;
+        h.parent = f;
+        i.parent = f;
+
+        List<PQNode> S = new ArrayList<>();
+        S.addAll(Arrays.asList(d, e, h));
+
+        PQ pq = new PQ();
+        PQNode _root = pq.root(z, S);
+
+        assertTrue(_root == a);
 
     }
 
