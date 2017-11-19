@@ -195,16 +195,18 @@ public class PQ {
         }
 
         PQNode lowestDepthNode = null;
-        int lowestDepth = 0;
+        int lowestDepth = Integer.MAX_VALUE;
         for(PQNode n : nodesSame){
             PQNode traversal = n;
-            int curNodeLowestDepth = 0;
+            int curNodesLowestDepth = 0;
             while(traversal != T){
                 traversal = traversal.getParent();
-                lowestDepth++;
+                //lowestDepth++;
+                curNodesLowestDepth++;
             }
-            if(lowestDepth > curNodeLowestDepth){
+            if(lowestDepth > curNodesLowestDepth){
                 lowestDepthNode = n;
+                lowestDepth = curNodesLowestDepth;
             }
         }
 
