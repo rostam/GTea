@@ -191,4 +191,24 @@ public class PQHelpers {
        return output;
     }
 
+    public static void printPreorderIds(PQNode _root){
+        List<PQNode> output = preorder(_root);
+        System.out.print("Preorder: ");
+        if(output.size() == 0) return;
+        for(PQNode n : output){
+            if(n.id.equals("")) System.out.print("no_id, ");
+            else System.out.print(n.id + ", ");
+        }
+        System.out.println();
+    }
+
+    public static void printListIds(List<PQNode> lis, String listName){
+        System.out.print(listName + ": ");
+        for(PQNode n : lis){
+            if(n.id.equals("")) System.out.print("no_id, ");
+            else System.out.print(n.id + ", ");
+        }
+        System.out.println();
+    }
+
 }
