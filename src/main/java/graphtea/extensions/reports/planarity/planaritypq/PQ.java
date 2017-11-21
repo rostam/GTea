@@ -856,15 +856,17 @@ public class PQ {
 
         /** Setup PNode */
         PQNode pNode = new PQNode();
-        pNode.labelType = PQNode.FULL;
-        pNode.nodeType = PQNode.PNODE;
+        if(fullRootChildList.size() > 1) {
+            pNode.labelType = PQNode.FULL;
+            pNode.nodeType = PQNode.PNODE;
 
-        setCircularLinks(fullRootChildList);
-        fullRootChildList.forEach(n -> n.parent = pNode);
+            setCircularLinks(fullRootChildList);
+            fullRootChildList.forEach(n -> n.parent = pNode);
         /*for(PQNode n : fullRootChildList){
              n.parent = pNode;
         }*/
-        pNode.children = fullRootChildList;
+            pNode.children = fullRootChildList;
+        }
 
         /** Reconfigure qNode1 */
         PQNode leftMost1 = qNode1.endmostChildren().get(0);
@@ -887,13 +889,25 @@ public class PQ {
         /** Reconfigure circular links for qNode1, pNode, qNode2
          * Could use setCircularLinks in  in PQHelper, but there is no need
          * to set all of the links. */
-        rightMost1.circularLink_next = pNode;
-        pNode.circularLink_next = leftMost2;
+        //rightMost1.circularLink_next = pNode;
+        //pNode.circularLink_next = leftMost2;
         rightMost2.circularLink_next = leftMost1;
 
         leftMost1.circularLink_prev = rightMost2;
-        leftMost2.circularLink_prev = pNode;
-        pNode.circularLink_prev = rightMost1;
+        //leftMost2.circularLink_prev = pNode;
+        //pNode.circularLink_prev = rightMost1;
+
+        if(fullRootChildList.size() > 1){
+            rightMost1.circularLink_next = pNode;
+            pNode.circularLink_next = leftMost2;
+
+            leftMost2.circularLink_prev = pNode;
+            pNode.circularLink_prev = rightMost1;
+        }
+        else {
+            rightMost1.circularLink_next = leftMost2;
+            leftMost2.circularLink_prev = rightMost1;
+        }
 
         /** Reconfigure qNode1, qNode2 parents */
         rightMost1.parent = null;
@@ -903,15 +917,45 @@ public class PQ {
         PQNode mergingQNode = new PQNode();
         mergingQNode.labelType = PQNode.PARTIAL;
         mergingQNode.nodeType = PQNode.QNODE;
-        mergingQNode.parent = x;
+
+        // Simplify if x only has one child
+        PQNode xParent = x.getParent();
+        if(xParent != null){
+            mergingQNode.parent = xParent;
+            xParent.children.remove(x);
+            mergingQNode.circularLink_next = x.circularLink_next;
+            mergingQNode.circularLink_prev = x.circularLink_prev;
+            x.circularLink_prev.circularLink_next = mergingQNode;
+            x.circularLink_next.circularLink_prev = mergingQNode;
+
+            if(xParent.nodeType.equals(PQNode.QNODE)){
+                PQNode traversal = xParent.endmostChildren().get(0);
+                PQNode end = xParent.endmostChildren().get(1);
+                int index = 0;
+                while(traversal != end && traversal != x){
+                    index++;
+                }
+                xParent.children.add(index, mergingQNode);
+            }
+            else {
+                xParent.children.add(mergingQNode);
+            }
+
+        }
+        else {
+            mergingQNode.parent = x;
+
+            /** Reconfigure root */
+            x.children.removeAll(fullRootChildList);
+            x.children.remove(qNode1);
+            x.children.remove(qNode2);
+            x.children.add(mergingQNode);
+
+
+        }
+
 
         mergingQNode.setQNodeEndmostChildren(leftMost1, rightMost2);
-
-        /** Reconfigure root */
-        x.children.removeAll(fullRootChildList);
-        x.children.remove(qNode1);
-        x.children.remove(qNode2);
-        x.children.add(mergingQNode);
 
         return true;
     }
