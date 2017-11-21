@@ -19,6 +19,8 @@ public class PQNode {
     PQNode circularLink_next;
     PQNode circularLink_prev;
 
+    boolean marked = false;
+
     int pertinentChildCount;
 
     int pertinentLeafCount;
@@ -227,6 +229,8 @@ public class PQNode {
     }
 
     public void setQNodeEndmostChildren(PQNode leftMost, PQNode rightMost){
+        //System.out.println("The function setQNodeEndmostChildren(...) is being retired.  " +
+                //"Set all children and use getEndmostChildren to access the endmost children.");
         try {
             if (!this.nodeType.equals(QNODE)) {
                 throw new IllegalNodeTypeException("endmostChildren() is only valid for Q-Nodes");
@@ -245,9 +249,29 @@ public class PQNode {
 
     public List<PQNode> fullChildren(){
         List<PQNode> full = new ArrayList<PQNode>();
-        for (PQNode c : children) {
-            if (c.labelType.equals(FULL)) {
-                full.add(c);
+
+        if(this.nodeType.equals(PQNode.QNODE)){
+
+            PQNode traversal = this.endmostChildren().get(0);
+            PQNode start = this.endmostChildren().get(0);
+
+            if(traversal.labelType.equals(PQNode.FULL))
+                full.add(traversal);
+
+            while(traversal.circularLink_next != start){
+
+                traversal = traversal.circularLink_next;
+
+                if(traversal.labelType.equals(PQNode.FULL))
+                    full.add(traversal);
+
+            }
+        }
+        else {
+            for (PQNode c : children) {
+                if (c.labelType.equals(FULL)) {
+                    full.add(c);
+                }
             }
         }
         return full;
@@ -384,7 +408,7 @@ public class PQNode {
     public PQNode getParent(){
         if(this.parent == null){
             PQNode iter = this;
-            while(iter.circularLink_next != this){
+            while(iter.circularLink_next != null && iter.circularLink_next != this){
                 if(iter.parent != null){
                     return iter.parent;
                 }

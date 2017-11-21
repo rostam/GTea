@@ -169,7 +169,7 @@ public class PQ {
 
     /**
      * For each element s in S, s_i's ancestors are traversed up to a maximum of T.
-     * If, for some j, ANCESTOR(s_i) in ANCESTORS(s_j), s_i's traversal stops because that ancestor has already been found.
+     * If, for some j, the element ANCESTOR(s_i) is in the set ANCESTORS(s_j), s_i's traversal stops because that ancestor has already been found.
      * For each s_i, s_j that has a common ancestor, that ancestor is added to a list.  That list then calculates
      * the lowest depth ancestor which will be returned.
      *
@@ -203,7 +203,6 @@ public class PQ {
             int curNodesLowestDepth = 0;
             while(traversal != T){
                 traversal = traversal.getParent();
-                //lowestDepth++;
                 curNodesLowestDepth++;
             }
             if(lowestDepth > curNodesLowestDepth){
@@ -955,7 +954,14 @@ public class PQ {
         }
 
 
+        // This should be changed to add the whole lists rather than traversing.
         mergingQNode.setQNodeEndmostChildren(leftMost1, rightMost2);
+        //PQNode traversal = leftMost1;
+        //while(traversal.circularLink_next != leftMost1){
+        //    mergingQNode.children.add(traversal);
+        //    traversal = traversal.circularLink_next;
+        //}
+
 
         return true;
     }
