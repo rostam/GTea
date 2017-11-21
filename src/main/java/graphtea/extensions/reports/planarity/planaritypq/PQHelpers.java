@@ -183,9 +183,26 @@ public class PQHelpers {
        while (S.isEmpty() == false) {
            PQNode curNode = S.get(0);
            S.remove(0);
-           for (PQNode child : curNode.getChildren()) {
-               S.add(child);
-               output.add(child);
+
+           if(curNode.nodeType.equals(PQNode.QNODE)){
+               PQNode itr = curNode.endmostChildren().get(0);
+
+               if(itr != null){
+                   S.add(itr);
+                   output.add(itr);
+                   itr = itr.circularLink_next;
+               }
+               while(itr != curNode.endmostChildren().get(0)){
+                   S.add(itr);
+                   output.add(itr);
+                   itr = itr.circularLink_next;
+               }
+           }
+           else {
+               for (PQNode child : curNode.getChildren()) {
+                   S.add(child);
+                   output.add(child);
+               }
            }
        }
        return output;
@@ -195,9 +212,20 @@ public class PQHelpers {
         List<PQNode> output = preorder(_root);
         System.out.print("Preorder: ");
         if(output.size() == 0) return;
-        for(PQNode n : output){
-            if(n.id.equals("")) System.out.print("no_id, ");
-            else System.out.print(n.id + ", ");
+
+        if(_root.nodeType.equals(PQNode.QNODE)){
+            PQNode itr = _root;
+            while(itr.circularLink_next != _root){
+                if (itr.id.equals("")) System.out.print("no_id, ");
+                else System.out.print(itr.id + ", ");
+                itr = itr.circularLink_next;
+            }
+        }
+        else {
+            for (PQNode n : output) {
+                if (n.id.equals("")) System.out.print("no_id, ");
+                else System.out.print(n.id + ", ");
+            }
         }
         System.out.println();
     }
