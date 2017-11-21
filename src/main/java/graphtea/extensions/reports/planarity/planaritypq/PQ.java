@@ -45,6 +45,8 @@ public class PQ {
 
             List<PQNode> BS = new ArrayList<>();
             List<PQNode> US = new ArrayList<>();
+
+            // In this case the circular links must be set on P-Node children.  This may be slower than necessary.
             for(PQNode u : x.immediateSiblings()){
                 if(u == null){
                     continue;
@@ -427,8 +429,8 @@ public class PQ {
         PQNode emptyPNode = new PQNode();
         PQNode fullPNode = new PQNode();
 
-        x.children.add(emptyPNode);
-        x.children.add(fullPNode);
+        //x.children.add(emptyPNode);
+        //x.children.add(fullPNode);
 
         emptyPNode.nodeType = PQNode.PNODE;
         fullPNode.nodeType = PQNode.PNODE;
@@ -443,17 +445,51 @@ public class PQ {
         fullPNode.children = fullChildren;
 
 
-        //Pointing the children to the appropriate P node
-        for (PQNode child : emptyChildren) {
-            child.parent = emptyPNode;
+        // Below checks if either of the P-Nodes are redundant with only 1 child
+        if(emptyChildren.size() == 1){
+            // P-Node is redundant
+            PQNode emptyChild = emptyChildren.get(0);
+            emptyChild.parent = x;
+            x.children.add(emptyChild);
+            if(fullChildren.size() > 1){
+                setCircularLinks(Arrays.asList(emptyChild, fullPNode));
+            } else {
+                setCircularLinks(Arrays.asList(emptyChild, fullPNode.children.get(0)));
+            }
         }
-        for (PQNode child : fullChildren) {
-            child.parent = fullPNode;
+        else {
+            //Pointing the children to the appropriate P node
+            for (PQNode child : emptyChildren) {
+                child.parent = emptyPNode;
+            }
+            x.children.add(emptyPNode);
+            //Setting the links again, otherwise the endmost children would point to the previous siblings (the empty ones)
+            setCircularLinks(emptyChildren);
+        }
+
+        if(fullChildren.size() == 1){
+            // P-Node is redundant
+            PQNode fullChild = fullChildren.get(0);
+            fullChild.parent = x;
+            x.children.add(fullChild);
+            if(emptyChildren.size() > 1){
+                setCircularLinks(Arrays.asList(emptyPNode, fullChild));
+            } else {
+                setCircularLinks(Arrays.asList(emptyPNode.children.get(0), fullChild));
+            }
+        }
+        else {
+            for (PQNode child : fullChildren) {
+                child.parent = fullPNode;
+            }
+            x.children.add(fullPNode);
+            //Setting the links again, otherwise the endmost children would point to the previous siblings (the empty ones)
+            setCircularLinks(fullChildren);
         }
 
         //Setting the links again, otherwise the endmost children would point to the previous siblings (the empty ones)
-        setCircularLinks(emptyChildren);
-        setCircularLinks(fullChildren);
+        //setCircularLinks(emptyChildren);
+        //setCircularLinks(fullChildren);
 
         return true;
     }
@@ -526,22 +562,51 @@ public class PQ {
 
         //Replacement phase
 
-        PQNode pNodeParent = new PQNode();
-        pNodeParent.nodeType = PQNode.PNODE;
-        pNodeParent.labelType = PQNode.FULL;
-        pNodeParent.children = fullChildren;
-        pNodeParent.parent = partialChildren.get(0);
+        x.children.removeAll(fullChildren);
 
-        partialChildren.get(0).children.add(pNodeParent);
+        if(fullChildren.size() == 1){
+            PQNode fullChild = fullChildren.get(0);
 
-        for (PQNode n : fullChildren) {
-            n.parent = pNodeParent;
+
+            fullChild.parent = partialChildren.get(0);
+
+            // Add child to side of Q-Node that is not empty
+            if(!partialChildren.get(0).endmostChildren().get(0).labelType.equals(PQNode.EMPTY)){
+                partialChildren.get(0).children.add(0, fullChild);
+            }
+            else {
+                partialChildren.get(0).children.add(fullChild);
+            }
+
+            setCircularLinks(partialChildren.get(0).children);
+        }
+        else {
+            PQNode pNodeParent = new PQNode();
+            pNodeParent.nodeType = PQNode.PNODE;
+            pNodeParent.labelType = PQNode.FULL;
+            pNodeParent.children = fullChildren;
+            pNodeParent.parent = partialChildren.get(0);
+
+            //partialChildren.get(0).children.add(pNodeParent);
+
+            // Add child to side of Q-Node that is not empty
+            if(!partialChildren.get(0).endmostChildren().get(0).labelType.equals(PQNode.EMPTY)){
+                partialChildren.get(0).children.add(0, pNodeParent);
+            }
+            else {
+                partialChildren.get(0).children.add(pNodeParent);
+            }
+
+            for (PQNode n : fullChildren) {
+                n.parent = pNodeParent;
+            }
+
+
+            //Setting the circular links, otherwise the endmost children would still point to their former neighbours
+            setCircularLinks(partialChildren.get(0).children);
+            setCircularLinks(pNodeParent.children);
         }
 
-
-        //Setting the circular links, otherwise the endmost children would still point to their former neighbours
-        setCircularLinks(partialChildren.get(0).children);
-        setCircularLinks(pNodeParent.children);
         setCircularLinks(x.children);
 
         return true;
