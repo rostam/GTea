@@ -21,7 +21,9 @@ public class PQMethod {
     public boolean isPlanar(GraphModel graph){
 
         Iterable<Edge> source = graph.getEdges();
-        ArrayList<PQNode> U = new ArrayList<>();
+        //ArrayList<PQNode> U = new ArrayList<>();
+        HashSet<PQNode> U = new HashSet<>();
+
         PQNode T = new PQNode(PQNode.PNODE, PQNode.EMPTY);
         T.id = "T";
         for(Edge e : source){
@@ -34,7 +36,7 @@ public class PQMethod {
                 leafNode.parent = T;
                 U.add(leafNode);
                 //U.add(new PQNode(e.source.getLabel() + " -> " + e.target.getLabel()));
-                System.out.println(U.get(U.size()-1).id);
+                //System.out.println(U.get(U.size()-1).id);
             }
         }
 
@@ -45,10 +47,6 @@ public class PQMethod {
         // Same as T(U, U) because all U are set to full and T (a p-node) can reach all of U in any order
         T.children.addAll(U);
         PQHelpers.setCircularLinks(T.children);
-
-        // This set is to contain all the leaves that are to be eventually queried.
-        HashSet<PQNode> searchLeavesSet = new HashSet<>();
-        searchLeavesSet.addAll(U);
 
         for(int j=1; j<graph.getVertexArray().length-1; j++){
             System.out.println("ITERATION: " + j);
@@ -65,9 +63,8 @@ public class PQMethod {
                     String _id = e.source.getId() + " -> " + e.target.getId();
                     PQNode leafNode = null;
 
-                    // Find leaf in the searchLeavesSet
-                    //for(PQNode pq : U){
-                    for(PQNode pq : searchLeavesSet){
+                    // Find leaf in the universal set
+                    for(PQNode pq : U){
                         if(pq.id.equals(_id)){
                             leafNode = pq;
                             leafNode.labelType = PQNode.FULL; // All descendants in S
@@ -94,16 +91,20 @@ public class PQMethod {
                     System.out.println(S.get(S.size()-1).id);
                 }
             }
+
+            //if(S.size() != 0){
+                 //System.out.println("No elements in S");
+                 //continue;
+
+
             System.out.println("----------B-----------");
             PQHelpers.printPreorderIds(T);
-            //System.out.print("S: ");
-            //for(PQNode s : S) System.out.print(s.id + ", ");
             PQHelpers.printListIds(S, "S");
 
             System.out.println("Running Bubble");
             T = PQTree.bubble(T, S);
 
-            PQHelpers.printPreorderIds(T);
+            //PQHelpers.printPreorderIds(T);
 
             System.out.println("Running Reduce");
             T = PQTree.reduce(T, S);
@@ -145,8 +146,21 @@ public class PQMethod {
             PQHelpers.printListIds(Sp, "Sp");
             PQNode root = PQTree.root(T, S);
 
+            if(root == null && Sp.size() > 0){
+                // If S is empty
+
+                if(T.nodeType.equals(PQNode.PNODE)){ // T should always be a P-Node
+                    T.children.addAll(Sp);
+                    setCircularLinks(T.children);
+                }
+                else {
+                    System.out.println("ERROR: T is not a P-Node.");
+                }
+
+
+            }
             // if ROOT(T, S) is a Q-Node
-            if (root.nodeType.equals(PQNode.QNODE)) {
+            else if (root.nodeType.equals(PQNode.QNODE) && Sp.size() > 0) {
                 // replace the full children of ROOT(T, S) and their descendants by T(S', S')
                 System.out.println("Inside: Subtree root is a Q-node");
 
@@ -209,7 +223,7 @@ public class PQMethod {
                     }
 
                 }
-                else {
+                else if(Sp.size() > 0) {
                     // Otherwise, create a P node
 
                     PQNode replacementPNode = new PQNode(PQNode.PNODE, PQNode.EMPTY);
@@ -245,7 +259,7 @@ public class PQMethod {
                     root.nodeType = PQNode.PNODE;
                 }
 
-            } else {
+            } else if(Sp.size() > 0) {
                 // replace ROOT(T, S) and its descendants by T(S', S')
                 System.out.println("Inside: Subtree root is a P-node");
 
@@ -265,7 +279,7 @@ public class PQMethod {
                     // Circular links are set for Q-Node and P-Node children for bubbling up phase
                     replacementPNode.circularLink_next = root.circularLink_next;
                     replacementPNode.circularLink_prev = root.circularLink_prev;
-                    root.circularLink_prev.circularLink_next = replacementPNode;
+                    root.circularLink_prev.circularLink_next = replacementPNode; // todo: breaks here when Sp.size() = 0
                     root.circularLink_next.circularLink_prev = replacementPNode;
 
                     if(rParent.nodeType.equals(PQNode.QNODE)){
@@ -299,15 +313,17 @@ public class PQMethod {
 
             }
 
-            // U := U - (S union S')
+
             PQHelpers.printListIds(S, "S");
             PQHelpers.printListIds(Sp, "Sp");
-            PQHelpers.printListIds(U, "U before");
-            U.removeAll(PQHelpers.union(S, Sp));
-            PQHelpers.printListIds(U, "U after");
-            PQHelpers.printPreorderIds(T);
+            PQHelpers.printListIds(new ArrayList<>(U), "U before");
 
-            searchLeavesSet.addAll(Sp);
+            // U := U - S union S' ->  U := (U - S) union S'
+            U.removeAll(S);
+            U.addAll(Sp);
+
+            PQHelpers.printListIds(new ArrayList<>(U), "U after");
+            PQHelpers.printPreorderIds(T);
 
             System.out.println("COMPLETED ITERATION: " + j);
         }
