@@ -177,6 +177,10 @@ public class PQ {
      * @param S is the list of nodes that must be legally reachable
      * @return the root of the subtree that can reach all of S */
     public PQNode root(PQNode T, List<PQNode> S){
+        if(S.size() == 0){
+            return null;
+        }
+
         if(S.size() == 1){
             return S.get(0);
         }
