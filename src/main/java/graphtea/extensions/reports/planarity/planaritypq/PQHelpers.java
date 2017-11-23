@@ -239,4 +239,32 @@ public class PQHelpers {
         System.out.println();
     }
 
+    public static void insertNodeIntoCircularList(PQNode insertionNode, PQNode leftNode, PQNode rightNode){
+        leftNode.circularLink_prev.circularLink_next = insertionNode;
+        rightNode.circularLink_next.circularLink_prev = insertionNode;
+        insertionNode.circularLink_prev = leftNode.circularLink_prev;
+        insertionNode.circularLink_next = rightNode.circularLink_next;
+    }
+
+    /** Places newNode into the same index in the children list as oldNode
+     * This is important because q-nodes are directional and ordered*/
+    public static void insertNodeIntoSameChildIndex(PQNode newNode, PQNode oldNode, PQNode parent){
+        try {
+            if (parent.labelType.equals(PQNode.QNODE)) {
+                PQNode end = parent.endmostChildren().get(1);
+                PQNode itr = parent.endmostChildren().get(0);
+                int index = 0;
+                while (itr != oldNode && itr != end) {
+                    itr = itr.circularLink_next;
+                }
+                parent.children.remove(oldNode);
+                parent.children.add(index, newNode);
+
+            } else throw new IllegalNodeTypeException("Parent must be a Q-Node");
+
+        } catch (IllegalNodeTypeException e) { }
+
+    }
+
+
 }
