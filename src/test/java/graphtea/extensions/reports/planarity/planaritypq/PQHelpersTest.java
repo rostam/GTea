@@ -304,5 +304,29 @@ public class PQHelpersTest {
         rootCopy.children.add(new PQNode());
         assertFalse(PQHelpers.equalTrees(root, rootCopy));
     }
+
+    @Test
+    public void gatherQNodeChildrenTest(){
+        PQNode root = new PQNode();
+        PQNode a = new PQNode();
+        PQNode b = new PQNode();
+        PQNode c = new PQNode();
+        PQNode d = new PQNode();
+        root.children.addAll(Arrays.asList(a, b, c, d));
+        PQHelpers.setCircularLinks(root.children);
+        root.nodeType = PQNode.QNODE;
+        for (PQNode n : root.children) {
+            n.labelType = PQNode.EMPTY;
+        }
+        List<PQNode> empties = new ArrayList<>();
+        List<PQNode> fulls = new ArrayList<>();
+
+        PQHelpers.gatherQNodeChildren(empties, fulls, root);
+
+        assertTrue(empties.size() == 4);
+
+    }
+
+
 }
 

@@ -137,9 +137,15 @@ public class PQHelpers {
     }
 
     public static void gatherQNodeChildren(List<PQNode> emptyChildren, List<PQNode> fullChildren, PQNode qNode){
+        if(qNode.getChildren().size() == 0){
+            return;
+        }
+
         PQNode leftMost = qNode.getChildren().get(0);
         PQNode iter = leftMost;
-        while(iter.circularLink_next != leftMost){
+
+        //while(iter.circularLink_next != leftMost){
+        do{
             if(iter.labelType.equals(PQNode.EMPTY)){
                 emptyChildren.add(iter);
             }
@@ -147,7 +153,7 @@ public class PQHelpers {
                 fullChildren.add(iter);
             }
             iter = iter.circularLink_next;
-        }
+        } while(iter != leftMost);
     }
 
     static void reverseCircularLinks(PQNode node){
