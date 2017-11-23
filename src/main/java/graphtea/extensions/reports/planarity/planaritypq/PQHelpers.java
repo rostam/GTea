@@ -266,5 +266,29 @@ public class PQHelpers {
 
     }
 
+    public static void collectChildrenByLabel(PQNode parent, List<PQNode> emptiesList, List<PQNode> fullsList){
+
+        if(parent.nodeType.equals(PQNode.QNODE)){
+            PQNode traversal = parent.endmostChildren().get(0);
+            PQNode start = traversal;
+            do {
+                if (traversal.labelType.equals(PQNode.FULL)) {
+                    fullsList.add(traversal);
+                } else if (traversal.labelType.equals(PQNode.EMPTY)) {
+                    emptiesList.add(traversal);
+                }
+                traversal = traversal.circularLink_next;
+            } while(traversal != start);
+        }
+        else {
+            for (PQNode child : parent.getChildren()) {
+                if (child.labelType.equals(PQNode.FULL)) {
+                    fullsList.add(child);
+                } else if (child.labelType.equals(PQNode.EMPTY)) {
+                    emptiesList.add(child);
+                }
+            }
+        }
+    }
 
 }
