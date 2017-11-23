@@ -121,18 +121,14 @@ public class PQNode {
             if(this.children.size() > 0){
 
                 PQNode start = this.children.get(0);
-                PQNode iter = start.circularLink_next;
-                if(start.labelType.equals(label)) {
-                    cList.add(start);
-                }
-                while(iter != start){
+                PQNode iter = start;
+                do {
                     if(iter.labelType.equals(label)) {
                         cList.add(iter);
                     }
                     iter = iter.circularLink_next;
-                }
+                } while(iter != start);
             }
-
         }
         else {
             // PNode
@@ -229,22 +225,15 @@ public class PQNode {
     }
 
     public void setQNodeEndmostChildren(PQNode leftMost, PQNode rightMost){
-        //System.out.println("The function setQNodeEndmostChildren(...) is being retired.  " +
-                //"Set all children and use getEndmostChildren to access the endmost children.");
         try {
             if (!this.nodeType.equals(QNODE)) {
                 throw new IllegalNodeTypeException("endmostChildren() is only valid for Q-Nodes");
             }
-
-            //this.children = null;
             this.children = new ArrayList<>();
             this.children.add(leftMost);
             this.children.add(rightMost);
-
         }
-        catch (IllegalNodeTypeException e) {
-
-        }
+        catch (IllegalNodeTypeException e) { }
     }
 
     public List<PQNode> fullChildren(){
@@ -255,17 +244,11 @@ public class PQNode {
             PQNode traversal = this.endmostChildren().get(0);
             PQNode start = this.endmostChildren().get(0);
 
-            if(traversal.labelType.equals(PQNode.FULL))
-                full.add(traversal);
-
-            while(traversal.circularLink_next != start){
-
-                traversal = traversal.circularLink_next;
-
+            do {
                 if(traversal.labelType.equals(PQNode.FULL))
                     full.add(traversal);
-
-            }
+                traversal = traversal.circularLink_next;
+            } while(traversal != start);
         }
         else {
             for (PQNode c : children) {
@@ -419,6 +402,25 @@ public class PQNode {
             return parent;
         }
         return null;
+    }
+
+    public void removeChildren(List<PQNode> children){
+        if(this.labelType.equals(PQNode.QNODE)){
+            if(this.children.size() == 0) return;
+            PQNode traversal = this.endmostChildren().get(0);
+            PQNode start = traversal;
+            do {
+                if(children.contains(traversal)){
+                    this.children.remove(traversal);
+                    traversal.circularLink_next.circularLink_prev = traversal.circularLink_prev;
+                    traversal.circularLink_prev.circularLink_next = traversal.circularLink_next;
+                }
+                traversal = traversal.circularLink_next;
+            } while(traversal != start);
+        }
+        else {
+            this.children.removeAll(children);
+        }
     }
 
 }
