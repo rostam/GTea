@@ -86,7 +86,7 @@ public class PQMethodTest {
         TreeGenerator gen = new TreeGenerator();
         GraphModel gm = gen.generateGraph();
         PQMethod pc = new PQMethod();
-        assertFalse(pc.isPlanar(gm));
+        assertTrue(pc.isPlanar(gm));
     }
 
     @Test
@@ -128,7 +128,25 @@ public class PQMethodTest {
     }
 
     @Test
-    public void BananaTreeGraphTest() {
+    public void BananatreeTest(){
+        BananaTreeGenerator gen = new BananaTreeGenerator();
+        for(int i=0; i<100; i++) {
+            GraphModel gm = gen.generateGraph();
+            PQMethod pc = new PQMethod();
+            assertTrue( pc.isPlanar(gm));
+        }
+    }
+
+    @Test
+    public void GearGraphTest_n3() {
+        GearGenerator gen = new GearGenerator();
+        GraphModel gm = gen.generateGear(3);
+        PQMethod pc = new PQMethod();
+        assertTrue( pc.isPlanar(gm));
+    }
+
+    @Test
+    public void GearGraphTest() {
         GearGenerator gen = new GearGenerator();
         for (int i = 1; i < 5; i++) {
             System.out.println("Testing for n = " + i);
