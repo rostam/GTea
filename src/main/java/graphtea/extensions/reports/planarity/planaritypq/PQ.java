@@ -666,7 +666,9 @@ public class PQ {
             return false;
         }
 
+        //Retrieves the leftmost node
         PQNode leftmostChild = qNode.endmostChildren().get(0);
+        //Retrieves the rightmost node
         PQNode rightmostChild = qNode.endmostChildren().get(1);
 
         PQNode newLeftmostPNode = new PQNode();
@@ -679,34 +681,46 @@ public class PQ {
         newRightmostPNode.nodeType = PQNode.PNODE;
 
         if(emptyChildList.size() > 0) { //todo: add functionality for if only 1 child - simplify by not using P-Node
-            leftmostChild.circularLink_prev = newLeftmostPNode;
-
-            newLeftmostPNode.parent = qNode;
-            newLeftmostPNode.circularLink_next = leftmostChild;
-
-            for (PQNode e : emptyChildList) {
-                e.parent = newLeftmostPNode;
-                newLeftmostPNode.children.add(e);
-                x.children.remove(e);
+            if (emptyChildList.size() == 1) {
+                PQNode newLeftMostNode = new PQNode();
+                newLeftMostNode.parent = qNode;
+                x.children.add(newLeftMostNode);
             }
-            qNode.children.remove(0);
-            qNode.children.add(0, newLeftmostPNode);
+            else {
+                leftmostChild.circularLink_prev = newLeftmostPNode;
+
+                newLeftmostPNode.parent = qNode;
+                newLeftmostPNode.circularLink_next = leftmostChild;
+
+                for (PQNode e : emptyChildList) {
+                    e.parent = newLeftmostPNode;
+                    newLeftmostPNode.children.add(e);
+                    x.children.remove(e);
+                }
+                qNode.children.add(0, newLeftmostPNode);
+            }
         }
 
         if(fullChildList.size() > 0) { //todo: add functionality for if only 1 child - simplify by not using P-Node
-            rightmostChild.circularLink_next = newRightmostPNode;
-
-            newRightmostPNode.parent = qNode;
-            newRightmostPNode.circularLink_prev = rightmostChild;
-            rightmostChild.circularLink_next = newRightmostPNode;
-
-            for (PQNode f : fullChildList) {
-                f.parent = newRightmostPNode;
-                newRightmostPNode.children.add(f);
-                x.children.remove(f);
+            if (fullChildList.size() == 1) {
+                PQNode newRightMostNode = new PQNode();
+                newRightMostNode.parent = qNode;
+                x.children.add(newRightMostNode);
             }
-            qNode.children.remove(qNode.children.size()-1);
-            qNode.children.add(qNode.children.size()-1, newRightmostPNode);
+            else {
+                rightmostChild.circularLink_next = newRightmostPNode;
+
+                newRightmostPNode.parent = qNode;
+                newRightmostPNode.circularLink_prev = rightmostChild;
+                rightmostChild.circularLink_next = newRightmostPNode;
+
+                for (PQNode f : fullChildList) {
+                    f.parent = newRightmostPNode;
+                    newRightmostPNode.children.add(f);
+                    x.children.remove(f);
+                }
+                qNode.children.add(qNode.children.size() - 1, newRightmostPNode);
+            }
         }
 
         if(fullChildList.size() > 0 && emptyChildList.size() > 0){
