@@ -3,9 +3,7 @@ package graphtea.extensions.reports.planarity.planaritypq;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.*;
 
@@ -18,6 +16,7 @@ public class PQMethod {
 
         Iterable<Edge> source = graph.getEdges();
         HashSet<PQNode> U = new HashSet<>();
+        //List<PQNode> U = new ArrayList<>();
 
         PQNode T = new PQNode(PQNode.PNODE, PQNode.EMPTY);
         T.id = "T";
@@ -54,16 +53,21 @@ public class PQMethod {
                      String _id = e.source.getId() + " -> " + e.target.getId();
                      PQNode leafNode = null;
 
+                     //System.out.println("Max: " + _id);
+
                      // Find leaf in the universal set
                      for(PQNode pq : U){
+                         //System.out.println("U:" + pq.id);
                          if(pq.id.equals(_id)){
-                            leafNode = pq;
-                            leafNode.labelType = PQNode.FULL; // All descendants in S
-                            S.add(leafNode);
+                             leafNode = pq;
+                             leafNode.labelType = PQNode.FULL; // All descendants in S
+                             // System.out.println("Add to S: " + pq.id);
+                             //S.add(leafNode);
+                             S.add(0, leafNode);
                         }
                         else {
-                            if(!pq.labelType.equals(PQNode.FULL)) // leaves will never be PARTIAL
-                                pq.labelType = PQNode.EMPTY; // No descendants in S
+                             if(!pq.labelType.equals(PQNode.FULL)) // leaves will never be PARTIAL
+                                 pq.labelType = PQNode.EMPTY; // No descendants in S
                         }
                     }
 
@@ -109,6 +113,7 @@ public class PQMethod {
                     for(PQNode pq : U){
                         if(pq.id.equals(_id)){
                             leafNode = pq;
+                            break;
                         }
                     }
                     // If leaf node does not exist yet, make it exist
@@ -235,6 +240,16 @@ public class PQMethod {
 
                 PQNode rParent = root.getParent();
 
+                /*if(rParent == T){
+                    System.out.println("rParent is T!");
+                    T.children = Sp;
+                    setCircularLinks(T.children);
+                    for(PQNode n : Sp){
+                        n.parent = T;
+                    }
+                }
+                else {*/
+
                 PQNode replacementNode;
                 if(Sp.size() == 1 && rParent != null){
                     replacementNode = Sp.get(0);
@@ -271,14 +286,28 @@ public class PQMethod {
 
                         rParent.children.remove(root);
                         rParent.children.add(replacementNode);
+                        setCircularLinks(rParent.children);
                     }
 
                 }
                 else {
                     // root is the root of the whole tree, not a subtree.
 
+                    /*if(replacementNode.equals(PQNode.QNODE) || replacementNode.equals(PQNode.PNODE)) {
+                        PQHelpers.union(T.children, replacementNode.children);
+                    }
+                    else {
+                        PQHelpers.union(T.children, Arrays.asList(replacementNode));
+                    }*/
+
+                    PQHelpers.printPreorderIds(T);
+                    PQHelpers.printPreorderIds(replacementNode);
+
+                    //T.children.removeAll()
+
                     root = replacementNode;
                     T = root;
+                    T.id = "rT";
                 }
 
 
@@ -292,6 +321,7 @@ public class PQMethod {
             // U := U - S union S' ->  U := (U - S) union S'
             U.removeAll(S);
             U.addAll(Sp);
+            //U.addAll(0, Sp);
 
             PQHelpers.printListIds(new ArrayList<>(U), "U after");
             PQHelpers.printPreorderIds(T);
