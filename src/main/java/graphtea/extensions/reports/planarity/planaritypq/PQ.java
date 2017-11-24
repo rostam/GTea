@@ -330,11 +330,11 @@ public class PQ {
 
         // One full child
         if(fullChildren.size() == 1){
-            x.children.add(fullChildren.get(0));
-            fullChildren.get(0).parent = x;
-            setCircularLinks(fullChildren);
+            //x.children.add(fullChildren.get(0));
+            //fullChildren.get(0).parent = x;
+            //setCircularLinks(fullChildren);
 
-            System.out.println("P2: One full child");
+            System.out.println("P2: One full child - 'skipped' with true");
             return true;
         }
 
