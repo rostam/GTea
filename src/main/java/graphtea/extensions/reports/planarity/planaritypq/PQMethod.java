@@ -131,6 +131,9 @@ public class PQMethod {
                     if (T.nodeType.equals(PQNode.PNODE)) { // T should always be a P-Node
                         T.children.addAll(Sp);
                         setCircularLinks(T.children);
+                        for(PQNode n : Sp){
+                            n.parent = T;
+                        }
                     }
                     else throw new IllegalNodeTypeException("T is not a P-Node");
                 }
