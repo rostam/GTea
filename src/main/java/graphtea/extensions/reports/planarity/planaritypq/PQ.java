@@ -1,5 +1,7 @@
 package graphtea.extensions.reports.planarity.planaritypq;
 
+import org.glassfish.grizzly.utils.ArraySet;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,7 +48,7 @@ public class PQ {
             List<PQNode> BS = new ArrayList<>();
             List<PQNode> US = new ArrayList<>();
 
-            // In this case the circular links must be set on P-Node children.  This may be slower than necessary.
+            // In this case the circular links must be have been set on P-Node children.
             for(PQNode u : x.immediateSiblings()){
                 if(u == null){
                     continue;
@@ -73,13 +75,16 @@ public class PQ {
             if(!x.blocked){
                 PQNode y = x.parent;
                 if(BS.size() > 0){
-                    Set<PQNode> list = x.maximalConsecutiveSetOfSiblingsAdjacent(true);
 
-                    listSize = list.size();
-                    for(PQNode z : list){
-                        z.blocked = false;
-                        y.pertinentChildCount++;
+                    Set<PQNode> list = x.maximalConsecutiveSetOfSiblingsAdjacent(true);
+                    if(list != null){
+                        listSize = list.size();
+                        for(PQNode z : list){
+                            z.blocked = false;
+                            y.pertinentChildCount++;
+                        }
                     }
+
                 }
                 if(y == null){
                     offTheTop = 1;
@@ -323,9 +328,17 @@ public class PQ {
             return false;
         }
 
+        // One full child
+        if(fullChildren.size() == 1){
+            x.children.add(fullChildren.get(0));
+            fullChildren.get(0).parent = x;
+            setCircularLinks(fullChildren);
+
+            System.out.println("P2: One full child");
+            return true;
+        }
 
         //Replacement phase
-
         PQNode fullParent = new PQNode();
         fullParent.nodeType = PQNode.PNODE;
         fullParent.labelType = PQNode.FULL;
@@ -424,6 +437,17 @@ public class PQ {
         emptyPNode.children = emptyChildren;
         fullPNode.children = fullChildren;
 
+        // Alternative form B
+        if(emptyChildren.size() == 1 && fullChildren.size() == 1){
+            PQNode emptyNode = emptyChildren.get(0);
+            PQNode fullNode = fullChildren.get(0);
+            x.children.addAll(Arrays.asList(emptyNode, fullNode));
+            setCircularLinks(x.children);
+            emptyNode.parent = x;
+            fullNode.parent = x;
+            System.out.println("TEMPLATE P3 (alt form)");
+            return true;
+        }
 
         // Below checks if either of the P-Nodes are redundant with only 1 child
         if(emptyChildren.size() == 1){
@@ -520,6 +544,10 @@ public class PQ {
         if ( fullChildren.size() + emptyChildren.size() + partialChildren.size() != x.children.size()) {
             return false;
         }
+
+        //if(partialChildren.get(0).children.size() <= 2){
+        //    partialChildren.get(0).nodeType = PQNode.QNODE;
+        //}
 
         //If partial node is not a Q node
         if (partialChildren.get(0).nodeType != PQNode.QNODE) {
