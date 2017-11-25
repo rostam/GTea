@@ -87,10 +87,12 @@ public class PQMethod {
             PQHelpers.printListIds(S, "S");
 
             System.out.println("Running Bubble");
-            T = PQTree.bubble(T, S);
+            if(S.size() > 0)
+                T = PQTree.bubble(T, S);
 
             System.out.println("Running Reduce");
-            T = PQTree.reduce(T, S);
+            if(S.size() > 0)
+                T = PQTree.reduce(T, S);
 
             if (T == null) {
                 return false;
