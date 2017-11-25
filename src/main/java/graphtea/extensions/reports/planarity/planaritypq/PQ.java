@@ -260,15 +260,15 @@ public class PQ {
      * Tries to match the tree/subtree at x to template P1, if successful,
      * we apply it.
      *
+     * Case #1:            Case #2:
      * TEMPLATE:
-     * Case #1:           |Case #2:
-     *        (E)         |        (E)
+     *    ----(E)---      |    ----(E)---
      *    |        |      |    |        |
      *                    |
      *    E  ....  E      |    F  ....  F
      *                    |
      * REPLACEMENT:       |
-     *        (E)         |        (F)
+     *    ----(E)---      |    ----(F)---
      *    |        |      |    |        |
      *                    |
      *    E  ....  E      |    F  ....  F
