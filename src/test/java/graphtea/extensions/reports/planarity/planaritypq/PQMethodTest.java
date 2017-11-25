@@ -189,6 +189,38 @@ public class PQMethodTest {
     }
 
     @Test
+    public void HelmTest1() {
+        HelmGraph gen = new HelmGraph();
+        GraphModel gm = gen.generateHelm(1);
+        PQMethod pc = new PQMethod();
+        assertTrue(pc.isPlanar(gm));
+    }
+
+    @Test
+    public void HelmTest2() {
+        HelmGraph gen = new HelmGraph();
+        GraphModel gm = gen.generateHelm(2);
+        PQMethod pc = new PQMethod();
+        assertTrue(pc.isPlanar(gm));
+    }
+
+    @Test
+    public void HelmTest3() {
+        HelmGraph gen = new HelmGraph();
+        GraphModel gm = gen.generateHelm(3);
+        PQMethod pc = new PQMethod();
+        assertTrue(pc.isPlanar(gm));
+    }
+
+    @Test
+    public void HelmTest4() {
+        HelmGraph gen = new HelmGraph();
+        GraphModel gm = gen.generateHelm(10);
+        PQMethod pc = new PQMethod();
+        assertTrue(pc.isPlanar(gm));
+    }
+
+    @Test
     public void RandomBinaryTreeTest1() {
         RandomTreeGenerator gen = new RandomTreeGenerator();
         GraphModel gm = gen.generateRandomTree(10, 10, 3);
