@@ -168,6 +168,14 @@ public class WagnerMethodTest {
     }
 
     @Test
+    public void PrismGraphTest() {
+        PrismGraph gen = new PrismGraph();
+        GraphModel gm = gen.generateGraph();
+        WagnerMethod pc = new WagnerMethod();
+        assertTrue(pc.isPlanar(gm));
+    }
+
+    @Test
     public void BananaTreeGraphTest() {
         GearGenerator gen = new GearGenerator();
         for (int i = 1; i < 5; i++) {

@@ -157,7 +157,71 @@ public class PQMethodTest {
     }
 
     @Test
-    public void ManualGraph1() {
+    public void PrismGraphTest() {
+        PrismGraph gen = new PrismGraph();
+        GraphModel gm = gen.generateGraph();
+        PQMethod pc = new PQMethod();
+        assertTrue(pc.isPlanar(gm));
+    }
+
+    @Test
+    public void AntiPrismGraphTest() {
+        AntiprismGraph gen = new AntiprismGraph();
+        GraphModel gm = gen.generateGraph();
+        PQMethod pc = new PQMethod();
+        assertTrue(pc.isPlanar(gm));
+    }
+
+    @Test
+    public void StarGraphTest() {
+        StarGenerator gen = new StarGenerator();
+        GraphModel gm = gen.generateStar(10);
+        PQMethod pc = new PQMethod();
+        assertTrue(pc.isPlanar(gm));
+    }
+
+    @Test
+    public void RandomBinaryTreeTest1() {
+        RandomTreeGenerator gen = new RandomTreeGenerator();
+        GraphModel gm = gen.generateRandomTree(10, 10, 3);
+        PQMethod pc = new PQMethod();
+        assertTrue(pc.isPlanar(gm));
+    }
+
+    @Test
+    public void RandomBinaryTreeTest2() {
+        RandomTreeGenerator gen = new RandomTreeGenerator();
+        GraphModel gm = gen.generateRandomTree(20, 30, 3);
+        PQMethod pc = new PQMethod();
+        assertTrue(pc.isPlanar(gm));
+    }
+
+    @Test
+    public void RandomBinaryTreeTest3() {
+        RandomTreeGenerator gen = new RandomTreeGenerator();
+        GraphModel gm = gen.generateRandomTree(50, 30, 3);
+        PQMethod pc = new PQMethod();
+        assertTrue(pc.isPlanar(gm));
+    }
+
+    @Test
+    public void RandomTreeTest1() {
+        RandomTreeGenerator gen = new RandomTreeGenerator();
+        GraphModel gm = gen.generateRandomTree(20, 50, 300);
+        PQMethod pc = new PQMethod();
+        assertTrue(pc.isPlanar(gm));
+    }
+
+    @Test
+    public void RandomTreeTest2() {
+        RandomTreeGenerator gen = new RandomTreeGenerator();
+        GraphModel gm = gen.generateRandomTree(50, 50, 300);
+        PQMethod pc = new PQMethod();
+        assertTrue(pc.isPlanar(gm));
+    }
+
+    @Test
+    public void ManualGraphTest1() {
         GraphModel gm = new GraphModel();
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         for (int i = 0; i < 8; i++) {
@@ -195,7 +259,7 @@ public class PQMethodTest {
     }
 
     @Test
-    public void ManualGraph2() {
+    public void ManualGraphTest2() {
         GraphModel gm = new GraphModel();
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         for (int i = 0; i < 8; i++) {
@@ -231,7 +295,7 @@ public class PQMethodTest {
     }
 
     @Test
-    public void ManualGraph3(){
+    public void ManualGraphTest3(){
         GraphModel gm = new GraphModel();
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         for (int i = 0; i < 10; i++) {
@@ -264,7 +328,7 @@ public class PQMethodTest {
     }
 
     @Test
-    public void ManualGraph4() {
+    public void ManualGraphTest4() {
         GraphModel gm = new GraphModel();
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         for (int i = 0; i < 8; i++) {
@@ -298,7 +362,7 @@ public class PQMethodTest {
     }
 
     @Test
-    public void ManualGraph5() {
+    public void ManualGraphTest5() {
         GraphModel gm = new GraphModel();
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         for (int i = 0; i < 8; i++) {
