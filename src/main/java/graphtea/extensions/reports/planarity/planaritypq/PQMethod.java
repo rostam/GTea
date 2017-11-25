@@ -251,7 +251,7 @@ public class PQMethod {
                 else {*/
 
                 PQNode replacementNode;
-                if(Sp.size() == 1 && rParent != null){
+                if(Sp.size() == 1/* && rParent != null*/){
                     replacementNode = Sp.get(0);
                 }
                 else {
@@ -304,9 +304,25 @@ public class PQMethod {
                     PQHelpers.printPreorderIds(replacementNode);
 
                     //T.children.removeAll()
+                    List<PQNode> removedNodes = new ArrayList<>();
+                    for(PQNode n : T.children){
+                        if(n.labelType.equals(PQNode.FULL) || n.labelType.equals(PQNode.PARTIAL)){
+                            //T.children.remove(n);
+                            removedNodes.add(n);
+                        }
+                    }
+                    T.children.removeAll(removedNodes);
 
-                    root = replacementNode;
-                    T = root;
+                    if(replacementNode.children.size() == 1){
+                        T.children.add(replacementNode.children.get(0));
+                    }
+                    else {
+                        T.children.add(replacementNode);
+                    }
+                    setCircularLinks(T.children);
+
+                    //root = replacementNode;
+                    //T = root;
                     T.id = "rT";
                 }
 
