@@ -221,6 +221,14 @@ public class PQMethodTest {
     }
 
     @Test
+    public void PetersenTest() {
+        GeneralizedPetersonGenerator gen = new GeneralizedPetersonGenerator();
+        GraphModel gm = gen.generateGeneralizedPeterson(5, 2);
+        PQMethod pc = new PQMethod();
+        assertFalse(pc.isPlanar(gm));
+    }
+
+    @Test
     public void RandomBinaryTreeTest1() {
         RandomTreeGenerator gen = new RandomTreeGenerator();
         GraphModel gm = gen.generateRandomTree(10, 10, 3);
