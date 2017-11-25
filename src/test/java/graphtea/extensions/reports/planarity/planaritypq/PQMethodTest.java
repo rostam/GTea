@@ -181,6 +181,14 @@ public class PQMethodTest {
     }
 
     @Test
+    public void TadPoleTest() {
+        TadpoleGenerator gen = new TadpoleGenerator();
+        GraphModel gm = gen.generateTadpole(5, 6);
+        PQMethod pc = new PQMethod();
+        assertTrue(pc.isPlanar(gm));
+    }
+
+    @Test
     public void RandomBinaryTreeTest1() {
         RandomTreeGenerator gen = new RandomTreeGenerator();
         GraphModel gm = gen.generateRandomTree(10, 10, 3);

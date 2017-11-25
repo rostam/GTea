@@ -119,6 +119,7 @@ public class PQ {
      * does not exist, returns the null tree.
      */
     public PQNode reduce(PQNode T, List<PQNode> S){
+        PQHelpers.printChildren(T);
         Queue<PQNode> queue = new LinkedList<>(S);
         for(PQNode x : S){
             x.pertinentLeafCount = 1;
