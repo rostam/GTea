@@ -144,7 +144,6 @@ public class PQHelpers {
         PQNode leftMost = qNode.getChildren().get(0);
         PQNode iter = leftMost;
 
-        //while(iter.circularLink_next != leftMost){
         do{
             if(iter.labelType.equals(PQNode.EMPTY)){
                 emptyChildren.add(iter);
@@ -256,7 +255,7 @@ public class PQHelpers {
      * This is important because q-nodes are directional and ordered*/
     public static void insertNodeIntoSameChildIndex(PQNode newNode, PQNode oldNode, PQNode parent){
         try {
-            if (parent.labelType.equals(PQNode.QNODE)) {
+            if (parent.nodeType.equals(PQNode.QNODE)) {
                 PQNode end = parent.endmostChildren().get(1);
                 PQNode itr = parent.endmostChildren().get(0);
                 int index = 0;
