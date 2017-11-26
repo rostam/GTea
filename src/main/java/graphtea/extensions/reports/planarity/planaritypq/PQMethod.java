@@ -104,7 +104,7 @@ public class PQMethod {
             // These edges are added to Sp
             ArrayList<PQNode> Sp = new ArrayList<>();
             for(Edge e : source){
-                //Vertex higherNumberedVertex;
+                //Vertex higherNumberedVerte
                 int targetId = e.target.getId();
                 int sourceId = e.source.getId();
                 if (Math.min(targetId, sourceId) == j) {
@@ -175,22 +175,48 @@ public class PQMethod {
                         index++;
                         traversal = traversal.circularLink_next;
                     }
-                    root.children.add(index, nodeSp);
 
-                    root.children.removeAll(fullChildren);
+                    PQNode rightMostFullNext = fullChildren.get(fullChildren.size() - 1).circularLink_next;
+                    PQNode leftMostFullPrev = fullChildren.get(0).circularLink_prev;
+
+                    root.removeChildren(fullChildren);
+
+                    //root.children.add(index, nodeSp);
+
+                    //root.children.removeAll(fullChildren);
 
                     // Replacing fulls with nodeSp in circular link
-                    PQNode rightMostFull = fullChildren.get(fullChildren.size() - 1);
-                    PQNode leftMostFull = fullChildren.get(0);
+                    //PQNode rightMostFull = fullChildren.get(fullChildren.size() - 1);
+                    //PQNode leftMostFull = fullChildren.get(0);
 
-                    if(leftMostFull.circularLink_prev.labelType.equals(PQNode.EMPTY)){
+                    //PQHelpers.insertNodeIntoCircularList(nodeSp, leftMostFull.circularLink_prev, rightMostFull.circularLink_next);
+
+                    if(index == 0){
+                        PQHelpers.insertNodeIntoCircularList(nodeSp, root.endmostChildren().get(1), root.endmostChildren().get(0));
+                    }
+                    else {
+                        PQHelpers.insertNodeIntoCircularList(nodeSp, leftMostFullPrev, rightMostFullNext);
+                    }
+
+                    // Because Q-Node should not keep track of all children adding at the index should eventually be phased
+                    // out and replaced with replacing the endMost children
+                    if(root.children.size() < index) {
+                        root.children.add(nodeSp);
+                    }
+                    else {
+                        root.children.add(index, nodeSp);
+                    }
+
+                    /*if(leftMostFull.circularLink_prev.labelType.equals(PQNode.EMPTY)){
                         // Right link points to fulls
-                        PQHelpers.insertNodeIntoCircularList(nodeSp, leftMostFull, rightMostFull);
+                        //PQHelpers.insertNodeIntoCircularList(nodeSp, leftMostFull, rightMostFull);
+                        PQHelpers.insertNodeIntoCircularList(nodeSp, rightMostFull, rightMostFull.circularLink_next);
                     }
                     else {
                         // Left link points to fulls
-                        PQHelpers.insertNodeIntoCircularList(nodeSp, rightMostFull, leftMostFull);
-                    }
+                        //PQHelpers.insertNodeIntoCircularList(nodeSp, rightMostFull, leftMostFull);
+                        PQHelpers.insertNodeIntoCircularList(nodeSp, leftMostFull, leftMostFull.circularLink_prev);
+                    }*/
 
                 }
                 else if(Sp.size() > 0) {
@@ -222,7 +248,9 @@ public class PQMethod {
                         root.children.add(replacementPNode); // Add to end of list
                     }
 
-                    PQHelpers.insertNodeIntoCircularList(replacementPNode, fullChildren.get(0), fullChildren.get(fullChildren.size()-1));
+                    //PQHelpers.insertNodeIntoCircularList(replacementPNode, fullChildren.get(0), fullChildren.get(fullChildren.size()-1));
+                    PQHelpers.insertNodeIntoCircularList(replacementPNode, fullChildren.get(0).circularLink_prev,
+                            fullChildren.get(fullChildren.size()-1).circularLink_next);
 
                 }
                 else {
@@ -271,7 +299,7 @@ public class PQMethod {
                     replacementNode.parent = rParent;
 
                     // Circular links are set for Q-Node and P-Node children for bubbling up phase
-                    PQHelpers.insertNodeIntoCircularList(replacementNode, root, root);
+                    //PQHelpers.insertNodeIntoCircularList(replacementNode, root.circularLink_prev, root.circularLink_next);
 
                 //public static void insertInto(PQNode newNode, PQNode oldNode, PQNode parent){
 
@@ -281,6 +309,8 @@ public class PQMethod {
                         // Places replacementPNode into the same index in the children list as the root
                         // This is important because q-nodes are directional and ordered
                         PQHelpers.insertNodeIntoSameChildIndex(replacementNode, root, rParent);
+                        PQHelpers.insertNodeIntoCircularList(replacementNode, root.circularLink_prev, root.circularLink_next);
+                        rParent.children.remove(root);
 
                     }
                     else {

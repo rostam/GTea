@@ -3,6 +3,7 @@ package graphtea.extensions.reports.planarity.planaritypq;
 import java.util.*;
 
 import graphtea.extensions.reports.planarity.planaritypq.IllegalNodeTypeException;
+import sun.awt.image.ImageWatched;
 
 public class PQNode {
     String id = "";
@@ -19,7 +20,11 @@ public class PQNode {
     PQNode circularLink_next;
     PQNode circularLink_prev;
 
-    boolean marked = false;
+    String marked = "";
+    static String UNMARKED = "unmarked";
+    static String QUEUED = "queued";
+    static String BLOCKED = "blocked";
+    static String UNBLOCKED = "unblocked";
 
     int pertinentChildCount;
 
@@ -151,7 +156,15 @@ public class PQNode {
                 throw new IllegalNodeTypeException("endmostChildren() is only valid for Q-Nodes");
             }
             //return this.children;
-            return Arrays.asList(this.children.get(0), this.children.get(this.children.size()-1));
+            if(this.children.size() == 1){
+                return Arrays.asList(this.children.get(0));
+            }
+            else if(this.children.size() >= 2){
+                return Arrays.asList(this.children.get(0), this.children.get(this.children.size()-1));
+            }
+            else {
+                return Arrays.asList();
+            }
         }
         catch (IllegalNodeTypeException e) {
 
@@ -202,6 +215,10 @@ public class PQNode {
 
     public List<PQNode> immediateSiblings(){
         List<PQNode> adjacents = new ArrayList<PQNode>();
+        if(this.circularLink_prev == this.circularLink_next && this.circularLink_prev != null){
+            adjacents.add(this.circularLink_next);
+            return adjacents;
+        }
         if(this.circularLink_prev != null)
             adjacents.add(this.circularLink_prev);
         if(this.circularLink_next != null)
@@ -230,8 +247,12 @@ public class PQNode {
                 throw new IllegalNodeTypeException("endmostChildren() is only valid for Q-Nodes");
             }
             this.children = new ArrayList<>();
-            this.children.add(leftMost);
-            this.children.add(rightMost);
+            if(leftMost != null) {
+                this.children.add(leftMost);
+            }
+            if(rightMost != null) {
+                this.children.add(rightMost);
+            }
         }
         catch (IllegalNodeTypeException e) { }
     }
@@ -404,22 +425,51 @@ public class PQNode {
         return null;
     }
 
-    public void removeChildren(List<PQNode> children){
-        if(this.labelType.equals(PQNode.QNODE)){
-            if(this.children.size() == 0) return;
+    public void removeChildren(List<PQNode> removalNodes){
+        if(this.nodeType.equals(PQNode.QNODE)){
+
+            if(this.endmostChildren().size() == 0) return;
+
+            List<PQNode> survivors = new ArrayList<>();
+
             PQNode traversal = this.endmostChildren().get(0);
             PQNode start = traversal;
+            boolean updateStart = false;
             do {
-                if(children.contains(traversal)){
+                if(updateStart) {
+                    start = traversal;
+                    updateStart = false;
+                }
+
+                if(removalNodes.contains(traversal)){
                     this.children.remove(traversal);
                     traversal.circularLink_next.circularLink_prev = traversal.circularLink_prev;
                     traversal.circularLink_prev.circularLink_next = traversal.circularLink_next;
+
+                    if(traversal == start){
+                        updateStart = true;
+                    }
+
+                }
+                else {
+                    survivors.add(traversal);
                 }
                 traversal = traversal.circularLink_next;
             } while(traversal != start);
+
+            if(survivors.size() >= 2){
+                setQNodeEndmostChildren(survivors.get(0), survivors.get(survivors.size()-1));
+            }
+            else if(survivors.size() == 1){
+                setQNodeEndmostChildren(survivors.get(0), null);
+            }
+            else {
+                setQNodeEndmostChildren(null, null);
+            }
+
         }
         else {
-            this.children.removeAll(children);
+            this.children.removeAll(removalNodes);
         }
     }
 

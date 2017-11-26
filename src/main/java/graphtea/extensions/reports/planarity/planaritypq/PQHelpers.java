@@ -245,10 +245,15 @@ public class PQHelpers {
     }
 
     public static void insertNodeIntoCircularList(PQNode insertionNode, PQNode leftNode, PQNode rightNode){
-        leftNode.circularLink_prev.circularLink_next = insertionNode;
-        rightNode.circularLink_next.circularLink_prev = insertionNode;
-        insertionNode.circularLink_prev = leftNode.circularLink_prev;
-        insertionNode.circularLink_next = rightNode.circularLink_next;
+        insertionNode.circularLink_next = rightNode;
+        insertionNode.circularLink_prev = leftNode;
+        leftNode.circularLink_next = insertionNode;
+        rightNode.circularLink_prev = insertionNode;
+
+        //leftNode.circularLink_prev.circularLink_next = insertionNode;
+        //rightNode.circularLink_next.circularLink_prev = insertionNode;
+        //insertionNode.circularLink_prev = leftNode.circularLink_prev;
+        //insertionNode.circularLink_next = rightNode.circularLink_next;
     }
 
     /** Places newNode into the same index in the children list as oldNode
@@ -294,6 +299,52 @@ public class PQHelpers {
                 }
             }
         }
+    }
+
+    public static boolean addNodesAsChildrenToQNode(List<PQNode> newNodes, PQNode parentQNode){
+        if(!parentQNode.nodeType.equals(PQNode.QNODE)) return false;
+
+        PQNode left = parentQNode.endmostChildren().get(0);
+        PQNode right = parentQNode.endmostChildren().get(1);
+
+        for(PQNode n : newNodes) {
+
+            PQNode newNode = n;
+            boolean fullLeft = false;
+
+
+            if (left.labelType.equals(PQNode.FULL)) {
+                fullLeft = true;
+            }
+            if (right.labelType.equals(PQNode.FULL)) {
+                fullLeft = false;
+            }
+
+            if (fullLeft) {
+                if (newNode.labelType.equals(PQNode.FULL)) {
+                    parentQNode.children.add(0, newNode);
+                    //insertNodeIntoCircularList(newNode, right, left);
+                    insertNodeIntoCircularList(newNode, left, right);
+                } else {
+                    parentQNode.children.add(newNode);
+                    //insertNodeIntoCircularList(newNode, left, right);
+                    insertNodeIntoCircularList(newNode, right, left);
+                }
+            } else {
+                if (newNode.labelType.equals(PQNode.FULL)) {
+                    parentQNode.children.add(newNode);
+                    insertNodeIntoCircularList(newNode, left, right);
+                } else {
+                    parentQNode.children.add(0, newNode);
+                    //insertNodeIntoCircularList(newNode, left, right);
+                    insertNodeIntoCircularList(newNode, right, left);
+                }
+            }
+
+            newNode.parent = parentQNode;
+        }
+
+        return true;
     }
 
 }

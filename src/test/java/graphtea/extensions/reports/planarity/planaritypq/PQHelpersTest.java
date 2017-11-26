@@ -327,6 +327,23 @@ public class PQHelpersTest {
 
     }
 
+    @Test
+    public void insertNodeIntoCircularList(){
+        PQNode left = new PQNode("left");
+        PQNode middle = new PQNode("middle");
+        PQNode right = new PQNode("right");
+        PQHelpers.setCircularLinks(Arrays.asList(left, middle, right));
+
+        PQNode newLeft = new PQNode("newNode");
+        PQHelpers.insertNodeIntoCircularList(newLeft, right, left);
+        assertTrue(newLeft.circularLink_next == left);
+        assertTrue(newLeft.circularLink_prev == right);
+        assertTrue(right.circularLink_next == newLeft );
+        assertTrue(left.circularLink_prev == newLeft );
+
+
+
+    }
 
 }
 
