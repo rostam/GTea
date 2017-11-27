@@ -215,6 +215,11 @@ public class PQNode {
 
     public List<PQNode> immediateSiblings(){
         List<PQNode> adjacents = new ArrayList<PQNode>();
+
+        if(this.parent != null && this.parent.nodeType.equals(PQNode.PNODE)){
+            return adjacents;
+        }
+
         if(this.circularLink_prev == this.circularLink_next && this.circularLink_prev != null){
             adjacents.add(this.circularLink_next);
             return adjacents;
@@ -257,6 +262,7 @@ public class PQNode {
         catch (IllegalNodeTypeException e) { }
     }
 
+    /**Change use to childrenOfLabel, this function is deprecated*/
     public List<PQNode> fullChildren(){
         List<PQNode> full = new ArrayList<PQNode>();
 
@@ -267,6 +273,32 @@ public class PQNode {
 
             do {
                 if(traversal.labelType.equals(PQNode.FULL))
+                    full.add(traversal);
+                traversal = traversal.circularLink_next;
+            } while(traversal != start);
+        }
+        else {
+            for (PQNode c : children) {
+                if (c.labelType.equals(FULL)) {
+                    full.add(c);
+                }
+            }
+        }
+        return full;
+    }
+
+    public List<PQNode> fullAndPartialChildren(){
+        List<PQNode> full = new ArrayList<PQNode>();
+
+        if(this.nodeType.equals(PQNode.QNODE)){
+
+            PQNode traversal = this.endmostChildren().get(0);
+            PQNode start = this.endmostChildren().get(0);
+
+            do {
+                if(traversal.labelType.equals(PQNode.FULL))
+                    full.add(traversal);
+                else if (traversal.labelType.equals(PQNode.PARTIAL))
                     full.add(traversal);
                 traversal = traversal.circularLink_next;
             } while(traversal != start);
