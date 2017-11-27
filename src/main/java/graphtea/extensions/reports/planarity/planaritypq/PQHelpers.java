@@ -213,6 +213,28 @@ public class PQHelpers {
        return output;
     }
 
+    public static void resetCounts(PQNode _root){
+        System.out.println("RESETTING COUNTS.  This is for TESTING purposes.  Make sure to reset counts properly before release.");
+        List<PQNode> output = preorder(_root);
+        if(output.size() == 0) return;
+
+        if(_root.nodeType.equals(PQNode.QNODE)){
+            PQNode itr = _root;
+            while(itr.circularLink_next != _root){
+                itr.pertinentLeafCount = 0;
+                itr.pertinentChildCount = 0;
+                itr = itr.circularLink_next;
+            }
+        }
+        else {
+            for (PQNode n : output) {
+                n.pertinentLeafCount = 0;
+                n.pertinentChildCount = 0;
+            }
+        }
+        System.out.println();
+    }
+
     public static void printPreorderIds(PQNode _root){
         List<PQNode> output = preorder(_root);
         System.out.print("Preorder: ");
@@ -234,6 +256,7 @@ public class PQHelpers {
         }
         System.out.println();
     }
+
 
     public static void printListIds(List<PQNode> lis, String listName){
         System.out.print(listName + ": ");

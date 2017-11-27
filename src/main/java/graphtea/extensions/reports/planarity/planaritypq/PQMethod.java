@@ -16,13 +16,12 @@ public class PQMethod {
 
         Iterable<Edge> source = graph.getEdges();
         HashSet<PQNode> U = new HashSet<>();
-        //List<PQNode> U = new ArrayList<>();
 
         PQNode T = new PQNode(PQNode.PNODE, PQNode.EMPTY);
         T.id = "T";
         for(Edge e : source){
 
-            System.out.println(e.source.getId() + " -> " + e.target.getId());
+            System.out.print("(" + e.source.getId() + " -> " + e.target.getId() + "), ");
 
             int targetId = e.target.getId();
             int sourceId = e.source.getId();
@@ -33,7 +32,7 @@ public class PQMethod {
             }
         }
 
-        System.out.println("----------A-----------");
+        System.out.println("\n----------A-----------");
         PQ PQTree = new PQ();
 
         // Same as T(U, U) because all U are set to full and T (a p-node) can reach all of U in any order
@@ -78,7 +77,7 @@ public class PQMethod {
                          }
                      } catch (NodeNotFoundException exc) { }
 
-                    System.out.println(S.get(S.size()-1).id);
+                    //System.out.println(S.get(S.size()-1).id);
                 }
             }
 
@@ -87,8 +86,10 @@ public class PQMethod {
             PQHelpers.printListIds(S, "S");
 
             System.out.println("Running Bubble");
-            if(S.size() > 0)
+            if(S.size() > 0) {
+                PQHelpers.resetCounts(T);
                 T = PQTree.bubble(T, S);
+            }
 
             System.out.println("Running Reduce");
             if(S.size() > 0)
@@ -104,7 +105,7 @@ public class PQMethod {
             // These edges are added to Sp
             ArrayList<PQNode> Sp = new ArrayList<>();
             for(Edge e : source){
-                //Vertex higherNumberedVerte
+                //Vertex higherNumberedVertex
                 int targetId = e.target.getId();
                 int sourceId = e.source.getId();
                 if (Math.min(targetId, sourceId) == j) {
@@ -124,7 +125,7 @@ public class PQMethod {
                     }
                     Sp.add(leafNode);
 
-                    System.out.println(Sp.get(Sp.size()-1).id);
+                    //System.out.println(Sp.get(Sp.size()-1).id);
                 }
             }
             System.out.println("----------C-----------");
@@ -154,6 +155,7 @@ public class PQMethod {
                 System.out.println("Inside: Subtree root is a Q-node");
 
                 List<PQNode> fullChildren = root.fullChildren();
+                //List<PQNode> fullAndPartialChildren = root.fullAndPartialChildren(); //todo: Possibly change to only fullChildren - partials may be accessed later.
 
                 if(fullChildren.size() == 0) {
                     break;
@@ -181,16 +183,6 @@ public class PQMethod {
 
                     root.removeChildren(fullChildren);
 
-                    //root.children.add(index, nodeSp);
-
-                    //root.children.removeAll(fullChildren);
-
-                    // Replacing fulls with nodeSp in circular link
-                    //PQNode rightMostFull = fullChildren.get(fullChildren.size() - 1);
-                    //PQNode leftMostFull = fullChildren.get(0);
-
-                    //PQHelpers.insertNodeIntoCircularList(nodeSp, leftMostFull.circularLink_prev, rightMostFull.circularLink_next);
-
                     if(index == 0){
                         PQHelpers.insertNodeIntoCircularList(nodeSp, root.endmostChildren().get(1), root.endmostChildren().get(0));
                     }
@@ -206,17 +198,6 @@ public class PQMethod {
                     else {
                         root.children.add(index, nodeSp);
                     }
-
-                    /*if(leftMostFull.circularLink_prev.labelType.equals(PQNode.EMPTY)){
-                        // Right link points to fulls
-                        //PQHelpers.insertNodeIntoCircularList(nodeSp, leftMostFull, rightMostFull);
-                        PQHelpers.insertNodeIntoCircularList(nodeSp, rightMostFull, rightMostFull.circularLink_next);
-                    }
-                    else {
-                        // Left link points to fulls
-                        //PQHelpers.insertNodeIntoCircularList(nodeSp, rightMostFull, leftMostFull);
-                        PQHelpers.insertNodeIntoCircularList(nodeSp, leftMostFull, leftMostFull.circularLink_prev);
-                    }*/
 
                 }
                 else if(Sp.size() > 0) {
@@ -270,16 +251,6 @@ public class PQMethod {
 
                 PQNode rParent = root.getParent();
 
-                /*if(rParent == T){
-                    System.out.println("rParent is T!");
-                    T.children = Sp;
-                    setCircularLinks(T.children);
-                    for(PQNode n : Sp){
-                        n.parent = T;
-                    }
-                }
-                else {*/
-
                 PQNode replacementNode;
                 if(Sp.size() == 1/* && rParent != null*/){
                     replacementNode = Sp.get(0);
@@ -297,11 +268,6 @@ public class PQMethod {
                 if(rParent != null) {
 
                     replacementNode.parent = rParent;
-
-                    // Circular links are set for Q-Node and P-Node children for bubbling up phase
-                    //PQHelpers.insertNodeIntoCircularList(replacementNode, root.circularLink_prev, root.circularLink_next);
-
-                //public static void insertInto(PQNode newNode, PQNode oldNode, PQNode parent){
 
                     if(rParent.nodeType.equals(PQNode.QNODE)){
                         // Parent is a Q-Node
@@ -325,20 +291,13 @@ public class PQMethod {
                 else {
                     // root is the root of the whole tree, not a subtree.
 
-                    /*if(replacementNode.equals(PQNode.QNODE) || replacementNode.equals(PQNode.PNODE)) {
-                        PQHelpers.union(T.children, replacementNode.children);
-                    }
-                    else {
-                        PQHelpers.union(T.children, Arrays.asList(replacementNode));
-                    }*/
-
                     PQHelpers.printPreorderIds(T);
                     PQHelpers.printPreorderIds(replacementNode);
 
                     //T.children.removeAll()
                     List<PQNode> removedNodes = new ArrayList<>();
                     for(PQNode n : T.children){
-                        if(n.labelType.equals(PQNode.FULL) || n.labelType.equals(PQNode.PARTIAL)){
+                        if(n.labelType.equals(PQNode.FULL)){
                             //T.children.remove(n);
                             removedNodes.add(n);
                         }
@@ -352,9 +311,6 @@ public class PQMethod {
                         T.children.add(replacementNode);
                     }
                     setCircularLinks(T.children);
-
-                    //root = replacementNode;
-                    //T = root;
                     T.id = "rT";
                 }
 
@@ -372,9 +328,8 @@ public class PQMethod {
             //U.addAll(0, Sp);
 
             PQHelpers.printListIds(new ArrayList<>(U), "U after");
-            PQHelpers.printPreorderIds(T);
-
-            System.out.println("COMPLETED ITERATION: " + j);
+            //PQHelpers.printPreorderIds(T);
+            //System.out.println("COMPLETED ITERATION: " + j);
         }
 
         return true;
