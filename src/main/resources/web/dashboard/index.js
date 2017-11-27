@@ -324,7 +324,9 @@ function showOnGraph() {
             var color = colors[parseInt(n.id())];
             var actualColor = distinctColors[Object.keys(distinctColors)[color]];
             n.style('background-color', actualColor);
+            n.style('background-opacity', 0.6);
         });
+        cy.nodes().style('background-opacity',0.6);
     }
 }
 

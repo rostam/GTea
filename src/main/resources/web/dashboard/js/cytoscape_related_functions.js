@@ -35,7 +35,8 @@ function initCytoscape(arrow, _serverAddr, _uuid) {
                 style: {
                     'background-color': 'lightgray',
                     'label': 'data(label)',
-                    'text-valign': 'center'
+                    'text-valign': 'center',
+                    'background-opacity':0.6
                 }
             },
             {
