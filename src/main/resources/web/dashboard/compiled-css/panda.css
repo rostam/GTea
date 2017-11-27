@@ -18,6 +18,8 @@
   border-right: 1px solid #ddd;
   z-index: 1;
   overflow: auto; }
+  .tools * {
+    max-width: 100%; }
 
 .tools2 {
   box-sizing: border-box;
