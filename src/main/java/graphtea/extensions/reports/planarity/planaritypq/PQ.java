@@ -44,6 +44,7 @@ public class PQ {
 
             PQNode x = queue.remove();
             x.blocked = true;
+
             //System.out.println("Processing: " + x.id);
 
             List<PQNode> BS = new ArrayList<>();
@@ -92,9 +93,8 @@ public class PQ {
                 }
                 else {
                     y.pertinentChildCount++;
-                    if(!y.queued){
+                    if(!queue.contains(y)){
                         queue.add(y);
-                        y.queued = true;
                     }
                 }
                 blockCount = blockCount - BS.size();
@@ -120,7 +120,7 @@ public class PQ {
      * does not exist, returns the null tree.
      */
     public PQNode reduce(PQNode T, List<PQNode> S){
-        PQHelpers.printChildren(T);
+        //PQHelpers.printChildren(T);
         Queue<PQNode> queue = new LinkedList<>(S);
         for(PQNode x : S){
             x.pertinentLeafCount = 1;
@@ -450,6 +450,7 @@ public class PQ {
             fullNode.parent = x;
             System.out.println("TEMPLATE P3 (alt form)");
             return true;
+            //return false;
         }
 
         // Below checks if either of the P-Nodes are redundant with only 1 child
@@ -854,9 +855,6 @@ public class PQ {
 
             setCircularLinks(fullRootChildList);
             fullRootChildList.forEach(n -> n.parent = pNode);
-        /*for(PQNode n : fullRootChildList){
-             n.parent = pNode;
-        }*/
             pNode.children = fullRootChildList;
         }
 
@@ -881,13 +879,9 @@ public class PQ {
         /** Reconfigure circular links for qNode1, pNode, qNode2
          * Could use setCircularLinks in  in PQHelper, but there is no need
          * to set all of the links. */
-        //rightMost1.circularLink_next = pNode;
-        //pNode.circularLink_next = leftMost2;
         rightMost2.circularLink_next = leftMost1;
 
         leftMost1.circularLink_prev = rightMost2;
-        //leftMost2.circularLink_prev = pNode;
-        //pNode.circularLink_prev = rightMost1;
 
         if(fullRootChildList.size() > 1){
             rightMost1.circularLink_next = pNode;
