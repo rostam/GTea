@@ -87,6 +87,14 @@
             <p id="strings-adjMatformat"></p>
             <textarea id="adjstring" name="Text1" cols="20" rows="5"></textarea>
             <br/>
+            <select id="adjmat-type">
+                <option value="adj">Adjacency Matrix</option>
+                <option value="cig">Column-Intersection Graph</option>
+                <option value="rig">Row-Intersection Graph</option>
+                <option value="bip">Bipartite Graph</option>
+                <option value="rcig">rho-Column-Intersection Graph</option>
+            </select>
+            <br/>
             <button onclick="load_graph('adj',false)">Load Only</button>
             <button onclick="load_graph('adj',true)">Load and Draw</button>
         </div>

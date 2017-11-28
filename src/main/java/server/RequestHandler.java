@@ -1,5 +1,6 @@
 package server;
 
+import Jama.Matrix;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
 import graphtea.extensions.Centrality;
@@ -420,17 +421,61 @@ public class RequestHandler {
                 g = getGraphFromEdgeList(graph);
                 break;
             case "g6":
-                graph = graph.replaceAll("qqq","?");
+                graph = graph.replaceAll("qqq", "?");
                 g = G6Format.stringToGraphModel(graph);
                 break;
-            case "adj":
-                String[] rows = info.split("-");
+            case "adjadj":
+                String[] rows = graph.split("-");
                 for (String row : rows) g.addVertex(new Vertex());
-                for(int i=0;i<rows.length;i++) {
+                for (int i = 0; i < rows.length; i++) {
                     String tmp[] = rows[i].split(",");
-                    for(int j=0;j<tmp.length;j++) {
-                        if(tmp[j].equals("1")) {
-                            g.addEdge(new Edge(g.getVertex(i),g.getVertex(j)));
+                    for (int j = 0; j < tmp.length; j++) {
+                        if (tmp[j].equals("1")) {
+                            g.addEdge(new Edge(g.getVertex(i), g.getVertex(j)));
+                        }
+                    }
+                }
+                break;
+            case "adjcig":
+                String[] rows2 = graph.split("-");
+                Matrix m = new Matrix(rows2.length, rows2.length);
+                for (int i = 0; i < rows2.length; i++) {
+                    String tmp[] = rows2[i].split(",");
+                    for (int j = 0; j < tmp.length; j++) {
+                        m.set(j, i, Double.parseDouble(tmp[j]));
+                    }
+                }
+                for (String row : rows2) g.addVertex(new Vertex());
+                for (int i = 0; i < m.getColumnDimension(); i++) {
+                    for (int j = 0; j < m.getColumnDimension(); j++) {
+                        for (int k = 0; k < m.getRowDimension(); k++) {
+                            if (m.get(i, k) != 0 && m.get(j, k) != 0) {
+                                g.addEdge(new Edge(g.getVertex(i), g.getVertex(j)));
+                                break;
+                            }
+                        }
+                    }
+                }
+                break;
+            case "adjrcig":
+                String[] rows3 = graph.split("-");
+                Matrix m3 = new Matrix(rows3.length, rows3.length);
+                for (int i = 0; i < rows3.length; i++) {
+                    String tmp[] = rows3[i].split(",");
+                    for (int j = 0; j < tmp.length; j++) {
+                        m3.set(j, i, Double.parseDouble(tmp[j]));
+                    }
+                }
+                for (String row : rows3) g.addVertex(new Vertex());
+                for (int i = 0; i < m3.getColumnDimension(); i++) {
+                    for (int j = 0; j < m3.getColumnDimension(); j++) {
+                        for (int k = 0; k < m3.getRowDimension(); k++) {
+                            if (m3.get(i, k) != 0 && m3.get(j, k) != 0) {
+                                if (m3.get(i, k) == 2 || m3.get(j, k) == 2) {
+                                    g.addEdge(new Edge(g.getVertex(i), g.getVertex(j)));
+                                    break;
+                                }
+                            }
                         }
                     }
                 }

@@ -285,6 +285,7 @@ function selectLoader() {
 function load_graph(type,isDraw) {
     var str = $('#' + type + 'string').val().replace(/\n/g, "-");
     var isDirected = $('#graphType').find('option:selected').text();
+    var adjMatType = $('#adjmat-type').find('option:selected').val();
     if (type == "g6") {
         var str2 = "";
         for (var i = 0; i < str.length; i++)
@@ -292,6 +293,7 @@ function load_graph(type,isDraw) {
             else str2 += str[i];
         str = str2;
     }
+    if(type == 'adj') type += adjMatType;
     server(serverAddr + 'loadGraph' + '/' + type + "--"
         + str + "--" + isDirected + "--" + uuid, function (data) {
         if (isDraw) {
