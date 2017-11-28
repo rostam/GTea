@@ -1,0 +1,44 @@
+.main {
+  position: absolute;
+  left: 22em;
+  top: 0;
+  right: 0em;
+  bottom: 0;
+  z-index: 1; }
+
+.tools {
+  box-sizing: border-box;
+  padding: 0.25em 0.5em;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 22em;
+  background: #ECEADF;
+  border-right: 1px solid #ddd;
+  z-index: 1;
+  overflow: auto; }
+  .tools * {
+    max-width: 100%; }
+
+.tools2 {
+  box-sizing: border-box;
+  padding: 0.25em 0.5em;
+  position: absolute;
+  left: 22.5em;
+  top: 26em;
+  bottom: 0;
+  width: 57.5em;
+  background: #ECEADF;
+  border-top: 1px solid #ddd;
+  z-index: 1;
+  overflow: auto; }
+
+.footer-link {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  margin: 0.25em 0.5em;
+  z-index: 2; }
+
+/*# sourceMappingURL=panda.css.map */
