@@ -213,17 +213,40 @@ public class PQNode {
         this.circularLink_prev = null;
     }
 
-    public List<PQNode> immediateSiblings(){
+    // todo: This list is not circular.  An end node will return the front node as well - FIX
+    public List<PQNode> immediateSiblings(boolean treatAsContainer){
         List<PQNode> adjacents = new ArrayList<PQNode>();
 
         if(this.parent != null && this.parent.nodeType.equals(PQNode.PNODE)){
             return adjacents;
         }
 
+        // If only 2 in list
         if(this.circularLink_prev == this.circularLink_next && this.circularLink_prev != null){
             adjacents.add(this.circularLink_next);
             return adjacents;
         }
+
+        if(treatAsContainer) {
+            PQNode parent = this.getParent();
+            if(parent == null){
+                return adjacents;
+            }
+
+            // If current if leftmost
+            List<PQNode> containerNodes = parent.endmostChildren();
+            if (containerNodes.get(0) == this) {
+                adjacents.add(this.circularLink_next);
+                return adjacents;
+            }
+            // If current is rightmost
+            if (containerNodes.get(1) == this) {
+                adjacents.add(this.circularLink_prev);
+                return adjacents;
+            }
+        }
+
+        // Otherwise, current is interior
         if(this.circularLink_prev != null)
             adjacents.add(this.circularLink_prev);
         if(this.circularLink_next != null)
@@ -502,6 +525,33 @@ public class PQNode {
         }
         else {
             this.children.removeAll(removalNodes);
+        }
+    }
+
+    public void replaceQNodeChild(PQNode newChild, PQNode oldChild){
+        if(this.labelType.equals(PQNode.QNODE)){
+            // Current node is a QNode
+            int index = 0;
+            for(PQNode n : this.endmostChildren()){
+                if(n == oldChild){
+                    if(index == 0){
+                        // place newChild at front, move oldChild to internals
+                        this.children.add(newChild);
+                    }
+                    else {
+                        // place newChild at end, move oldChild to internals
+                        this.children.add(this.children.size()-1, newChild);
+                    }
+
+                }
+                index++;
+            }
+            PQHelpers.insertNodeIntoCircularList(newChild, oldChild.circularLink_prev, oldChild.circularLink_next);
+            this.children.remove(oldChild);
+        }
+        else {
+            // Current node is a PNode
+            System.out.println("Current node is not a Q-Node!");
         }
     }
 

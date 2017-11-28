@@ -50,8 +50,8 @@ public class PQ {
             List<PQNode> BS = new ArrayList<>();
             List<PQNode> US = new ArrayList<>();
 
-            // In this case the circular links must be have been set on P-Node children.
-            for(PQNode u : x.immediateSiblings()){
+            // Only QNodes have immediate siblings
+            for(PQNode u : x.immediateSiblings(true)){
                 if(u == null){
                     continue;
                 }
@@ -66,10 +66,11 @@ public class PQ {
             //System.out.println("|US| = " + US.size());
             if(US.size() > 0){
                 PQNode y = US.get(0);
-                x.parent = y.parent;
+                //x.parent = y.parent;
+                x.parent = y.getParent(); // todo: is this still correct??
                 x.blocked = false;
             }
-            else if(x.immediateSiblings().size() < 2){
+            else if(x.immediateSiblings(true).size() < 2){
                 x.blocked = false;
             }
 
@@ -105,6 +106,10 @@ public class PQ {
                 blockedNodes = blockedNodes + 1;
             }
 
+        }
+
+        if(queue.size() > 1){
+            System.out.println("Oh no!");
         }
 
         return _root;

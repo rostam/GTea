@@ -42,6 +42,8 @@ public class PQMethod {
         for(int j=1; j<graph.getVertexArray().length-1; j++){
             System.out.println("ITERATION: " + j);
 
+            PQHelpers.reset(T, false, true);
+
             // The set of edges whose higher numbered vertex is j
             // These are the edges we are to reduce
              ArrayList<PQNode> S = new ArrayList<>();
@@ -87,7 +89,7 @@ public class PQMethod {
 
             System.out.println("Running Bubble");
             if(S.size() > 0) {
-                PQHelpers.resetCounts(T);
+                PQHelpers.reset(T, true, false);
                 T = PQTree.bubble(T, S);
             }
 
@@ -137,11 +139,18 @@ public class PQMethod {
 
                 try {
                     if (T.nodeType.equals(PQNode.PNODE)) { // T should always be a P-Node
-                        T.children.addAll(Sp);
-                        setCircularLinks(T.children);
+                        PQNode intermediaryPNode = new PQNode(PQNode.PNODE, PQNode.EMPTY);
+                        T.children.add(intermediaryPNode);
+                        intermediaryPNode.parent = T;
                         for(PQNode n : Sp){
-                            n.parent = T;
+                            n.parent = intermediaryPNode;
                         }
+
+                        /*T.children.addAll(Sp);
+                        //setCircularLinks(T.children);
+                        /*for(PQNode n : Sp){
+                            n.parent = T;
+                        }*/
                     }
                     else throw new IllegalNodeTypeException("T is not a P-Node");
                 }
@@ -154,166 +163,40 @@ public class PQMethod {
                 // replace the full children of ROOT(T, S) and their descendants by T(S', S')
                 System.out.println("Inside: Subtree root is a Q-node");
 
-                List<PQNode> fullChildren = root.fullChildren();
-                //List<PQNode> fullAndPartialChildren = root.fullAndPartialChildren(); //todo: Possibly change to only fullChildren - partials may be accessed later.
-
-                if(fullChildren.size() == 0) {
-                    break;
-                }
-
-                if(Sp.size() == 1){
-                    // No need for a P-Node, so we simplify and leave it out
-                    PQNode nodeSp = Sp.get(0);
-                    nodeSp.parent = root;
-
-                    // Finding the correct index to place nodeSp
-                    PQNode leftMost = fullChildren.get(0);
-                    PQNode traversal = root.children.get(0);
-                    int index = 0;
-                    while (traversal != leftMost) {
-                        if(traversal.labelType.equals(PQNode.FULL)){
-                            break;
-                        }
-                        index++;
-                        traversal = traversal.circularLink_next;
-                    }
-
-                    PQNode rightMostFullNext = fullChildren.get(fullChildren.size() - 1).circularLink_next;
-                    PQNode leftMostFullPrev = fullChildren.get(0).circularLink_prev;
-
-                    root.removeChildren(fullChildren);
-
-                    if(index == 0){
-                        PQHelpers.insertNodeIntoCircularList(nodeSp, root.endmostChildren().get(1), root.endmostChildren().get(0));
-                    }
-                    else {
-                        PQHelpers.insertNodeIntoCircularList(nodeSp, leftMostFullPrev, rightMostFullNext);
-                    }
-
-                    // Because Q-Node should not keep track of all children adding at the index should eventually be phased
-                    // out and replaced with replacing the endMost children
-                    if(root.children.size() < index) {
-                        root.children.add(nodeSp);
-                    }
-                    else {
-                        root.children.add(index, nodeSp);
-                    }
-
-                }
-                else if(Sp.size() > 0) {
-                    // Otherwise, create a P node
-
-                    PQNode replacementPNode = new PQNode(PQNode.PNODE, PQNode.EMPTY);
-                    replacementPNode.id = "rNode-2";
-                    replacementPNode.parent = root;
-                    replacementPNode.children.addAll(Sp);
-                    setCircularLinks(replacementPNode.children);
-
-                    for(PQNode n : Sp){
-                        n.parent = replacementPNode;
-                    }
-
-                    boolean fullsOnLeftSide = false;
-                    if(root.endmostChildren().get(0).labelType.equals(PQNode.FULL)){
-                        fullsOnLeftSide = true;
-                    }
-
-                    root.removeChildren(fullChildren);
-
-                    // Set the circular links with replacementPNode
-                    if(fullsOnLeftSide){
-                        root.children.add(0, replacementPNode); // Add to start of list
-                    }
-                    else {
-                        // Fulls were on the right side
-                        root.children.add(replacementPNode); // Add to end of list
-                    }
-
-                    //PQHelpers.insertNodeIntoCircularList(replacementPNode, fullChildren.get(0), fullChildren.get(fullChildren.size()-1));
-                    PQHelpers.insertNodeIntoCircularList(replacementPNode, fullChildren.get(0).circularLink_prev,
-                            fullChildren.get(fullChildren.size()-1).circularLink_next);
-
-                }
-                else {
-                    // Otherwise, SP.Size() == 0.
-
-                    // ignored intentionally
-                }
-
-                // Q-Nodes are directional, but this only matters if they have 3+ children.
-                if(root.getChildren().size() < 3) {
-                    root.nodeType = PQNode.PNODE;
-                }
+                replaceFullChildrenOfRoot(root, Sp);
 
             } else if(Sp.size() > 0) {
                 // replace ROOT(T, S) and its descendants by T(S', S')
                 System.out.println("Inside: Subtree root is a P-node");
 
-                PQNode rParent = root.getParent();
+                replaceRootAndDescendants(root, Sp);
 
-                PQNode replacementNode;
-                if(Sp.size() == 1/* && rParent != null*/){
-                    replacementNode = Sp.get(0);
-                }
-                else {
-                    replacementNode = new PQNode(PQNode.PNODE, PQNode.EMPTY);
-                    replacementNode.id = "rNode";
-                    replacementNode.children.addAll(Sp);
-                    setCircularLinks(replacementNode.children);
-                    for(PQNode n : Sp){
-                        n.parent = replacementNode;
-                    }
-                }
+            } else {
+                // Todo: Check if this is correct
+                // if the set Sp is empty
 
-                if(rParent != null) {
+                List<PQNode> removalNodes = root.fullChildren();
+                root.removeChildren(removalNodes);
 
-                    replacementNode.parent = rParent;
+                if(root.getChildren().size() == 1) {
+                    PQNode child = root.getChildren().get(0);
+                    PQNode rParent = root.getParent();
 
                     if(rParent.nodeType.equals(PQNode.QNODE)){
-                        // Parent is a Q-Node
+                        // rParent is Q-Node
 
-                        // Places replacementPNode into the same index in the children list as the root
-                        // This is important because q-nodes are directional and ordered
-                        PQHelpers.insertNodeIntoSameChildIndex(replacementNode, root, rParent);
-                        PQHelpers.insertNodeIntoCircularList(replacementNode, root.circularLink_prev, root.circularLink_next);
-                        rParent.children.remove(root);
+                        PQHelpers.insertNodeIntoSameChildIndex(child, root, rParent);
+                        rParent.removeChildren(Arrays.asList(root));
 
                     }
                     else {
-                        // Parent is a P-Node
+                        // rParent is P-Node
 
-                        rParent.children.remove(root);
-                        rParent.children.add(replacementNode);
-                        setCircularLinks(rParent.children);
+                        rParent.removeChildren(Arrays.asList(root));
+                        rParent.children.add(child);
+                        child.parent = rParent;
                     }
-
                 }
-                else {
-                    // root is the root of the whole tree, not a subtree.
-
-                    PQHelpers.printPreorderIds(T);
-                    PQHelpers.printPreorderIds(replacementNode);
-
-                    //T.children.removeAll()
-                    List<PQNode> removedNodes = new ArrayList<>();
-                    for(PQNode n : T.children){
-                        if(n.labelType.equals(PQNode.FULL)){
-                            //T.children.remove(n);
-                            removedNodes.add(n);
-                        }
-                    }
-                    T.children.removeAll(removedNodes);
-
-                    if(replacementNode.children.size() == 1){
-                        T.children.add(replacementNode.children.get(0));
-                    }
-                    else {
-                        T.children.add(replacementNode);
-                    }
-                    setCircularLinks(T.children);
-                    T.id = "rT";
-                }
-
 
             }
 
@@ -331,8 +214,175 @@ public class PQMethod {
             //PQHelpers.printPreorderIds(T);
             //System.out.println("COMPLETED ITERATION: " + j);
         }
-
+        System.out.println("DONE!");
         return true;
+    }
+
+    public void replaceFullChildrenOfRoot(PQNode root, List<PQNode> Sp){
+        List<PQNode> fullChildren = root.fullChildren();
+
+        if(fullChildren.size() == 0) {
+            return;
+        }
+
+        if(Sp.size() == 1){
+            // No need for a P-Node, so we simplify and leave it out
+            PQNode nodeSp = Sp.get(0);
+            nodeSp.parent = root;
+
+            // Finding the correct index to place nodeSp
+            PQNode leftMost = fullChildren.get(0);
+            PQNode traversal = root.children.get(0);
+            int index = 0;
+            while (traversal != leftMost) {
+                if(traversal.labelType.equals(PQNode.FULL)){
+                    break;
+                }
+                index++;
+                traversal = traversal.circularLink_next;
+            }
+
+            PQNode rightMostFullNext = fullChildren.get(fullChildren.size() - 1).circularLink_next;
+            PQNode leftMostFullPrev = fullChildren.get(0).circularLink_prev;
+
+            root.removeChildren(fullChildren);
+
+            if(index == 0){
+                PQHelpers.insertNodeIntoCircularList(nodeSp, root.endmostChildren().get(1), root.endmostChildren().get(0));
+            }
+            else {
+                PQHelpers.insertNodeIntoCircularList(nodeSp, leftMostFullPrev, rightMostFullNext);
+            }
+
+            // Because Q-Node should not keep track of all children adding at the index should eventually be phased
+            // out and replaced with replacing the endMost children
+            if(root.children.size() < index) {
+                root.children.add(nodeSp);
+            }
+            else {
+                root.children.add(index, nodeSp);
+            }
+
+        }
+        else if(Sp.size() > 0) {
+            // Otherwise, create a P node
+
+            PQNode replacementPNode = new PQNode(PQNode.PNODE, PQNode.EMPTY);
+            replacementPNode.id = "rNode-2";
+            replacementPNode.parent = root;
+            replacementPNode.children.addAll(Sp);
+            setCircularLinks(replacementPNode.children);
+
+            for(PQNode n : Sp){
+                n.parent = replacementPNode;
+            }
+
+            boolean fullsOnLeftSide = false;
+            if(root.endmostChildren().get(0).labelType.equals(PQNode.FULL)){
+                fullsOnLeftSide = true;
+            }
+
+            root.removeChildren(fullChildren);
+
+            // Set the circular links with replacementPNode
+            if(fullsOnLeftSide){
+                root.children.add(0, replacementPNode); // Add to start of list
+            }
+            else {
+                // Fulls were on the right side
+                root.children.add(replacementPNode); // Add to end of list
+            }
+
+            //PQHelpers.insertNodeIntoCircularList(replacementPNode, fullChildren.get(0), fullChildren.get(fullChildren.size()-1));
+            PQHelpers.insertNodeIntoCircularList(replacementPNode, fullChildren.get(0).circularLink_prev,
+                    fullChildren.get(fullChildren.size()-1).circularLink_next);
+
+        }
+        /*else {
+            // Otherwise, SP.Size() == 0.
+
+            // ignored intentionally
+            System.out.println("QNode: SP ZERO");
+            root.removeChildren(fullChildren);
+        }*/
+
+        // Q-Nodes are directional, but this only matters if they have 3+ children.
+        if(root.getChildren().size() < 3) {
+            root.nodeType = PQNode.PNODE;
+        }
+
+    }
+
+    public void replaceRootAndDescendants(PQNode root, List<PQNode> Sp){
+        PQNode rParent = root.getParent();
+        //boolean SpEmpty = false;
+        PQNode replacementNode;
+        if(Sp.size() == 1){
+            // Simplify by not adding an intermediary P-Node
+            replacementNode = Sp.get(0);
+        }
+        else /*if(Sp.size() > 1)*/ {
+            // Create an intermediary P-Node
+            replacementNode = new PQNode(PQNode.PNODE, PQNode.EMPTY);
+            replacementNode.id = "rNode";
+            replacementNode.children.addAll(Sp);
+            setCircularLinks(replacementNode.children);
+            for(PQNode n : Sp){
+                n.parent = replacementNode;
+            }
+        }
+        /*else {
+            System.out.println("P-Node parent: Sp is 0! ");
+            SpEmpty = true;
+        }*/
+
+        if(rParent != null /*&& !SpEmpty*/) {
+            // ROOT(T, S) is not the root of the whole tree
+
+            replacementNode.parent = rParent;
+
+            if(rParent.nodeType.equals(PQNode.QNODE)){
+                // rParent is a Q-Node
+
+                // Places replacementPNode into the same index in the children list as the root
+                // This is important because q-nodes are directional and ordered
+
+                //PQHelpers.insertNodeIntoSameChildIndex(replacementNode, root, rParent);
+                //PQHelpers.insertNodeIntoCircularList(replacementNode, root.circularLink_prev, root.circularLink_next);
+                //rParent.removeChildren(Arrays.asList(root));
+                rParent.replaceQNodeChild(replacementNode, root); // above has been refactored to this
+
+            }
+            else {
+                // rParent is a P-Node
+
+                rParent.removeChildren(Arrays.asList(root));
+                rParent.children.add(replacementNode);
+            }
+
+        }
+        else /*if(!SpEmpty)*/{
+            // ROOT(T, S) is the root of the whole tree.
+
+            PQHelpers.printPreorderIds(root);
+            PQHelpers.printPreorderIds(replacementNode);
+
+            List<PQNode> removedNodes = root.fullChildren();
+            root.removeChildren(removedNodes);
+
+            root.children.add(replacementNode);
+
+            root.id = "rT"; // For testing purposes
+        }
+        /*else {
+            System.out.println("PNode: SP ZERO");
+
+            List<PQNode> removedNodes = root.fullChildren();
+            root.removeChildren(removedNodes);
+
+            root.id = "rTSpZero";
+        }*/
+
     }
 
 }

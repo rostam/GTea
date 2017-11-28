@@ -213,7 +213,7 @@ public class PQHelpers {
        return output;
     }
 
-    public static void resetCounts(PQNode _root){
+    public static void reset(PQNode _root, boolean counts, boolean labels){
         System.out.println("RESETTING COUNTS.  This is for TESTING purposes.  Make sure to reset counts properly before release.");
         List<PQNode> output = preorder(_root);
         if(output.size() == 0) return;
@@ -221,15 +221,25 @@ public class PQHelpers {
         if(_root.nodeType.equals(PQNode.QNODE)){
             PQNode itr = _root;
             while(itr.circularLink_next != _root){
-                itr.pertinentLeafCount = 0;
-                itr.pertinentChildCount = 0;
+                if(counts) {
+                    itr.pertinentLeafCount = 0;
+                    itr.pertinentChildCount = 0;
+                }
+                if(labels) {
+                    itr.labelType = PQNode.EMPTY;
+                }
                 itr = itr.circularLink_next;
             }
         }
         else {
             for (PQNode n : output) {
-                n.pertinentLeafCount = 0;
-                n.pertinentChildCount = 0;
+                if(counts) {
+                    n.pertinentLeafCount = 0;
+                    n.pertinentChildCount = 0;
+                }
+                if(labels) {
+                    n.labelType = PQNode.EMPTY;
+                }
             }
         }
         System.out.println();

@@ -117,11 +117,6 @@ public class PQNodeTest {
     }
 
     @Test
-    public void immediateSiblings() throws Exception {
-
-    }
-
-    @Test
     public void replaceInCircularLink() throws Exception {
         PQNode mid = new PQNode();
         PQNode prev = new PQNode();
@@ -416,5 +411,13 @@ public class PQNodeTest {
 
         assertTrue(qNode.endmostChildren().size() == 0);
     }
+
+
+    @Test
+    public void immediateSiblings() throws Exception {
+
+    }
+
+
 
 }
