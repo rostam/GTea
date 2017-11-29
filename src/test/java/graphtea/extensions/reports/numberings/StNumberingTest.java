@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class PreOrderNumberingTest {
+public class StNumberingTest {
     @Test
     public void preOrderPathTest() {
         GraphModel gm = new GraphModel();
