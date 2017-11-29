@@ -2,6 +2,7 @@ package graphtea.extensions.reports.planarity.planaritypq;
 
 import org.glassfish.grizzly.utils.ArraySet;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,13 +44,14 @@ public class PQ {
 
             PQNode x = queue.remove();
             x.blocked = true;
+
             //System.out.println("Processing: " + x.id);
 
             List<PQNode> BS = new ArrayList<>();
             List<PQNode> US = new ArrayList<>();
 
-            // In this case the circular links must be have been set on P-Node children.
-            for(PQNode u : x.immediateSiblings()){
+            // Only QNodes have immediate siblings
+            for(PQNode u : x.immediateSiblings(true)){
                 if(u == null){
                     continue;
                 }
@@ -64,10 +66,11 @@ public class PQ {
             //System.out.println("|US| = " + US.size());
             if(US.size() > 0){
                 PQNode y = US.get(0);
-                x.parent = y.parent;
+                //x.parent = y.parent;
+                x.parent = y.getParent(); // todo: is this still correct??
                 x.blocked = false;
             }
-            else if(x.immediateSiblings().size() < 2){
+            else if(x.immediateSiblings(true).size() < 2){
                 x.blocked = false;
             }
 
@@ -91,9 +94,8 @@ public class PQ {
                 }
                 else {
                     y.pertinentChildCount++;
-                    if(!y.queued){
+                    if(!queue.contains(y)){
                         queue.add(y);
-                        y.queued = true;
                     }
                 }
                 blockCount = blockCount - BS.size();
@@ -104,6 +106,10 @@ public class PQ {
                 blockedNodes = blockedNodes + 1;
             }
 
+        }
+
+        if(queue.size() > 1){
+            System.out.println("Oh no!");
         }
 
         return _root;
@@ -119,7 +125,7 @@ public class PQ {
      * does not exist, returns the null tree.
      */
     public PQNode reduce(PQNode T, List<PQNode> S){
-        PQHelpers.printChildren(T);
+        //PQHelpers.printChildren(T);
         Queue<PQNode> queue = new LinkedList<>(S);
         for(PQNode x : S){
             x.pertinentLeafCount = 1;
@@ -131,6 +137,7 @@ public class PQ {
                 // X is not ROOT(T, S)
 
                 //PQNode y = x.parent;
+                //System.out.println("Finding parent for... " + x.id);
                 PQNode y = x.getParent();
                 y.pertinentLeafCount = y.pertinentLeafCount + x.pertinentLeafCount;
                 y.pertinentChildCount = y.pertinentChildCount - 1;
@@ -448,6 +455,7 @@ public class PQ {
             fullNode.parent = x;
             System.out.println("TEMPLATE P3 (alt form)");
             return true;
+            //return false;
         }
 
         // Below checks if either of the P-Nodes are redundant with only 1 child
@@ -667,88 +675,64 @@ public class PQ {
             return false;
         }
 
-        //Retrieves the leftmost node
-        PQNode leftmostChild = qNode.endmostChildren().get(0);
-        //Retrieves the rightmost node
-        PQNode rightmostChild = qNode.endmostChildren().get(1);
+        PQNode newEmptiesNode = new PQNode();
+        PQNode newFullsNode = new PQNode();
 
-        PQNode newLeftmostPNode = new PQNode();
-        PQNode newRightmostPNode = new PQNode();
-
-        newLeftmostPNode.labelType = PQNode.EMPTY;
-        newLeftmostPNode.nodeType = PQNode.PNODE;
-
-        newRightmostPNode.labelType = PQNode.FULL;
-        newRightmostPNode.nodeType = PQNode.PNODE;
-
-        if(emptyChildList.size() > 0) { //todo: add functionality for if only 1 child - simplify by not using P-Node
+        if(emptyChildList.size() > 0) {
             if (emptyChildList.size() == 1) {
-                PQNode newLeftMostNode = new PQNode();
-                newLeftMostNode.parent = qNode;
-                x.children.add(newLeftMostNode);
+                newEmptiesNode = emptyChildList.get(0);
+
             }
             else {
-                leftmostChild.circularLink_prev = newLeftmostPNode;
 
-                newLeftmostPNode.parent = qNode;
-                newLeftmostPNode.circularLink_next = leftmostChild;
+                newEmptiesNode.labelType = PQNode.EMPTY;
+                newEmptiesNode.nodeType = PQNode.PNODE;
 
-                for (PQNode e : emptyChildList) {
-                    e.parent = newLeftmostPNode;
-                    newLeftmostPNode.children.add(e);
-                    x.children.remove(e);
+                for (PQNode n : emptyChildList) {
+                    n.parent = newEmptiesNode;
+                    newEmptiesNode.children.add(n);
+                    //x.children.remove(e);
                 }
-                qNode.children.add(0, newLeftmostPNode);
             }
+            PQHelpers.addNodesAsChildrenToQNode(Arrays.asList(newEmptiesNode), qNode);
         }
 
-        if(fullChildList.size() > 0) { //todo: add functionality for if only 1 child - simplify by not using P-Node
+        if(fullChildList.size() > 0) {
             if (fullChildList.size() == 1) {
-                PQNode newRightMostNode = new PQNode();
-                newRightMostNode.parent = qNode;
-                x.children.add(newRightMostNode);
+                newFullsNode = fullChildList.get(0);
+
             }
             else {
-                rightmostChild.circularLink_next = newRightmostPNode;
+                newFullsNode.labelType = PQNode.FULL;
+                newFullsNode.nodeType = PQNode.PNODE;
 
-                newRightmostPNode.parent = qNode;
-                newRightmostPNode.circularLink_prev = rightmostChild;
-                rightmostChild.circularLink_next = newRightmostPNode;
-
-                for (PQNode f : fullChildList) {
-                    f.parent = newRightmostPNode;
-                    newRightmostPNode.children.add(f);
-                    x.children.remove(f);
+                for (PQNode n : fullChildList) {
+                    n.parent = newFullsNode;
+                    newFullsNode.children.add(n);
+                    //x.children.remove(f);
                 }
-                qNode.children.add(qNode.children.size() - 1, newRightmostPNode);
+
             }
+            PQHelpers.addNodesAsChildrenToQNode(Arrays.asList(newFullsNode), qNode);
         }
 
-        if(fullChildList.size() > 0 && emptyChildList.size() > 0){
-            newLeftmostPNode.circularLink_prev = newRightmostPNode;
-            newRightmostPNode.circularLink_next = newLeftmostPNode;
-            newLeftmostPNode.parent = x;
-            newRightmostPNode.parent = x;
-        }
-        else if(fullChildList.size() > 0){
-            newRightmostPNode.circularLink_next = leftmostChild;
-            leftmostChild.circularLink_prev = newRightmostPNode;
-            newRightmostPNode.parent = x;
-        }
-        else if(emptyChildList.size() > 0){
-            newLeftmostPNode.circularLink_prev = rightmostChild;
-            rightmostChild.circularLink_next = newLeftmostPNode;
-            newLeftmostPNode.parent = x;
+        //PQHelpers.addNodesAsChildrenToQNode(Arrays.asList(newEmptiesNode), qNode);
+        //PQHelpers.addNodesAsChildrenToQNode(Arrays.asList(newFullsNode), qNode);
+
+        PQNode xParent = x.getParent();
+        qNode.parent = xParent;
+        if(xParent.nodeType.equals(PQNode.PNODE)){
+            xParent.children.add(qNode);
+            xParent.removeChildren(Arrays.asList(x));
         }
         else {
-            // ignore
+            PQHelpers.insertNodeIntoSameChildIndex(qNode, x, xParent);
+            PQHelpers.insertNodeIntoCircularList(qNode, x.circularLink_prev, x.circularLink_next);
+            xParent.removeChildren(Arrays.asList(x));
         }
 
-        x.labelType = qNode.labelType;
-        x.nodeType = qNode.nodeType;
-        x.children = qNode.children;
+        x = qNode;
 
-        //qNode = null;
         System.out.println("TEMPLATE P5");
 
         return true;
@@ -876,9 +860,6 @@ public class PQ {
 
             setCircularLinks(fullRootChildList);
             fullRootChildList.forEach(n -> n.parent = pNode);
-        /*for(PQNode n : fullRootChildList){
-             n.parent = pNode;
-        }*/
             pNode.children = fullRootChildList;
         }
 
@@ -903,13 +884,9 @@ public class PQ {
         /** Reconfigure circular links for qNode1, pNode, qNode2
          * Could use setCircularLinks in  in PQHelper, but there is no need
          * to set all of the links. */
-        //rightMost1.circularLink_next = pNode;
-        //pNode.circularLink_next = leftMost2;
         rightMost2.circularLink_next = leftMost1;
 
         leftMost1.circularLink_prev = rightMost2;
-        //leftMost2.circularLink_prev = pNode;
-        //pNode.circularLink_prev = rightMost1;
 
         if(fullRootChildList.size() > 1){
             rightMost1.circularLink_next = pNode;
