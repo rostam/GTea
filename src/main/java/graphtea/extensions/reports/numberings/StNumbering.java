@@ -84,20 +84,20 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
             this.visited.put(u, false);
         }
         for (Vertex u : this.graph) {
-            computeLHelper(1, u);
+            computeLHelper(u);
         }
         return this.LNumbering.get(v);
     }
 
-    public int computeLHelper(int backEdgeJumpsLeft, Vertex v) {
+    public int computeLHelper(Vertex v) {
         if (visited.get(v) == false) {
             this.visited.put(v, true);
             for (Vertex u : this.graph.neighbors(v)) {
-                if (this.visited.get(u) == true && backEdgeJumpsLeft > 0) {
+                if (this.visited.get(u) == true) {
                     this.LNumbering.put(v, Math.min(this.LNumbering.get(v), preOrderMapping.get(u)));
                 }
                 else {
-                    this.LNumbering.put(v, Math.min(this.LNumbering.get(v), computeLHelper(backEdgeJumpsLeft, u)));
+                    this.LNumbering.put(v, Math.min(this.LNumbering.get(v), computeLHelper(u)));
                 }
             }
         }
