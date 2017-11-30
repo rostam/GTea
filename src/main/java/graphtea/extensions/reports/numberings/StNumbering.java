@@ -5,6 +5,7 @@ import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.library.algorithms.Algorithm;
 import graphtea.plugins.reports.extension.GraphReportExtension;
+import java.lang.Math;
 
 import java.util.HashMap;
 
@@ -16,11 +17,13 @@ import java.util.HashMap;
  */
 public class StNumbering extends Algorithm implements GraphReportExtension {
 
-    int highestId;
-    HashMap<Vertex, Integer> preOrderMapping;
-    HashMap<Vertex, Integer> L;
-    HashMap<Vertex, Integer> stMapping;
-    HashMap<Vertex, Boolean> visited;
+    private int highestId;
+    private HashMap<Vertex, Integer> preOrderMapping;
+    private HashMap<Vertex, Integer> L;
+    private HashMap<Vertex, Integer> stMapping;
+    private HashMap<Vertex, Boolean> visited;
+    private HashMap<Vertex, Integer> LNumbering;
+    private GraphModel graph;
 
     public String getName() {
 		return "st-numbering numbering";
@@ -34,42 +37,73 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
         return -1;
 	}
 
-    public HashMap<Vertex, Integer> stNumbering(GraphModel g, Vertex v) throws NotBiconnectedException {
-
+	public StNumbering(GraphModel g) throws NotBiconnectedException {
         KConnected kc = new KConnected();
-        if(kc.kconn(g) < 2) {
+        if (kc.kconn(g) < 2) {
             throw new NotBiconnectedException("Graph must be biconnected for StNumbering to work!");
         }
+        this.graph = g;
+        this.highestId = 0;
+        this.preOrderMapping = new HashMap<Vertex, Integer>();
+        this.stMapping = new HashMap<Vertex, Integer>();
+        this.visited = new HashMap<Vertex, Boolean>();
+        this.LNumbering = new HashMap<Vertex, Integer>();
+    }
+
+    public HashMap<Vertex, Integer> stNumbering() {
+
         return stMapping;
     }
 
-    public HashMap<Vertex, Integer> preOrderNumbering(GraphModel g) {
+    public HashMap<Vertex, Integer> preOrderNumbering() {
+        for (Vertex v : this.graph) {
+            visited.put(v, false);
+        }
+        for (Vertex v : this.graph) {
+            preOrderNumberingHelper(v);
+        }
         this.highestId = 0;
-        this.preOrderMapping = new HashMap<Vertex, Integer>();
-        this.visited = new HashMap<Vertex, Boolean>();
-        this.L = new HashMap<Vertex, Integer>();
-
-        for (Vertex v : g.vertices()) {
-            this.preOrderMapping.put(v, -1);
-            this.visited.put(v, false);
-            this.L.put(v, Integer.MAX_VALUE);
-        }
-        for (Vertex v : g) {
-            preOrderNumberingHelper(g, v);
-        }
+        this.visited.clear();
         return this.preOrderMapping;
     }
 
-    public void preOrderNumberingHelper(GraphModel g, Vertex v) {
-
+    public void preOrderNumberingHelper(Vertex v) {
         preOrderMapping.put(v, this.highestId++);
-        for (Vertex u : g.neighbors(v)) {
+        for (Vertex u : this.graph.neighbors(v)) {
             if (visited.get(u) != true) {
                 visited.put(u, true);
-                preOrderNumberingHelper(g, u);
+                preOrderNumberingHelper(u);
             }
         }
     }
+
+
+    public int computeL(Vertex v) {
+        for (Vertex u : this.graph) {
+            this.LNumbering.put(u, this.preOrderMapping.get(u));
+            this.visited.put(u, false);
+        }
+        for (Vertex u : this.graph) {
+            computeLHelper(1, u);
+        }
+        return this.LNumbering.get(v);
+    }
+
+    public int computeLHelper(int backEdgeJumpsLeft, Vertex v) {
+        if (visited.get(v) == false) {
+            this.visited.put(v, true);
+            for (Vertex u : this.graph.neighbors(v)) {
+                if (this.visited.get(u) == true && backEdgeJumpsLeft > 0) {
+                    this.LNumbering.put(v, Math.min(this.LNumbering.get(v), preOrderMapping.get(u)));
+                }
+                else {
+                    this.LNumbering.put(v, Math.min(this.LNumbering.get(v), computeLHelper(backEdgeJumpsLeft, u)));
+                }
+            }
+        }
+        return LNumbering.get(v);
+    }
+
 
 	@Override
 	public String getCategory() {
