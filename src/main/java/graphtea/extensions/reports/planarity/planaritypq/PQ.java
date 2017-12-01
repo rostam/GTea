@@ -27,7 +27,7 @@ public class PQ {
      *
      * @param _root root of the tree/subtree
      * @param S a set of nodes, describes a constraint sequence
-     * @return a tree rooted at _root which do not violate S (nor the reverse of S) nor previously applied constraint sequences.
+     * @return a tree rooted at _root, where the children have the pertinentChildCount set.
      */
     public PQNode bubble(PQNode _root, List<PQNode> S){
         Queue<PQNode> queue = new LinkedList<>(S);
