@@ -19,16 +19,14 @@ import java.util.*;
 public class StNumbering extends Algorithm implements GraphReportExtension {
 
     private Stack<Vertex> stack;
-    //private Stack<Vertex> path;
     private int highestId;
     private HashMap<Vertex, Integer> preOrderMapping;
-    private HashMap<Vertex, Integer> L;
+    //private HashMap<Vertex, Integer> L;
     private HashMap<Vertex, Integer> stMapping;
     private HashMap<Vertex, Boolean> visited;
     private HashMap<Vertex, Integer> LNumbering;
     private HashMap<Vertex, Boolean> newVertex;
     private HashMap<Edge, Boolean> newEdge;
-    private HashMap<Vertex, Integer> number;
     List<Edge> treeEdges;
 
     private GraphModel graph;
@@ -59,16 +57,15 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
         this.newVertex = new HashMap<Vertex, Boolean>();
         this.newEdge = new HashMap<Edge, Boolean>();
         this.stack = new Stack<Vertex>();
-        this.number = new HashMap<Vertex, Integer>();
         this.treeEdges = new ArrayList<>();
     }
 
     public HashMap<Vertex, Integer> stNumbering() {
 
         this.preOrderNumbering();
-        for(Edge e : treeEdges){
-            System.out.println(e.getId());
-        }
+        //for(Edge e : treeEdges){
+            //System.out.println(e.getId());
+        //}
 
         Vertex arbitraryVertex = null;
         for (Vertex v : this.graph) {
@@ -88,22 +85,27 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
             else newEdge.put(e, true);
         }
 
+        this.computeL(t);
+
         stack.push(t);
         stack.push(s);
 
         Stack<Vertex> path;
         int i = 0;
-        while(!stack.empty()){
+        while(!stack.empty()) {
             Vertex v = stack.pop();
 
             // Find path with PATHFINDER
             path = pathfinder(v);
 
-            if(!path.isEmpty()){
+            if (!path.isEmpty()) {
                 // Add V_k-1, ..., V_1 (V_1 = v on top) to stack
-                path.pop(); // V_1, added last
-                while(!path.isEmpty()){
-                    if(path.size() > 1)
+                path.pop();
+                while(!path.isEmpty())
+                    stack.push(path.pop());
+                /*path.pop(); // V_1, added last
+                while (!path.isEmpty()) {
+                    if (path.size() > 1)
                         //stack.push(path.remove());
                         stack.push(path.pop());
                     else {
@@ -111,15 +113,13 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
                         path.pop();
                         break;
                     }
-                }
-                stack.push(v); // V_1
-            }
-            else {
-                number.put(v, i++);
+                }*/
+                //stack.push(v); // V_1
+            } else {
+                stMapping.put(v, i++);
             }
 
         }
-
 
         return stMapping;
     }
@@ -127,10 +127,13 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
     public Stack<Vertex> pathfinder(Vertex v){
         Stack<Vertex> path = new Stack<>();
 
+        //computeL(v);
+
         // (a)
         // If there is a new cycle edge {u,w} with w *-> v
         for(Vertex w : this.graph.directNeighbors(v)) {
             Edge currentEdge = this.graph.getEdge(v, w);
+            if(currentEdge == null) continue;
             if(newEdge.get(currentEdge) && !treeEdges.contains(currentEdge) && preOrderMapping.get(w) < preOrderMapping.get(v)){
                 newEdge.put(currentEdge, false);
                 path.add(v);
@@ -143,27 +146,32 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
         // Else if there is a new tree edge v -> w
         for(Vertex w : this.graph.directNeighbors(v)){
             Edge currentEdge = this.graph.getEdge(v, w);
+            if(currentEdge == null) continue;
+
             if(newEdge.get(currentEdge) && treeEdges.contains(currentEdge) && preOrderMapping.get(w) > preOrderMapping.get(v)){
                 newEdge.put(currentEdge, false);
                 path.add(v);
                 path.add(w);
 
                 // while w is new
-                Vertex nextVertex = w;
+                Vertex currentVertex = w;
                 boolean foundNextEdge = true;
-                while(newVertex.get(nextVertex) && foundNextEdge){
+                while(newVertex.get(currentVertex) && foundNextEdge){
                     // find a (new) edge {w,x} with x = L(w) or L(x) = L(w)
                     foundNextEdge = false;
-                    for(Vertex x : this.graph.directNeighbors(nextVertex)){
-                        Edge nextEdge = this.graph.getEdge(nextVertex, x);
-                        if(newEdge.get(nextEdge) && preOrderMapping.get(x) == L.get(nextVertex) || L.get(x) == L.get(nextVertex)){
-                            newVertex.put(nextVertex, false);
+                    for(Vertex x : this.graph.directNeighbors(currentVertex)){
+                        Edge nextEdge = this.graph.getEdge(currentVertex, x);
+                        if(nextEdge == null) continue;
+
+                        if (newEdge.get(nextEdge) && preOrderMapping.get(x) == LNumbering.get(currentVertex) || LNumbering.get(x) == LNumbering.get(currentVertex)) {
+                            newVertex.put(currentVertex, false);
                             newEdge.put(nextEdge, false);
                             path.add(x);
-                            nextVertex = x;
+                            currentVertex = x;
                             foundNextEdge = true;
                             break;
                         }
+
                     }
                 }
                 return path;
@@ -174,6 +182,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
         // Else if there is a new edge {v, w} with v *-> w
         for (Vertex w : this.graph.directNeighbors(v)) {
             Edge currentEdge = this.graph.getEdge(v, w);
+            if(currentEdge == null) continue;
             if(newEdge.get(currentEdge) && !treeEdges.contains(currentEdge) &&  preOrderMapping.get(w) > preOrderMapping.get(v)){
                 newEdge.put(currentEdge, false);
                 path.add(v);
@@ -185,6 +194,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
                     foundNextEdge = false;
                     for (Vertex x : this.graph.directNeighbors(currentVertex)){
                         Edge nextEdge = this.graph.getEdge(currentVertex, x);
+                        if(nextEdge == null) continue;
                         if (newEdge.get(nextEdge) && (!treeEdges.contains(nextEdge) || preOrderMapping.get(x) > preOrderMapping.get(currentVertex))) {
                             newVertex.put(currentVertex, false);
                             newEdge.put(nextEdge, false);
@@ -238,7 +248,6 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
         for (Vertex u : this.graph) {
             this.LNumbering.put(u, this.preOrderMapping.get(u));
             this.visited.put(u, false);
-            //this.backEdges.put(v, new ArrayList<Vertex>());
         }
         for (Vertex u : this.graph) {
             computeLHelper(u);
@@ -249,7 +258,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
     public int computeLHelper(Vertex v) {
         if (visited.get(v) == false) {
             this.visited.put(v, true);
-            for (Vertex u : this.graph.neighbors(v)) {
+            for (Vertex u : this.graph.directNeighbors(v)) {
                 if (this.visited.get(u) == true) {
                     this.LNumbering.put(v, Math.min(this.LNumbering.get(v), preOrderMapping.get(u)));
                 }
