@@ -249,6 +249,29 @@ public class PQ {
         return true;
     }
 
+    /**All children must be labelled identically (page 348)*/
+    public boolean QNODE_TEMPLATE_1(PQNode x){
+        PQNode front = x.endmostChildren().get(0);
+
+        final String consistentLabel = front.labelType;
+        PQNode iter = front;
+
+        do {
+            if(iter.labelType.equals(consistentLabel)){
+                iter = iter.circularLink_next;
+            }
+            else {
+                return false;
+            }
+
+        } while (iter != front);
+
+        System.out.println("TEMPLATE Q 1");
+
+        return true;
+    }
+
+    //todo: All children must be labelled identically (page 348), not necessarily false?
     public boolean GENERALIZED_TEMPLATE_1(PQNode x){
         if(!x.labelType.equals(PQNode.FULL)){
             for(PQNode n : x.children){
@@ -322,6 +345,10 @@ public class PQ {
         List<PQNode> fullChildren = new ArrayList<PQNode>();
 
         PQHelpers.collectChildrenByLabel(x, emptyChildren, fullChildren);
+
+        if(x.nodeType.equals(PQNode.QNODE)){
+            return false;
+        }
 
         //If there are no full nodes
         if (fullChildren.size() == 0) {
@@ -430,6 +457,18 @@ public class PQ {
         x.nodeType = PQNode.QNODE;
         x.children = new ArrayList<>();
 
+        // Alternative form B
+        if(emptyChildren.size() == 1 && fullChildren.size() == 1){
+            PQNode emptyNode = emptyChildren.get(0);
+            PQNode fullNode = fullChildren.get(0);
+            x.children.addAll(Arrays.asList(emptyNode, fullNode));
+            setCircularLinks(x.children);
+            emptyNode.parent = x;
+            fullNode.parent = x;
+            System.out.println("TEMPLATE P3 (alt form)");
+            return true;
+        }
+
         PQNode emptyPNode = new PQNode();
         PQNode fullPNode = new PQNode();
 
@@ -445,68 +484,67 @@ public class PQ {
         emptyPNode.children = emptyChildren;
         fullPNode.children = fullChildren;
 
-        // Alternative form B
         if(emptyChildren.size() == 1 && fullChildren.size() == 1){
-            PQNode emptyNode = emptyChildren.get(0);
-            PQNode fullNode = fullChildren.get(0);
-            x.children.addAll(Arrays.asList(emptyNode, fullNode));
-            setCircularLinks(x.children);
-            emptyNode.parent = x;
-            fullNode.parent = x;
-            System.out.println("TEMPLATE P3 (alt form)");
-            return true;
-            //return false;
-        }
-
-        // Below checks if either of the P-Nodes are redundant with only 1 child
-        if(emptyChildren.size() == 1){
-            // P-Node is redundant
             PQNode emptyChild = emptyChildren.get(0);
             emptyChild.parent = x;
             x.children.add(emptyChild);
-            if(fullChildren.size() > 1){
-                // Link to the other P-Node
-                setCircularLinks(Arrays.asList(emptyChild, fullPNode));
-            } else {
-                // Other P-Node will not be placed, so link to its first child
-                setCircularLinks(Arrays.asList(emptyChild, fullPNode.children.get(0)));
-            }
-        }
-        else {
-            //Pointing the children to the appropriate P node
-            for (PQNode child : emptyChildren) {
-                child.parent = emptyPNode;
-            }
-            x.children.add(emptyPNode);
-            //Setting the links again, otherwise the endmost children would point to the previous siblings (the empty ones)
-            setCircularLinks(emptyChildren);
-        }
+            setCircularLinks(Arrays.asList(emptyChild, fullChildren.get(0)));
 
-        if(fullChildren.size() == 1){
-            // P-Node is redundant
             PQNode fullChild = fullChildren.get(0);
             fullChild.parent = x;
             x.children.add(fullChild);
-            if(emptyChildren.size() > 1){
-                // Link to the other P-Node
-                setCircularLinks(Arrays.asList(emptyPNode, fullChild));
-            } else {
-                // Other P-Node was not placed, so link to its first child
-                setCircularLinks(Arrays.asList(emptyPNode.children.get(0), fullChild));
-            }
+            setCircularLinks(Arrays.asList(emptyChildren.get(0), fullChild));
         }
-        else {
+        else if(emptyChildren.size() == 1 && fullChildren.size() > 1){
+            PQNode emptyChild = emptyChildren.get(0);
+            emptyChild.parent = x;
+            x.children.add(emptyChild);
+            setCircularLinks(Arrays.asList(emptyChild, fullPNode));
+
             for (PQNode child : fullChildren) {
                 child.parent = fullPNode;
             }
             x.children.add(fullPNode);
-            //Setting the links again, otherwise the endmost children would point to the previous siblings (the empty ones)
             setCircularLinks(fullChildren);
+        }
+        else if(emptyChildren.size() > 1 && fullChildren.size() == 1){
+            for (PQNode child : emptyChildren) {
+                child.parent = emptyPNode;
+            }
+            x.children.add(emptyPNode);
+            setCircularLinks(emptyChildren);
+
+            PQNode fullChild = fullChildren.get(0);
+            fullChild.parent = x;
+            x.children.add(fullChild);
+            setCircularLinks(Arrays.asList(emptyPNode, fullChild));
+        }
+        else {
+            for (PQNode child : emptyChildren) {
+                child.parent = emptyPNode;
+            }
+            x.children.add(emptyPNode);
+            setCircularLinks(emptyChildren);
+
+            for (PQNode child : fullChildren) {
+                child.parent = fullPNode;
+            }
+            x.children.add(fullPNode);
+            setCircularLinks(fullChildren);
+        }
+
+        for (PQNode n : x.endmostChildren()) {
+            n.parent = x;
+        }
+
+        for (PQNode n : x.internalChildren()) {
+            n.parent = null;
         }
 
         System.out.println("TEMPLATE P3");
         return true;
     }
+
 
     /**
      * Tries to match the tree at x (x must be the root of the pertinent subtree) to template P4, if successful,
@@ -539,6 +577,10 @@ public class PQ {
      */
     public boolean TEMPLATE_P4(PQNode x){
 
+        if(!x.nodeType.equals(PQNode.PNODE)){
+            return false;
+        }
+
         //Matching phase
         List<PQNode> emptyChildren = x.getChildrenOfLabel(PQNode.EMPTY);
         List<PQNode> fullChildren = x.getChildrenOfLabel(PQNode.FULL);
@@ -553,10 +595,6 @@ public class PQ {
         if ( fullChildren.size() + emptyChildren.size() + partialChildren.size() != x.children.size()) {
             return false;
         }
-
-        //if(partialChildren.get(0).children.size() <= 2){
-        //    partialChildren.get(0).nodeType = PQNode.QNODE;
-        //}
 
         //If partial node is not a Q node
         if (partialChildren.get(0).nodeType != PQNode.QNODE) {
@@ -980,7 +1018,8 @@ public class PQ {
      */
     public boolean TEMPLATE_Q1(PQNode x){
        if (x.nodeType.equals(PQNode.QNODE)) {
-           return GENERALIZED_TEMPLATE_1(x);
+           //return GENERALIZED_TEMPLATE_1(x);
+           return QNODE_TEMPLATE_1(x);
        }
        return false;
     }
