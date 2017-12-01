@@ -1,13 +1,14 @@
 package graphtea.extensions.reports.numberings;
 
 import graphtea.extensions.reports.connectivity.KConnected;
+import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.library.algorithms.Algorithm;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 import java.lang.Math;
 
-import java.util.HashMap;
+import java.util.*;
 
 /*
  * Selects the first vertex in the graph, and labels the vertices in the graph by doing a pre-order
@@ -17,12 +18,19 @@ import java.util.HashMap;
  */
 public class StNumbering extends Algorithm implements GraphReportExtension {
 
+    private Stack<Vertex> stack;
+    //private Stack<Vertex> path;
     private int highestId;
     private HashMap<Vertex, Integer> preOrderMapping;
     private HashMap<Vertex, Integer> L;
     private HashMap<Vertex, Integer> stMapping;
     private HashMap<Vertex, Boolean> visited;
     private HashMap<Vertex, Integer> LNumbering;
+    private HashMap<Vertex, Boolean> newVertex;
+    private HashMap<Edge, Boolean> newEdge;
+    private HashMap<Vertex, Integer> number;
+    List<Edge> treeEdges;
+
     private GraphModel graph;
 
     public String getName() {
@@ -48,11 +56,153 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
         this.stMapping = new HashMap<Vertex, Integer>();
         this.visited = new HashMap<Vertex, Boolean>();
         this.LNumbering = new HashMap<Vertex, Integer>();
+        this.newVertex = new HashMap<Vertex, Boolean>();
+        this.newEdge = new HashMap<Edge, Boolean>();
+        this.stack = new Stack<Vertex>();
+        this.number = new HashMap<Vertex, Integer>();
+        this.treeEdges = new ArrayList<>();
     }
 
     public HashMap<Vertex, Integer> stNumbering() {
 
+        this.preOrderNumbering();
+        for(Edge e : treeEdges){
+            System.out.println(e.getId());
+        }
+
+        Vertex arbitraryVertex = null;
+        for (Vertex v : this.graph) {
+            if(arbitraryVertex == null) {
+                arbitraryVertex = v;
+                newVertex.put(v, false);
+            }
+            else newVertex.put(v, true);
+        }
+
+        Vertex t = arbitraryVertex;
+        Vertex s = this.graph.directNeighbors(t).get(0);
+        for (Edge e : this.graph.getEdges()){
+            if(e.source == t && e.target == s){
+                newEdge.put(e, false);
+            }
+            else newEdge.put(e, true);
+        }
+
+        stack.push(t);
+        stack.push(s);
+
+        Stack<Vertex> path;
+        int i = 0;
+        while(!stack.empty()){
+            Vertex v = stack.pop();
+
+            // Find path with PATHFINDER
+            path = pathfinder(v);
+
+            if(!path.isEmpty()){
+                // Add V_k-1, ..., V_1 (V_1 = v on top) to stack
+                path.pop(); // V_1, added last
+                while(!path.isEmpty()){
+                    if(path.size() > 1)
+                        //stack.push(path.remove());
+                        stack.push(path.pop());
+                    else {
+                        //path.remove();
+                        path.pop();
+                        break;
+                    }
+                }
+                stack.push(v); // V_1
+            }
+            else {
+                number.put(v, i++);
+            }
+
+        }
+
+
         return stMapping;
+    }
+
+    public Stack<Vertex> pathfinder(Vertex v){
+        Stack<Vertex> path = new Stack<>();
+
+        // (a)
+        // If there is a new cycle edge {u,w} with w *-> v
+        for(Vertex w : this.graph.directNeighbors(v)) {
+            Edge currentEdge = this.graph.getEdge(v, w);
+            if(newEdge.get(currentEdge) && !treeEdges.contains(currentEdge) && preOrderMapping.get(w) < preOrderMapping.get(v)){
+                newEdge.put(currentEdge, false);
+                path.add(v);
+                path.add(w);
+                return path;
+            }
+        }
+
+        // (b)
+        // Else if there is a new tree edge v -> w
+        for(Vertex w : this.graph.directNeighbors(v)){
+            Edge currentEdge = this.graph.getEdge(v, w);
+            if(newEdge.get(currentEdge) && treeEdges.contains(currentEdge) && preOrderMapping.get(w) > preOrderMapping.get(v)){
+                newEdge.put(currentEdge, false);
+                path.add(v);
+                path.add(w);
+
+                // while w is new
+                Vertex nextVertex = w;
+                boolean foundNextEdge = true;
+                while(newVertex.get(nextVertex) && foundNextEdge){
+                    // find a (new) edge {w,x} with x = L(w) or L(x) = L(w)
+                    foundNextEdge = false;
+                    for(Vertex x : this.graph.directNeighbors(nextVertex)){
+                        Edge nextEdge = this.graph.getEdge(nextVertex, x);
+                        if(newEdge.get(nextEdge) && preOrderMapping.get(x) == L.get(nextVertex) || L.get(x) == L.get(nextVertex)){
+                            newVertex.put(nextVertex, false);
+                            newEdge.put(nextEdge, false);
+                            path.add(x);
+                            nextVertex = x;
+                            foundNextEdge = true;
+                            break;
+                        }
+                    }
+                }
+                return path;
+            }
+        }
+
+        // (c)
+        // Else if there is a new edge {v, w} with v *-> w
+        for (Vertex w : this.graph.directNeighbors(v)) {
+            Edge currentEdge = this.graph.getEdge(v, w);
+            if(newEdge.get(currentEdge) && !treeEdges.contains(currentEdge) &&  preOrderMapping.get(w) > preOrderMapping.get(v)){
+                newEdge.put(currentEdge, false);
+                path.add(v);
+                path.add(w);
+
+                Vertex currentVertex = w;
+                boolean foundNextEdge = true;
+                while (newVertex.get(currentVertex) && foundNextEdge){
+                    foundNextEdge = false;
+                    for (Vertex x : this.graph.directNeighbors(currentVertex)){
+                        Edge nextEdge = this.graph.getEdge(currentVertex, x);
+                        if (newEdge.get(nextEdge) && (!treeEdges.contains(nextEdge) || preOrderMapping.get(x) > preOrderMapping.get(currentVertex))) {
+                            newVertex.put(currentVertex, false);
+                            newEdge.put(nextEdge, false);
+                            path.add(x);
+                            currentVertex = x;
+                            foundNextEdge = true;
+                            break;
+                        }
+                    }
+                }
+                return path;
+            }
+
+        }
+
+        // (d)
+        // Else return empty path
+        return path;
     }
 
     public HashMap<Vertex, Integer> preOrderNumbering() {
@@ -68,11 +218,17 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
     }
 
     public void preOrderNumberingHelper(Vertex v) {
-        preOrderMapping.put(v, this.highestId++);
+
+        if(preOrderMapping.get(v) == null){
+            preOrderMapping.put(v, this.highestId++);
+        }
+
         for (Vertex u : this.graph.neighbors(v)) {
             if (visited.get(u) != true) {
+                //System.out.println(u.getId());
                 visited.put(u, true);
                 preOrderNumberingHelper(u);
+                treeEdges.add(this.graph.getEdge(v, u));
             }
         }
     }
@@ -82,6 +238,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
         for (Vertex u : this.graph) {
             this.LNumbering.put(u, this.preOrderMapping.get(u));
             this.visited.put(u, false);
+            //this.backEdges.put(v, new ArrayList<Vertex>());
         }
         for (Vertex u : this.graph) {
             computeLHelper(1, u);
