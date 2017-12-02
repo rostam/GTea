@@ -1,5 +1,6 @@
 package graphtea.extensions.reports.planarity;
 
+import graphtea.extensions.reports.numberings.NotBiconnectedException;
 import graphtea.extensions.reports.planarity.planaritypq.PQMethod;
 import graphtea.graph.graph.GraphModel;
 import graphtea.library.algorithms.Algorithm;
@@ -27,7 +28,11 @@ public class Planarity extends Algorithm implements GraphReportExtension {
 		//WagnerMethod wm = new WagnerMethod();
         //return wm.isPlanar(g);
 		PQMethod pq = new PQMethod();
-		return pq.isPlanar(g);
+		try {
+			return pq.isPlanar(g);
+		} catch (NotBiconnectedException e) {
+			return null;
+		}
         //return doAlgorithm();
 	}
 

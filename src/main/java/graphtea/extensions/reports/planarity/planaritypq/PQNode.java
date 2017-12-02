@@ -254,6 +254,7 @@ public class PQNode {
         return adjacents;
     }
 
+    // x is replaced by this
     public void replaceInCircularLink(PQNode x){
         this.circularLink_next.circularLink_prev = x;
         this.circularLink_prev.circularLink_next = x;
@@ -285,7 +286,6 @@ public class PQNode {
         catch (IllegalNodeTypeException e) { }
     }
 
-    /**Change use to childrenOfLabel, this function is deprecated*/
     public List<PQNode> fullChildren(){
         List<PQNode> full = new ArrayList<PQNode>();
 

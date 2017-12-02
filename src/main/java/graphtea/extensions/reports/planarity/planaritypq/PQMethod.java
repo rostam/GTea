@@ -1,7 +1,12 @@
 package graphtea.extensions.reports.planarity.planaritypq;
 
+import com.sun.org.apache.xerces.internal.impl.dv.dtd.NOTATIONDatatypeValidator;
+import graphtea.extensions.algs4.Graph;
+import graphtea.extensions.reports.numberings.NotBiconnectedException;
+import graphtea.extensions.reports.numberings.StNumbering;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
+import graphtea.graph.graph.Vertex;
 
 import java.util.*;
 
@@ -9,10 +14,25 @@ import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.*;
 
 public class PQMethod {
 
+    HashMap<Vertex, Integer> stMapping;
+
     public PQMethod() {
     }
+    private boolean configureSTMapping(GraphModel graph) {
+        try {
+            StNumbering st = new StNumbering(graph);
+            stMapping = st.stNumbering();
+        } catch (NotBiconnectedException e) {
+            System.err.println(e);
+            return false;
+        }
+        return true;
+    }
 
-    public boolean isPlanar(GraphModel graph){
+    public boolean isPlanar(GraphModel graph) throws NotBiconnectedException {
+
+        if(!configureSTMapping(graph))
+            throw new NotBiconnectedException("Graph must be biconnected for StNumbering to work!");
 
         Iterable<Edge> source = graph.getEdges();
         HashSet<PQNode> U = new HashSet<>();
@@ -21,12 +41,16 @@ public class PQMethod {
         T.id = "T";
         for(Edge e : source){
 
-            System.out.print("(" + e.source.getId() + " -> " + e.target.getId() + "), ");
+            //System.out.print("(" + e.source.getId() + " -> " + e.target.getId() + "), ");
+            //int targetId = e.target.getId();
+            //int sourceId = e.source.getId();
+            int targetId = stMapping.get(e.target);
+            int sourceId = stMapping.get(e.source);
+            System.out.print("(" + sourceId + " -> " + targetId + "), ");
 
-            int targetId = e.target.getId();
-            int sourceId = e.source.getId();
             if (Math.min(targetId, sourceId) == 0) {
-                PQNode leafNode = new PQNode(e.source.getId() + " -> " + e.target.getId());
+                //PQNode leafNode = new PQNode(e.source.getId() + " -> " + e.target.getId());
+                PQNode leafNode = new PQNode(sourceId + " -> " + targetId);
                 leafNode.parent = T;
                 U.add(leafNode);
             }
@@ -37,7 +61,7 @@ public class PQMethod {
 
         // Same as T(U, U) because all U are set to full and T (a p-node) can reach all of U in any order
         T.children.addAll(U);
-        PQHelpers.setCircularLinks(T.children);
+        //PQHelpers.setCircularLinks(T.children);
 
         for(int j=1; j<graph.getVertexArray().length-1; j++){
             System.out.println("ITERATION: " + j);
@@ -48,10 +72,15 @@ public class PQMethod {
             // These are the edges we are to reduce
              ArrayList<PQNode> S = new ArrayList<>();
              for(Edge e : source){
-                 int targetId = e.target.getId();
-                 int sourceId = e.source.getId();
+                 //int targetId = e.target.getId();
+                 //int sourceId = e.source.getId();
+                 int targetId = stMapping.get(e.target);
+                 int sourceId = stMapping.get(e.source);
+
                  if (Math.max(targetId, sourceId) == j) {
-                     String _id = e.source.getId() + " -> " + e.target.getId();
+                     //String _id = e.source.getId() + " -> " + e.target.getId();
+                     String _id = sourceId + " -> " + targetId;
+
                      PQNode leafNode = null;
 
                      //System.out.println("Max: " + _id);
@@ -83,19 +112,29 @@ public class PQMethod {
                 }
             }
 
+            try {
+                if (S.isEmpty()) {
+                    throw new IllegalNumberingException("S is empty");
+                }
+            }
+            catch (IllegalNumberingException e) {
+                //System.exit(2);
+                return false;
+            }
+
             System.out.println("----------B-----------");
             PQHelpers.printPreorderIds(T);
             PQHelpers.printListIds(S, "S");
 
             System.out.println("Running Bubble");
-            if(S.size() > 0) {
-                PQHelpers.reset(T, true, false);
-                T = PQTree.bubble(T, S);
-            }
+            //if(S.size() > 0) {
+            PQHelpers.reset(T, true, false);
+            T = PQTree.bubble(T, S);
+            //}
 
             System.out.println("Running Reduce");
-            if(S.size() > 0)
-                T = PQTree.reduce(T, S);
+            //if(S.size() > 0)
+            T = PQTree.reduce(T, S);
 
             if (T == null) {
                 return false;
@@ -107,12 +146,15 @@ public class PQMethod {
             // These edges are added to Sp
             ArrayList<PQNode> Sp = new ArrayList<>();
             for(Edge e : source){
-                //Vertex higherNumberedVertex
-                int targetId = e.target.getId();
-                int sourceId = e.source.getId();
+                //int targetId = e.target.getId();
+                //int sourceId = e.source.getId();
+                int targetId = stMapping.get(e.target);
+                int sourceId = stMapping.get(e.source);
                 if (Math.min(targetId, sourceId) == j) {
 
-                    String _id = e.source.getId() + " -> " + e.target.getId();
+                    //String _id = e.source.getId() + " -> " + e.target.getId();
+                    String _id = sourceId + " -> " + targetId;
+
                     PQNode leafNode = null;
                     // Check if leaf node already exists in the universal set
                     for(PQNode pq : U){
@@ -132,25 +174,39 @@ public class PQMethod {
             }
             System.out.println("----------C-----------");
             PQHelpers.printListIds(Sp, "Sp");
+
+            try {
+                if (Sp.isEmpty()){
+                    throw new IllegalNumberingException("Sp is empty");
+                }
+            }
+            catch (IllegalNumberingException e) {
+                //System.exit(2);
+                return false;
+            }
+
+
             PQNode root = PQTree.root(T, S);
 
-            if(root == null && Sp.size() > 0){
+            /*if(root == null && Sp.size() > 0){
                 // If S is empty
 
                 try {
                     if (T.nodeType.equals(PQNode.PNODE)) { // T should always be a P-Node
-                        PQNode intermediaryPNode = new PQNode(PQNode.PNODE, PQNode.EMPTY);
-                        T.children.add(intermediaryPNode);
-                        intermediaryPNode.parent = T;
-                        for(PQNode n : Sp){
-                            n.parent = intermediaryPNode;
+
+                        if(Sp.size() == 1){
+                            T.children.add(Sp.get(0));
+                            Sp.get(0).parent = T;
+                        }
+                        else {
+                            PQNode intermediaryPNode = new PQNode(PQNode.PNODE, PQNode.EMPTY);
+                            T.children.add(intermediaryPNode);
+                            intermediaryPNode.parent = T;
+                            for (PQNode n : Sp) {
+                                n.parent = intermediaryPNode;
+                            }
                         }
 
-                        /*T.children.addAll(Sp);
-                        //setCircularLinks(T.children);
-                        /*for(PQNode n : Sp){
-                            n.parent = T;
-                        }*/
                     }
                     else throw new IllegalNodeTypeException("T is not a P-Node");
                 }
@@ -159,7 +215,8 @@ public class PQMethod {
 
             }
             // if ROOT(T, S) is a Q-Node
-            else if (root.nodeType.equals(PQNode.QNODE) && Sp.size() > 0) {
+            else */
+            if (root.nodeType.equals(PQNode.QNODE) && Sp.size() > 0) {
                 // replace the full children of ROOT(T, S) and their descendants by T(S', S')
                 System.out.println("Inside: Subtree root is a Q-node");
 
@@ -171,8 +228,7 @@ public class PQMethod {
 
                 replaceRootAndDescendants(root, Sp);
 
-            } else {
-                // Todo: Check if this is correct
+            } /*else {
                 // if the set Sp is empty
 
                 List<PQNode> removalNodes = root.fullChildren();
@@ -198,8 +254,7 @@ public class PQMethod {
                     }
                 }
 
-            }
-
+            }*/
 
             PQHelpers.printListIds(S, "S");
             PQHelpers.printListIds(Sp, "Sp");
@@ -211,7 +266,7 @@ public class PQMethod {
             //U.addAll(0, Sp);
 
             PQHelpers.printListIds(new ArrayList<>(U), "U after");
-            //PQHelpers.printPreorderIds(T);
+            PQHelpers.printPreorderIds(T);
             //System.out.println("COMPLETED ITERATION: " + j);
         }
         System.out.println("DONE!");
@@ -307,7 +362,7 @@ public class PQMethod {
         }*/
 
         // Q-Nodes are directional, but this only matters if they have 3+ children.
-        if(root.getChildren().size() < 3) {
+        if(root.getChildren().size() < 3) { //todo: should this be here?
             root.nodeType = PQNode.PNODE;
         }
 
@@ -326,15 +381,11 @@ public class PQMethod {
             replacementNode = new PQNode(PQNode.PNODE, PQNode.EMPTY);
             replacementNode.id = "rNode";
             replacementNode.children.addAll(Sp);
-            setCircularLinks(replacementNode.children);
+            //setCircularLinks(replacementNode.children);
             for(PQNode n : Sp){
                 n.parent = replacementNode;
             }
         }
-        /*else {
-            System.out.println("P-Node parent: Sp is 0! ");
-            SpEmpty = true;
-        }*/
 
         if(rParent != null /*&& !SpEmpty*/) {
             // ROOT(T, S) is not the root of the whole tree
@@ -347,10 +398,7 @@ public class PQMethod {
                 // Places replacementPNode into the same index in the children list as the root
                 // This is important because q-nodes are directional and ordered
 
-                //PQHelpers.insertNodeIntoSameChildIndex(replacementNode, root, rParent);
-                //PQHelpers.insertNodeIntoCircularList(replacementNode, root.circularLink_prev, root.circularLink_next);
-                //rParent.removeChildren(Arrays.asList(root));
-                rParent.replaceQNodeChild(replacementNode, root); // above has been refactored to this
+                rParent.replaceQNodeChild(replacementNode, root);
 
             }
             else {
@@ -374,14 +422,6 @@ public class PQMethod {
 
             root.id = "rT"; // For testing purposes
         }
-        /*else {
-            System.out.println("PNode: SP ZERO");
-
-            List<PQNode> removedNodes = root.fullChildren();
-            root.removeChildren(removedNodes);
-
-            root.id = "rTSpZero";
-        }*/
 
     }
 

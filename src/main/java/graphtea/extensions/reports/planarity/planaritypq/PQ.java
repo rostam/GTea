@@ -1089,6 +1089,7 @@ public class PQ {
         }
         else {
             // No reduction needed
+            x.labelType = PQNode.PARTIAL;
             return true;
         }
 

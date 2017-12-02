@@ -487,7 +487,7 @@ public class StNumberingTest {
         PrismGraph gen = new PrismGraph();
         GraphModel gm = gen.generateGraph();
 
-        // Assert false
+        // Assert true
         assertTrue(genericStNumberingTest(gm));
     }
 
