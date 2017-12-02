@@ -45,7 +45,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
 
 	public StNumbering(GraphModel g) throws NotBiconnectedException {
         KConnected kc = new KConnected();
-        if (kc.kconn(g) < 2) {
+        if (kc.kconn(g) < 2 && g.getVerticesCount() > 2) {
             throw new NotBiconnectedException("Graph must be biconnected for StNumbering to work!");
         }
         this.graph = g;
@@ -62,10 +62,16 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
 
     public HashMap<Vertex, Integer> stNumbering() {
 
+        if(this.graph.getVerticesCount() <= 2) {
+            for(Vertex v : this.graph.getVertexArray()){
+                stMapping.put(v, v.getId());
+            }
+            return stMapping;
+        }
+
+        graph.setDirected(false);
+
         this.preOrderNumbering();
-        //for(Edge e : treeEdges){
-            //System.out.println(e.getId());
-        //}
 
         Vertex arbitraryVertex = null;
         for (Vertex v : this.graph) {
@@ -78,8 +84,10 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
 
         Vertex t = arbitraryVertex;
         Vertex s = this.graph.directNeighbors(t).get(0);
+        newVertex.put(s, false);
         for (Edge e : this.graph.getEdges()){
-            if(e.source == t && e.target == s){
+            //if(e.source == t && e.target == s){
+            if(e == graph.getEdge(s, t)){
                 newEdge.put(e, false);
             }
             else newEdge.put(e, true);
@@ -99,26 +107,19 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
             path = pathfinder(v);
 
             if (!path.isEmpty()) {
-                // Add V_k-1, ..., V_1 (V_1 = v on top) to stack
                 path.pop();
                 while(!path.isEmpty())
                     stack.push(path.pop());
-                /*path.pop(); // V_1, added last
-                while (!path.isEmpty()) {
-                    if (path.size() > 1)
-                        //stack.push(path.remove());
-                        stack.push(path.pop());
-                    else {
-                        //path.remove();
-                        path.pop();
-                        break;
-                    }
-                }*/
-                //stack.push(v); // V_1
             } else {
                 stMapping.put(v, i++);
             }
 
+        }
+
+        for (Vertex v : this.graph) {
+            if(newVertex.get(v)) {
+                System.out.println("Missed node: " + v.getId());
+            }
         }
 
         return stMapping;
@@ -163,7 +164,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
                         Edge nextEdge = this.graph.getEdge(currentVertex, x);
                         if(nextEdge == null) continue;
 
-                        if (newEdge.get(nextEdge) && preOrderMapping.get(x) == LNumbering.get(currentVertex) || LNumbering.get(x) == LNumbering.get(currentVertex)) {
+                        if (newEdge.get(nextEdge) && (preOrderMapping.get(x) == LNumbering.get(currentVertex) || LNumbering.get(x) == LNumbering.get(currentVertex))) {
                             newVertex.put(currentVertex, false);
                             newEdge.put(nextEdge, false);
                             path.add(x);
@@ -195,7 +196,8 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
                     for (Vertex x : this.graph.directNeighbors(currentVertex)){
                         Edge nextEdge = this.graph.getEdge(currentVertex, x);
                         if(nextEdge == null) continue;
-                        if (newEdge.get(nextEdge) && (!treeEdges.contains(nextEdge) || preOrderMapping.get(x) > preOrderMapping.get(currentVertex))) {
+                        //if (newEdge.get(nextEdge) && (!treeEdges.contains(nextEdge) || preOrderMapping.get(x) < preOrderMapping.get(currentVertex))) {
+                        if (newEdge.get(nextEdge) && treeEdges.contains(nextEdge)) {
                             newVertex.put(currentVertex, false);
                             newEdge.put(nextEdge, false);
                             path.add(x);
@@ -220,6 +222,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
             visited.put(v, false);
         }
         for (Vertex v : this.graph) {
+            visited.put(v, true);
             preOrderNumberingHelper(v);
         }
         this.highestId = 0;
@@ -235,10 +238,9 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
 
         for (Vertex u : this.graph.neighbors(v)) {
             if (visited.get(u) != true) {
-                //System.out.println(u.getId());
                 visited.put(u, true);
-                preOrderNumberingHelper(u);
                 treeEdges.add(this.graph.getEdge(v, u));
+                preOrderNumberingHelper(u);
             }
         }
     }
