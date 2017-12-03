@@ -282,11 +282,48 @@ public class PQHelpers {
         insertionNode.circularLink_prev = leftNode;
         leftNode.circularLink_next = insertionNode;
         rightNode.circularLink_prev = insertionNode;
+    }
 
-        //leftNode.circularLink_prev.circularLink_next = insertionNode;
-        //rightNode.circularLink_next.circularLink_prev = insertionNode;
-        //insertionNode.circularLink_prev = leftNode.circularLink_prev;
-        //insertionNode.circularLink_next = rightNode.circularLink_next;
+    public static void reduceChildQNodeIntoParentQNode(PQNode partialNode, PQNode parentQNode){
+        //List<PQNode> insertedChildren = new ArrayList<>();
+
+        PQNode leftmostChildOfParent = parentQNode.endmostChildren().get(0);
+        PQNode rightmostChildOfParent = parentQNode.endmostChildren().get(1);
+
+        PQNode rightMostChildOfQ = partialNode.endmostChildren().get(1);
+        PQNode leftMostChildOfQ = partialNode.endmostChildren().get(0);
+
+        PQNode leftNode = partialNode.circularLink_prev, rightNode = partialNode.circularLink_next;
+        PQNode partialChildTraversal = leftMostChildOfQ;
+        do {
+            //insertedChildren.add(partialChildTraversal);
+            PQNode tmp = partialChildTraversal.circularLink_next;
+            PQHelpers.insertNodeIntoCircularList(partialChildTraversal, leftNode, rightNode);
+            leftNode = partialChildTraversal;
+            partialChildTraversal = tmp;
+        } while(partialChildTraversal != leftMostChildOfQ);
+
+        if(leftmostChildOfParent == partialNode){
+            parentQNode.children.remove(leftmostChildOfParent);
+            parentQNode.children.add(1, leftMostChildOfQ);
+        }
+        else if(rightmostChildOfParent == partialNode){
+            parentQNode.children.remove(rightmostChildOfParent);
+            parentQNode.children.add(rightMostChildOfQ);
+        }
+        parentQNode.children.remove(partialNode);
+
+        for (PQNode n : parentQNode.endmostChildren()) {
+            n.parent = parentQNode;
+        }
+
+        List<PQNode> removalNodes = new ArrayList<>();
+        for (PQNode n : parentQNode.internalChildren()) {
+            n.parent = null;
+            removalNodes.add(n);
+        }
+        parentQNode.children.removeAll(removalNodes);
+
     }
 
     /** Places newNode into the same index in the children list as oldNode

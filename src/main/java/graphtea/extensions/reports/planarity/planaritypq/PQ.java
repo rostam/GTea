@@ -67,7 +67,7 @@ public class PQ {
             if(US.size() > 0){
                 PQNode y = US.get(0);
                 //x.parent = y.parent;
-                x.parent = y.getParent(); // todo: is this still correct??
+                x.parent = y.getParent();
                 x.blocked = false;
             }
             else if(x.immediateSiblings(true).size() < 2){
@@ -271,7 +271,6 @@ public class PQ {
         return true;
     }
 
-    //todo: All children must be labelled identically (page 348), not necessarily false?
     public boolean GENERALIZED_TEMPLATE_1(PQNode x){
         if(!x.labelType.equals(PQNode.FULL)){
             for(PQNode n : x.children){
@@ -936,6 +935,9 @@ public class PQ {
         else {
             rightMost1.circularLink_next = leftMost2;
             leftMost2.circularLink_prev = rightMost1;
+
+            rightMost2.circularLink_next = leftMost1;
+            leftMost1.circularLink_prev = rightMost2;
         }
 
         /** Reconfigure qNode1, qNode2 parents */
@@ -984,11 +986,15 @@ public class PQ {
 
         // This should be changed to add the whole lists rather than traversing.
         mergingQNode.setQNodeEndmostChildren(leftMost1, rightMost2);
-        //PQNode traversal = leftMost1;
-        //while(traversal.circularLink_next != leftMost1){
-        //    mergingQNode.children.add(traversal);
-        //    traversal = traversal.circularLink_next;
-        //}
+
+        //Set parent links
+        for (PQNode n : mergingQNode.endmostChildren()) {
+            n.parent = mergingQNode;
+        }
+
+        for (PQNode n : mergingQNode.internalChildren()) {
+            n.parent = null;
+        }
 
         System.out.println("TEMPLATE P6");
 
@@ -1101,29 +1107,70 @@ public class PQ {
 
         x.labelType = PQNode.PARTIAL;
 
+        PQNode leftMostChildOfQ = partialNode.endmostChildren().get(0);
+        PQNode rightMostChildOfQ = partialNode.endmostChildren().get(1);
+        PQNode leftMostChildOfX = x.endmostChildren().get(0);
+        PQNode rightMostChildOfX = x.endmostChildren().get(1);
+
+        if(partialNode == leftMostChildOfX){
+            // Q ... rest
+            if(partialNode.circularLink_next.labelType.equals(PQNode.FULL) && leftMostChildOfQ.labelType.equals(PQNode.FULL)){
+                // x children: (partialNode) ... (fulls) ... (empties)
+                // partialNode children: (fulls) ... (empties) -> (empties) ... (fulls)
+                rotateQNode(partialNode);
+            }
+            else {
+                // ignore
+            }
+        }
+        else if(partialNode == rightMostChildOfX){
+            // rest ... Q
+            if(partialNode.circularLink_prev.labelType.equals(PQNode.FULL) && rightMostChildOfQ.labelType.equals(PQNode.FULL)){
+                // x children: (empties) ... (fulls) ... (partialNode)
+                // partialNode children: (empties) ... (fulls) -> (fulls) ... (empties)
+                rotateQNode(partialNode);
+            }
+            else {
+                // ignore
+            }
+        }
+        else {
+            // some ... Q ... some
+            if(partialNode.circularLink_prev.labelType.equals(PQNode.FULL) && leftMostChildOfQ.labelType.equals(PQNode.EMPTY)){
+                // x children: (fulls) ... (partialNode) ... (empties)
+                rotateQNode(partialNode);
+            }
+            else {
+                // ignore
+            }
+
+        }
+
+        PQHelpers.reduceChildQNodeIntoParentQNode(partialNode, x);
+
         //Move all children of the partial node to the root
-        List<PQNode> replacementChildren = new ArrayList<PQNode>();
+        /*List<PQNode> replacementChildren = new ArrayList<PQNode>();
         replacementChildren.addAll(x.getChildrenOfLabel(PQNode.EMPTY));
         replacementChildren.addAll(partialNode.getChildrenOfLabel(PQNode.EMPTY));
         replacementChildren.addAll(partialNode.getChildrenOfLabel(PQNode.FULL));
-        replacementChildren.addAll(x.getChildrenOfLabel(PQNode.FULL));
+        replacementChildren.addAll(x.getChildrenOfLabel(PQNode.FULL));*/
 
         //Delete partial child
-        partialNode = null;
+        //partialNode = null;
 
         //Reset circular links
-        setCircularLinks(replacementChildren);
+        //setCircularLinks(replacementChildren);
 
-        x.children = replacementChildren;
+        //x.children = replacementChildren;
 
         //Set parent links
-        for (PQNode n : x.endmostChildren()) {
+        /*for (PQNode n : x.endmostChildren()) {
             n.parent = x;
         }
 
         for (PQNode n : x.internalChildren()) {
             n.parent = null;
-        }
+        }*/
 
         System.out.println("TEMPLATE Q2");
 
