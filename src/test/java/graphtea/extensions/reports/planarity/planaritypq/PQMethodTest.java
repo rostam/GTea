@@ -14,6 +14,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.*;
@@ -153,8 +154,6 @@ public class PQMethodTest {
     public void TreeTest(){
         TreeGenerator gen = new TreeGenerator();
         GraphModel gm = gen.generateGraph();
-        //PQMethod pc = new PQMethod();
-        //assertTrue(pc.isPlanar(gm));
         genericIsPlanarTest(gm, true);
     }
 
@@ -264,63 +263,6 @@ public class PQMethodTest {
         genericIsPlanarTest(gm, true);
     }
 
-    //@Test
-    public void PrismGraphstNumbering(){
-        GraphModel gm = new GraphModel();
-
-        Vertex v0 = new Vertex();
-        Vertex v1 = new Vertex();
-        Vertex v2 = new Vertex();
-        Vertex v3 = new Vertex();
-        Vertex v4 = new Vertex();
-        Vertex v5 = new Vertex();
-        Vertex v6 = new Vertex();
-        Vertex v7 = new Vertex();
-
-        Edge e1 = new Edge(v0, v1);
-        Edge e2 = new Edge(v0, v4);
-        Edge e3 = new Edge(v0, v7);
-
-        Edge e4 = new Edge(v1, v2);
-        Edge e5 = new Edge(v1, v5);
-
-        Edge e6 = new Edge(v2, v7);
-        Edge e7 = new Edge(v2, v6);
-
-        Edge e8 = new Edge(v6, v5);
-        Edge e9 = new Edge(v6, v3);
-
-        Edge e10 = new Edge(v3, v4);
-        Edge e11 = new Edge(v3, v7);
-
-        Edge e12 = new Edge(v4, v5);
-
-        gm.addVertex(v1);
-        gm.addVertex(v2);
-        gm.addVertex(v3);
-        gm.addVertex(v4);
-        gm.addVertex(v5);
-        gm.addVertex(v6);
-        gm.addVertex(v7);
-
-        gm.addEdge(e1);
-        gm.addEdge(e2);
-        gm.addEdge(e3);
-        gm.addEdge(e4);
-        gm.addEdge(e5);
-        gm.addEdge(e6);
-        gm.addEdge(e7);
-        gm.addEdge(e8);
-        gm.addEdge(e9);
-        gm.addEdge(e10);
-        gm.addEdge(e11);
-        gm.addEdge(e12);
-
-        //PQMethod pc = new PQMethod();
-        //assertFalse(pc.isPlanar(gm));
-        genericIsPlanarTest(gm, false);
-    }
-
     @Test
     public void AntiPrismGraphTest() {
         AntiprismGraph gen = new AntiprismGraph();
@@ -341,14 +283,6 @@ public class PQMethodTest {
     public void TadPoleTest() {
         TadpoleGenerator gen = new TadpoleGenerator();
         GraphModel gm = gen.generateTadpole(5, 6);
-
-        //KConnected kc = new KConnected();
-        //if(kc.kconn(gm) > 1){
-        //    PQMethod pc = new PQMethod();
-        //    assertTrue(pc.isPlanar(gm));
-        //} else {
-        //    System.out.println("NOT BICONNECTED");
-        //}
         genericIsPlanarTest(gm, true);
     }
 
@@ -357,14 +291,6 @@ public class PQMethodTest {
     public void HelmTest1() {
         HelmGraph gen = new HelmGraph();
         GraphModel gm = gen.generateHelm(1);
-
-        //KConnected kc = new KConnected();
-        //if(kc.kconn(gm) > 1){
-        //    PQMethod pc = new PQMethod();
-        //    assertTrue(pc.isPlanar(gm));
-        //} else {
-        //    System.out.println("NOT BICONNECTED");
-        //}
         genericIsPlanarTest(gm, true);
     }
 

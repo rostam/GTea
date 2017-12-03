@@ -214,7 +214,7 @@ public class PQHelpers {
     }
 
     public static void reset(PQNode _root, boolean counts, boolean labels){
-        System.out.println("RESETTING COUNTS.  This is for TESTING purposes.  Make sure to reset counts properly before release.");
+        //System.out.println("RESETTING COUNTS.  This is for TESTING purposes.  Make sure to reset counts properly before release.");
         List<PQNode> output = preorder(_root);
         if(output.size() == 0) return;
 
@@ -285,8 +285,6 @@ public class PQHelpers {
     }
 
     public static void reduceChildQNodeIntoParentQNode(PQNode partialNode, PQNode parentQNode){
-        //List<PQNode> insertedChildren = new ArrayList<>();
-
         PQNode leftmostChildOfParent = parentQNode.endmostChildren().get(0);
         PQNode rightmostChildOfParent = parentQNode.endmostChildren().get(1);
 
@@ -296,7 +294,6 @@ public class PQHelpers {
         PQNode leftNode = partialNode.circularLink_prev, rightNode = partialNode.circularLink_next;
         PQNode partialChildTraversal = leftMostChildOfQ;
         do {
-            //insertedChildren.add(partialChildTraversal);
             PQNode tmp = partialChildTraversal.circularLink_next;
             PQHelpers.insertNodeIntoCircularList(partialChildTraversal, leftNode, rightNode);
             leftNode = partialChildTraversal;
@@ -393,11 +390,9 @@ public class PQHelpers {
             if (fullLeft) {
                 if (newNode.labelType.equals(PQNode.FULL)) {
                     parentQNode.children.add(0, newNode);
-                    //insertNodeIntoCircularList(newNode, right, left);
                     insertNodeIntoCircularList(newNode, left, right);
                 } else {
                     parentQNode.children.add(newNode);
-                    //insertNodeIntoCircularList(newNode, left, right);
                     insertNodeIntoCircularList(newNode, right, left);
                 }
             } else {
@@ -406,7 +401,6 @@ public class PQHelpers {
                     insertNodeIntoCircularList(newNode, left, right);
                 } else {
                     parentQNode.children.add(0, newNode);
-                    //insertNodeIntoCircularList(newNode, left, right);
                     insertNodeIntoCircularList(newNode, right, left);
                 }
             }

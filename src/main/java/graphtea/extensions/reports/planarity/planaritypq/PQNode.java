@@ -213,7 +213,6 @@ public class PQNode {
         this.circularLink_prev = null;
     }
 
-    // todo: This list is not circular.  An end node will return the front node as well - FIX
     public List<PQNode> immediateSiblings(boolean treatAsContainer){
         List<PQNode> adjacents = new ArrayList<PQNode>();
 
@@ -350,7 +349,7 @@ public class PQNode {
         return null;
     }
 
-    /** todo: Check if we should be returning max{left, right}, or left union right
+    /**
      *
      * Returns:
      * 11110[1111]
@@ -529,30 +528,30 @@ public class PQNode {
     }
 
     public void replaceQNodeChild(PQNode newChild, PQNode oldChild){
-        if(this.labelType.equals(PQNode.QNODE)){
-            // Current node is a QNode
-            int index = 0;
-            for(PQNode n : this.endmostChildren()){
-                if(n == oldChild){
-                    if(index == 0){
-                        // place newChild at front, move oldChild to internals
-                        this.children.add(newChild);
-                    }
-                    else {
-                        // place newChild at end, move oldChild to internals
-                        this.children.add(this.children.size()-1, newChild);
-                    }
+        try {
+            if (this.nodeType.equals(PQNode.QNODE)) {
+                // Current node is a QNode
+                int index = 0;
+                for (PQNode n : this.endmostChildren()) {
+                    if (n == oldChild) {
+                        if (index == 0) {
+                            // place newChild at front, move oldChild to internals
+                            this.children.add(newChild);
+                        } else {
+                            // place newChild at end, move oldChild to internals
+                            this.children.add(this.children.size() - 1, newChild);
+                        }
 
+                    }
+                    index++;
                 }
-                index++;
+                PQHelpers.insertNodeIntoCircularList(newChild, oldChild.circularLink_prev, oldChild.circularLink_next);
+                this.children.remove(oldChild);
             }
-            PQHelpers.insertNodeIntoCircularList(newChild, oldChild.circularLink_prev, oldChild.circularLink_next);
-            this.children.remove(oldChild);
-        }
-        else {
-            // Current node is a PNode
-            System.out.println("Current node is not a Q-Node!");
-        }
+            else {
+                throw new IllegalNodeTypeException("Current node must be a Q-Node.");
+            }
+        } catch (IllegalNodeTypeException e) { }
     }
 
 }

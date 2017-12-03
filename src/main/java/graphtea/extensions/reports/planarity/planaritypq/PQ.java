@@ -108,10 +108,6 @@ public class PQ {
 
         }
 
-        if(queue.size() > 1){
-            System.out.println("Oh no!");
-        }
-
         return _root;
     }
 
@@ -245,7 +241,7 @@ public class PQ {
         if(x.nodeType.equals(PQNode.PNODE) || x.nodeType.equals(PQNode.QNODE)){
             return false;
         }
-        System.out.println("TEMPLATE L1");
+        //System.out.println("TEMPLATE L1");
         return true;
     }
 
@@ -266,7 +262,7 @@ public class PQ {
 
         } while (iter != front);
 
-        System.out.println("TEMPLATE Q 1");
+        //System.out.println("TEMPLATE Q 1");
 
         return true;
     }
@@ -280,7 +276,7 @@ public class PQ {
             }
             x.labelType = PQNode.FULL;
 
-            System.out.println("TEMPLATE P (or Q) 1");
+            //System.out.println("TEMPLATE P (or Q) 1");
             return true;
         }
         return false;
@@ -364,11 +360,8 @@ public class PQ {
 
         // One full child
         if(fullChildren.size() == 1){
-            //x.children.add(fullChildren.get(0));
-            //fullChildren.get(0).parent = x;
-            //setCircularLinks(fullChildren);
 
-            System.out.println("P2: One full child - 'skipped' with true");
+            //System.out.println("P2: One full child - 'skipped' with true");
             return true;
         }
 
@@ -394,7 +387,7 @@ public class PQ {
         //Setting the links again, otherwise the endmost children would point to the previous siblings (the empty ones)
         setCircularLinks(fullChildren);
 
-        System.out.println("TEMPLATE P2");
+        //System.out.println("TEMPLATE P2");
 
         return true;
     }
@@ -464,7 +457,7 @@ public class PQ {
             setCircularLinks(x.children);
             emptyNode.parent = x;
             fullNode.parent = x;
-            System.out.println("TEMPLATE P3 (alt form)");
+            //System.out.println("TEMPLATE P3 (alt form)");
             return true;
         }
 
@@ -540,7 +533,7 @@ public class PQ {
             n.parent = null;
         }
 
-        System.out.println("TEMPLATE P3");
+        //System.out.println("TEMPLATE P3");
         return true;
     }
 
@@ -648,7 +641,7 @@ public class PQ {
 
         setCircularLinks(x.children);
 
-        System.out.println("TEMPLATE P4");
+        //System.out.println("TEMPLATE P4");
 
         return true;
     }
@@ -770,7 +763,7 @@ public class PQ {
 
         x = qNode;
 
-        System.out.println("TEMPLATE P5");
+        //System.out.println("TEMPLATE P5");
 
         return true;
     }
@@ -996,7 +989,7 @@ public class PQ {
             n.parent = null;
         }
 
-        System.out.println("TEMPLATE P6");
+        //System.out.println("TEMPLATE P6");
 
         return true;
     }
@@ -1172,7 +1165,7 @@ public class PQ {
             n.parent = null;
         }*/
 
-        System.out.println("TEMPLATE Q2");
+        //System.out.println("TEMPLATE Q2");
 
         return true;
     }
@@ -1311,7 +1304,7 @@ public class PQ {
         x.children = replacementChildren;
         setCircularLinks(replacementChildren);
 
-        System.out.println("TEMPLATE Q3");
+        //System.out.println("TEMPLATE Q3");
 
         return true;
     }

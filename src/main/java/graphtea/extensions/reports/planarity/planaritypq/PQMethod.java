@@ -1,8 +1,5 @@
 package graphtea.extensions.reports.planarity.planaritypq;
 
-import EDU.oswego.cs.dl.util.concurrent.FJTask;
-import com.sun.org.apache.xerces.internal.impl.dv.dtd.NOTATIONDatatypeValidator;
-import graphtea.extensions.algs4.Graph;
 import graphtea.extensions.reports.numberings.NotBiconnectedException;
 import graphtea.extensions.reports.numberings.StNumbering;
 import graphtea.graph.graph.Edge;

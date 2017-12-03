@@ -21,13 +21,12 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
     private Stack<Vertex> stack;
     private int highestId;
     private HashMap<Vertex, Integer> preOrderMapping;
-    //private HashMap<Vertex, Integer> L;
     private HashMap<Vertex, Integer> stMapping;
     private HashMap<Vertex, Boolean> visited;
     private HashMap<Vertex, Integer> LNumbering;
     private HashMap<Vertex, Boolean> newVertex;
     private HashMap<Edge, Boolean> newEdge;
-    List<Edge> treeEdges;
+    private List<Edge> treeEdges;
 
     private GraphModel graph;
 
@@ -116,26 +115,20 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
 
         }
 
-        for (Vertex v : this.graph) {
-            if(newVertex.get(v)) {
-                System.out.println("Missed node: " + v.getId());
-            }
-        }
-
         return stMapping;
     }
 
     public Stack<Vertex> pathfinder(Vertex v){
         Stack<Vertex> path = new Stack<>();
 
-        //computeL(v);
-
         // (a)
         // If there is a new cycle edge {u,w} with w *-> v
         for(Vertex w : this.graph.directNeighbors(v)) {
             Edge currentEdge = this.graph.getEdge(v, w);
             if(currentEdge == null) continue;
-            if(newEdge.get(currentEdge) && !treeEdges.contains(currentEdge) && preOrderMapping.get(w) < preOrderMapping.get(v)){
+            if(newEdge.get(currentEdge) && !treeEdges.contains(currentEdge) &&
+                    preOrderMapping.get(w) < preOrderMapping.get(v)){
+
                 newEdge.put(currentEdge, false);
                 path.add(v);
                 path.add(w);
@@ -149,7 +142,9 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
             Edge currentEdge = this.graph.getEdge(v, w);
             if(currentEdge == null) continue;
 
-            if(newEdge.get(currentEdge) && treeEdges.contains(currentEdge) && preOrderMapping.get(w) > preOrderMapping.get(v)){
+            if(newEdge.get(currentEdge) && treeEdges.contains(currentEdge) &&
+                    preOrderMapping.get(w) > preOrderMapping.get(v)){
+
                 newEdge.put(currentEdge, false);
                 path.add(v);
                 path.add(w);
@@ -164,7 +159,10 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
                         Edge nextEdge = this.graph.getEdge(currentVertex, x);
                         if(nextEdge == null) continue;
 
-                        if (newEdge.get(nextEdge) && (preOrderMapping.get(x) == LNumbering.get(currentVertex) || LNumbering.get(x) == LNumbering.get(currentVertex))) {
+                        if (newEdge.get(nextEdge) &&
+                                (preOrderMapping.get(x) == LNumbering.get(currentVertex) ||
+                                        LNumbering.get(x) == LNumbering.get(currentVertex))) {
+
                             newVertex.put(currentVertex, false);
                             newEdge.put(nextEdge, false);
                             path.add(x);
@@ -184,7 +182,9 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
         for (Vertex w : this.graph.directNeighbors(v)) {
             Edge currentEdge = this.graph.getEdge(v, w);
             if(currentEdge == null) continue;
-            if(newEdge.get(currentEdge) && !treeEdges.contains(currentEdge) &&  preOrderMapping.get(w) > preOrderMapping.get(v)){
+            if(newEdge.get(currentEdge) && !treeEdges.contains(currentEdge) &&
+                    preOrderMapping.get(w) > preOrderMapping.get(v)){
+
                 newEdge.put(currentEdge, false);
                 path.add(v);
                 path.add(w);
@@ -196,7 +196,6 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
                     for (Vertex x : this.graph.directNeighbors(currentVertex)){
                         Edge nextEdge = this.graph.getEdge(currentVertex, x);
                         if(nextEdge == null) continue;
-                        //if (newEdge.get(nextEdge) && (!treeEdges.contains(nextEdge) || preOrderMapping.get(x) < preOrderMapping.get(currentVertex))) {
                         if (newEdge.get(nextEdge) && treeEdges.contains(nextEdge)) {
                             newVertex.put(currentVertex, false);
                             newEdge.put(nextEdge, false);
