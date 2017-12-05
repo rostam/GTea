@@ -10,12 +10,15 @@ import java.lang.Math;
 
 import java.util.*;
 
-/*
- * Selects the first vertex in the graph, and labels the vertices in the graph by doing a pre-order
- * traversal. (Described in the paper "Computing an st-Numbering" by S. Even and R. E. Tarjan).
+/**
+ * This class takes a graph and applies an st-numbering to its vertices.
+ * An st-numbering is a biconnected graph numbering such that vertex 1 and n
+ * are adjacent and, for any vertex numbere 1 < j < n, there exist vertices
+ * numbered i and k such tht i < j < k and both i and k are adjacent to j.
  *
+ * @author Alex Cregten
  * @author Hannes Kr. Hannesson
- */
+ * */
 public class StNumbering extends Algorithm implements GraphReportExtension {
 
     private Stack<Vertex> stack;

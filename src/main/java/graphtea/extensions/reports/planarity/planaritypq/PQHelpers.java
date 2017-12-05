@@ -5,6 +5,14 @@ import java.util.*;
 
 import graphtea.extensions.reports.planarity.planaritypq.PQNode;
 
+/**
+ * This class holds various functions that are applied in the PQTree data-structure
+ * in regards to traversal and updating the tree
+ *
+ * @author Alex Cregten
+ * @author Hannes Kr. Hannesson
+ * */
+
 public class PQHelpers {
     public static void setCircularLinks(List<PQNode> nodes) {
         int modulo = nodes.size();
@@ -214,7 +222,6 @@ public class PQHelpers {
     }
 
     public static void reset(PQNode _root, boolean counts, boolean labels){
-        //System.out.println("RESETTING COUNTS.  This is for TESTING purposes.  Make sure to reset counts properly before release.");
         List<PQNode> output = preorder(_root);
         if(output.size() == 0) return;
 
@@ -242,7 +249,6 @@ public class PQHelpers {
                 }
             }
         }
-        System.out.println();
     }
 
     public static void printPreorderIds(PQNode _root){

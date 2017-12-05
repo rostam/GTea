@@ -5,6 +5,16 @@ import java.util.*;
 import graphtea.extensions.reports.planarity.planaritypq.IllegalNodeTypeException;
 import sun.awt.image.ImageWatched;
 
+/**
+ * This class holds the required functions and variables for a PQNode which are used
+ * in the PQTree data-structure.
+ *
+ * There are three types of nodes that can be modelled: P-Nodes, Q-Nodes, and leaf nodes.
+ *
+ * @author Alex Cregten
+ * @author Hannes Kr. Hannesson
+ * */
+
 public class PQNode {
     String id = "";
     static String PNODE = "p-node";
@@ -37,6 +47,8 @@ public class PQNode {
     int childCount;
 
     PQNode parent;
+    PQNode leftMostSibling = null;
+    PQNode rightMostSibling = null;
     List<PQNode> children = new ArrayList<>();
 
     public PQNode(){
@@ -215,6 +227,8 @@ public class PQNode {
 
     public List<PQNode> immediateSiblings(boolean treatAsContainer){
         List<PQNode> adjacents = new ArrayList<PQNode>();
+
+        if(this.parent == null) return adjacents;
 
         if(this.parent != null && this.parent.nodeType.equals(PQNode.PNODE)){
             return adjacents;
@@ -552,6 +566,23 @@ public class PQNode {
                 throw new IllegalNodeTypeException("Current node must be a Q-Node.");
             }
         } catch (IllegalNodeTypeException e) { }
+    }
+
+    public void setEndmostSiblings(PQNode left, PQNode right){
+        leftMostSibling = left;
+        rightMostSibling = right;
+    }
+
+    public void setParentQNodeChildren(){
+        for (PQNode n : this.endmostChildren()) {
+            n.parent = this;
+            n.setEndmostSiblings(this.endmostChildren().get(0), this.endmostChildren().get(1));
+        }
+
+        for (PQNode n : this.internalChildren()) {
+            n.parent = null;
+            n.setEndmostSiblings(this.endmostChildren().get(0), this.endmostChildren().get(1));
+        }
     }
 
 }

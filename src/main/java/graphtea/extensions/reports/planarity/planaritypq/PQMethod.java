@@ -12,6 +12,17 @@ import java.util.*;
 
 import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.*;
 
+/**
+ * This class takes a biconnected graph, applies an st-numbering, and then runs the edges
+ * through a PQTree algorithm to determine whether the graph is planar. It is described
+ * in the 1976 paper "Testing for Consecutive Ones Property, Interval Graphs,
+ * and Graph Planarity Using PQ-Tree Algorithms" by Kellogg S. Booth and George S. Lueker.
+ *
+ * We highly recommend reading over the paper before reading this codebase.
+ *
+ * @author Alex Cregten
+ * @author Hannes Kr. Hannesson
+ * */
 public class PQMethod {
 
     HashMap<Vertex, Integer> stMapping;
@@ -75,6 +86,7 @@ public class PQMethod {
         HashSet<PQNode> U = new HashSet<>();
 
         PQNode T = new PQNode(PQNode.PNODE, PQNode.EMPTY);
+        T.id = "T";
         if(lowerAndHigherVerticesMap.get(0) != null) {
             for (Edge e : lowerAndHigherVerticesMap.get(0).first) {
                 PQNode leafNode = new PQNode(stMapping.get(e.source) + " -> " + stMapping.get(e.target));
@@ -182,6 +194,8 @@ public class PQMethod {
             // U := U - S union S' ->  U := (U - S) union S'
             U.removeAll(S);
             U.addAll(Sp);
+
+            PQHelpers.printPreorderIds(T);
         }
         //System.out.println("DONE!");
         return true;
@@ -263,6 +277,8 @@ public class PQMethod {
                     fullChildren.get(fullChildren.size()-1).circularLink_next);
 
         }
+
+        //root.setParentQNodeChildren();
 
         // Q-Nodes are directional, but this only matters if they have 3+ children.
         if(root.getChildren().size() < 3) {

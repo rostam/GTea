@@ -457,6 +457,8 @@ public class PQ {
             setCircularLinks(x.children);
             emptyNode.parent = x;
             fullNode.parent = x;
+            emptyNode.setEndmostSiblings(x.endmostChildren().get(0), x.endmostChildren().get(1));
+            fullNode.setEndmostSiblings(x.endmostChildren().get(0), x.endmostChildren().get(1));
             //System.out.println("TEMPLATE P3 (alt form)");
             return true;
         }
@@ -531,6 +533,7 @@ public class PQ {
 
         for (PQNode n : x.internalChildren()) {
             n.parent = null;
+            n.setEndmostSiblings(x.endmostChildren().get(0), x.endmostChildren().get(1));
         }
 
         //System.out.println("TEMPLATE P3");
@@ -1140,30 +1143,6 @@ public class PQ {
         }
 
         PQHelpers.reduceChildQNodeIntoParentQNode(partialNode, x);
-
-        //Move all children of the partial node to the root
-        /*List<PQNode> replacementChildren = new ArrayList<PQNode>();
-        replacementChildren.addAll(x.getChildrenOfLabel(PQNode.EMPTY));
-        replacementChildren.addAll(partialNode.getChildrenOfLabel(PQNode.EMPTY));
-        replacementChildren.addAll(partialNode.getChildrenOfLabel(PQNode.FULL));
-        replacementChildren.addAll(x.getChildrenOfLabel(PQNode.FULL));*/
-
-        //Delete partial child
-        //partialNode = null;
-
-        //Reset circular links
-        //setCircularLinks(replacementChildren);
-
-        //x.children = replacementChildren;
-
-        //Set parent links
-        /*for (PQNode n : x.endmostChildren()) {
-            n.parent = x;
-        }
-
-        for (PQNode n : x.internalChildren()) {
-            n.parent = null;
-        }*/
 
         //System.out.println("TEMPLATE Q2");
 
