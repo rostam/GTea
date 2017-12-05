@@ -66,7 +66,6 @@ public class PQ {
             //System.out.println("|US| = " + US.size());
             if(US.size() > 0){
                 PQNode y = US.get(0);
-                //x.parent = y.parent;
                 x.parent = y.getParent();
                 x.blocked = false;
             }
@@ -76,7 +75,8 @@ public class PQ {
 
             int listSize = 0;
             if(!x.blocked){
-                PQNode y = x.parent;
+                //PQNode y = x.parent;
+                PQNode y = x.getParent();
                 if(BS.size() > 0){
 
                     Set<PQNode> list = x.maximalConsecutiveSetOfSiblingsAdjacent(true);
@@ -276,7 +276,7 @@ public class PQ {
             }
             x.labelType = PQNode.FULL;
 
-            //System.out.println("TEMPLATE P (or Q) 1");
+            System.out.println("TEMPLATE P (or Q) 1");
             return true;
         }
         return false;
@@ -361,7 +361,7 @@ public class PQ {
         // One full child
         if(fullChildren.size() == 1){
 
-            //System.out.println("P2: One full child - 'skipped' with true");
+            System.out.println("P2: One full child - 'skipped' with true");
             return true;
         }
 
@@ -460,6 +460,7 @@ public class PQ {
             emptyNode.setEndmostSiblings(x.endmostChildren().get(0), x.endmostChildren().get(1));
             fullNode.setEndmostSiblings(x.endmostChildren().get(0), x.endmostChildren().get(1));
             //System.out.println("TEMPLATE P3 (alt form)");
+            x.setParentQNodeChildren();
             return true;
         }
 
@@ -527,14 +528,7 @@ public class PQ {
             setCircularLinks(fullChildren);
         }
 
-        for (PQNode n : x.endmostChildren()) {
-            n.parent = x;
-        }
-
-        for (PQNode n : x.internalChildren()) {
-            n.parent = null;
-            n.setEndmostSiblings(x.endmostChildren().get(0), x.endmostChildren().get(1));
-        }
+        x.setParentQNodeChildren();
 
         //System.out.println("TEMPLATE P3");
         return true;
@@ -598,38 +592,42 @@ public class PQ {
 
         //Replacement phase
 
+        PQNode qNode = partialChildren.get(0);
+        PQNode leftMost = qNode.endmostChildren().get(0);
+        PQNode rightMost = qNode.endmostChildren().get(1);
         x.children.removeAll(fullChildren);
 
         if(fullChildren.size() == 1){
             PQNode fullChild = fullChildren.get(0);
 
 
-            fullChild.parent = partialChildren.get(0);
+            fullChild.parent = qNode;
 
             // Add child to side of Q-Node that is not empty
-            if(!partialChildren.get(0).endmostChildren().get(0).labelType.equals(PQNode.EMPTY)){
-                partialChildren.get(0).children.add(0, fullChild);
+            if(!qNode.endmostChildren().get(0).labelType.equals(PQNode.EMPTY)){
+                qNode.children.add(0, fullChild);
+                PQHelpers.insertNodeIntoCircularList(fullChild, leftMost, rightMost);
             }
             else {
-                partialChildren.get(0).children.add(fullChild);
+                qNode.children.add(fullChild);
+                PQHelpers.insertNodeIntoCircularList(fullChild, rightMost, leftMost);
             }
-
-            setCircularLinks(partialChildren.get(0).children);
+            setCircularLinks(qNode.getChildren());
         }
         else {
             PQNode pNodeParent = new PQNode();
             pNodeParent.nodeType = PQNode.PNODE;
             pNodeParent.labelType = PQNode.FULL;
             pNodeParent.children = fullChildren;
-            pNodeParent.parent = partialChildren.get(0);
+            pNodeParent.parent = qNode;
 
 
             // Add child to side of Q-Node that is not empty
-            if(!partialChildren.get(0).endmostChildren().get(0).labelType.equals(PQNode.EMPTY)){
-                partialChildren.get(0).children.add(0, pNodeParent);
+            if(!qNode.endmostChildren().get(0).labelType.equals(PQNode.EMPTY)){
+                qNode.children.add(0, pNodeParent);
             }
             else {
-                partialChildren.get(0).children.add(pNodeParent);
+                qNode.children.add(pNodeParent);
             }
 
             for (PQNode n : fullChildren) {
@@ -638,11 +636,25 @@ public class PQ {
 
 
             //Setting the circular links, otherwise the endmost children would still point to their former neighbours
-            setCircularLinks(partialChildren.get(0).children);
+            setCircularLinks(qNode.children);
             setCircularLinks(pNodeParent.children);
         }
 
-        setCircularLinks(x.children);
+        PQNode xParent = x.getParent();
+        if(x.getChildren().size() == 1 && xParent != null) {
+            if (xParent.nodeType.equals(PQNode.PNODE)) {
+                xParent.children.remove(x);
+                xParent.children.add(qNode);
+                qNode.parent = xParent;
+            } else {
+                PQHelpers.insertNodeIntoSameChildIndex(qNode, x, xParent);
+                PQHelpers.insertNodeIntoCircularList(qNode, x.circularLink_prev, x.circularLink_next);
+                xParent.removeChildren(Arrays.asList(x));
+                xParent.setParentQNodeChildren();
+            }
+        }
+
+        qNode.setParentQNodeChildren();
 
         //System.out.println("TEMPLATE P4");
 
@@ -765,7 +777,7 @@ public class PQ {
         }
 
         x = qNode;
-
+        x.setParentQNodeChildren();
         //System.out.println("TEMPLATE P5");
 
         return true;
@@ -984,15 +996,16 @@ public class PQ {
         mergingQNode.setQNodeEndmostChildren(leftMost1, rightMost2);
 
         //Set parent links
-        for (PQNode n : mergingQNode.endmostChildren()) {
+        /*for (PQNode n : mergingQNode.endmostChildren()) {
             n.parent = mergingQNode;
         }
 
         for (PQNode n : mergingQNode.internalChildren()) {
             n.parent = null;
-        }
+        }*/
 
         //System.out.println("TEMPLATE P6");
+        mergingQNode.setParentQNodeChildren();
 
         return true;
     }
@@ -1145,6 +1158,7 @@ public class PQ {
         PQHelpers.reduceChildQNodeIntoParentQNode(partialNode, x);
 
         //System.out.println("TEMPLATE Q2");
+        x.setParentQNodeChildren();
 
         return true;
     }
@@ -1284,6 +1298,7 @@ public class PQ {
         setCircularLinks(replacementChildren);
 
         //System.out.println("TEMPLATE Q3");
+        x.setParentQNodeChildren();
 
         return true;
     }

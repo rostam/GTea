@@ -136,6 +136,8 @@ public class PQMethod {
                 return false;
             }
 
+            //PQHelpers.printListIds(S, "S");
+
             T = PQTree.bubble(T, S);
             T = PQTree.reduce(T, S);
 
@@ -184,6 +186,7 @@ public class PQMethod {
             if (root.nodeType.equals(PQNode.QNODE) && Sp.size() > 0) {
                 // replace the full children of ROOT(T, S) and their descendants by T(S', S')
                 replaceFullChildrenOfRoot(root, Sp);
+                root.setParentQNodeChildren();
 
             } else if(Sp.size() > 0) {
                 // replace ROOT(T, S) and its descendants by T(S', S')
@@ -195,7 +198,7 @@ public class PQMethod {
             U.removeAll(S);
             U.addAll(Sp);
 
-            PQHelpers.printPreorderIds(T);
+            //PQHelpers.printPreorderIds(T);
         }
         //System.out.println("DONE!");
         return true;
@@ -338,7 +341,6 @@ public class PQMethod {
 
             root.children.add(replacementNode);
 
-            //root.id = "rT"; // For testing purposes
         }
 
     }

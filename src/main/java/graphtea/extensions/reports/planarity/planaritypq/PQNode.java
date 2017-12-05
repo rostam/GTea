@@ -30,12 +30,6 @@ public class PQNode {
     PQNode circularLink_next;
     PQNode circularLink_prev;
 
-    String marked = "";
-    static String UNMARKED = "unmarked";
-    static String QUEUED = "queued";
-    static String BLOCKED = "blocked";
-    static String UNBLOCKED = "unblocked";
-
     int pertinentChildCount;
 
     int pertinentLeafCount;
@@ -479,13 +473,10 @@ public class PQNode {
 
     public PQNode getParent(){
         if(this.parent == null){
-            PQNode iter = this;
-            while(iter.circularLink_next != null && iter.circularLink_next != this){
-                if(iter.parent != null){
-                    return iter.parent;
-                }
-                iter = iter.circularLink_next;
-            }
+            if(leftMostSibling != null)
+                return leftMostSibling.parent;
+            if(rightMostSibling != null)
+                return rightMostSibling.parent;
         }
         else {
             return parent;
@@ -569,8 +560,13 @@ public class PQNode {
     }
 
     public void setEndmostSiblings(PQNode left, PQNode right){
-        leftMostSibling = left;
-        rightMostSibling = right;
+        if(left == null)
+            leftMostSibling = null;
+        else leftMostSibling = left;
+
+        if(right == null)
+            rightMostSibling = null;
+        else rightMostSibling = right;
     }
 
     public void setParentQNodeChildren(){
@@ -579,10 +575,16 @@ public class PQNode {
             n.setEndmostSiblings(this.endmostChildren().get(0), this.endmostChildren().get(1));
         }
 
-        for (PQNode n : this.internalChildren()) {
+        List<PQNode> internals = this.internalChildren();
+        List<PQNode> removalNodes = new ArrayList<>();
+
+        for (PQNode n : internals) {
             n.parent = null;
             n.setEndmostSiblings(this.endmostChildren().get(0), this.endmostChildren().get(1));
+            if(!endmostChildren().contains(n)) removalNodes.add(n);
         }
+
+        this.children.removeAll(removalNodes);
     }
 
 }
