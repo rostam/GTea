@@ -27,13 +27,12 @@ public class PQNodeTest {
 
     @Test
     public void endmostChildrenTest() throws Exception {
-        PQNode _root = new PQNode();
-        _root.nodeType = PQNode.QNODE;
+        PQNode _root = new QNode();
 
-        PQNode first = new PQNode("A");
-        PQNode second = new PQNode("B");
-        PQNode third = new PQNode("C");
-        PQNode fourth = new PQNode("D");
+        PQNode first = new LeafNode("A");
+        PQNode second = new LeafNode("B");
+        PQNode third = new LeafNode("C");
+        PQNode fourth = new LeafNode("D");
 
         //Setting parent links
         first.parent = _root;
@@ -48,13 +47,12 @@ public class PQNodeTest {
 
     @Test
     public void internalChildrenTest() throws Exception {
-        PQNode _root = new PQNode();
-        _root.nodeType = PQNode.QNODE;
+        PQNode _root = new QNode();
 
-        PQNode first = new PQNode();
-        PQNode second = new PQNode();
-        PQNode third = new PQNode();
-        PQNode fourth = new PQNode();
+        PQNode first = new LeafNode();
+        PQNode second = new LeafNode();
+        PQNode third = new LeafNode();
+        PQNode fourth = new LeafNode();
 
         first.id = "first";
         second.id = "second";
@@ -74,9 +72,9 @@ public class PQNodeTest {
 
     @Test
     public void emptySibling() throws Exception {
-        PQNode mid = new PQNode();
-        PQNode prev = new PQNode();
-        PQNode next = new PQNode();
+        PQNode mid = new LeafNode();
+        PQNode prev = new LeafNode();
+        PQNode next = new LeafNode();
         next.labelType = PQNode.EMPTY;
 
         prev.circularLink_prev = next;
@@ -95,9 +93,9 @@ public class PQNodeTest {
 
     @Test
     public void removeFromCircularLink() throws Exception {
-        PQNode mid = new PQNode();
-        PQNode prev = new PQNode();
-        PQNode next = new PQNode();
+        PQNode mid = new LeafNode();
+        PQNode prev = new LeafNode();
+        PQNode next = new LeafNode();
 
         prev.circularLink_prev = next;
         prev.circularLink_next = mid;
@@ -118,10 +116,10 @@ public class PQNodeTest {
 
     @Test
     public void replaceInCircularLink() throws Exception {
-        PQNode mid = new PQNode();
-        PQNode prev = new PQNode();
-        PQNode next = new PQNode();
-        PQNode x = new PQNode();
+        PQNode mid = new LeafNode();
+        PQNode prev = new LeafNode();
+        PQNode next = new LeafNode();
+        PQNode x = new LeafNode();
 
         prev.circularLink_prev = next;
         prev.circularLink_next = mid;
@@ -150,11 +148,11 @@ public class PQNodeTest {
 
     @Test
     public void fullChildren() throws Exception {
-        PQNode root = new PQNode();
-        PQNode c1 = new PQNode();
-        PQNode c2 = new PQNode();
-        PQNode c3 = new PQNode();
-        PQNode c4 = new PQNode();
+        PQNode root = new PNode();
+        PQNode c1 = new LeafNode();
+        PQNode c2 = new LeafNode();
+        PQNode c3 = new LeafNode();
+        PQNode c4 = new LeafNode();
         c1.labelType = PQNode.FULL;
         c3.labelType = PQNode.FULL;
         List<PQNode> fullChildren = new ArrayList<PQNode>();
@@ -185,16 +183,16 @@ public class PQNodeTest {
         *              ^
         *              x
         */
-        PQNode root = new PQNode();
-        PQNode c1 = new PQNode();
-        PQNode c2 = new PQNode();
-        PQNode c3 = new PQNode();
-        PQNode c4 = new PQNode();
-        PQNode c5 = new PQNode();
-        PQNode c6 = new PQNode();
-        PQNode c7 = new PQNode();
-        PQNode c8 = new PQNode();
-        PQNode c9 = new PQNode();
+        PQNode root = new PNode();
+        PQNode c1 = new LeafNode();
+        PQNode c2 = new LeafNode();
+        PQNode c3 = new LeafNode();
+        PQNode c4 = new LeafNode();
+        PQNode c5 = new LeafNode();
+        PQNode c6 = new LeafNode();
+        PQNode c7 = new LeafNode();
+        PQNode c8 = new LeafNode();
+        PQNode c9 = new LeafNode();
 
         c1.blocked = false;
         c2.blocked = true;
@@ -245,13 +243,12 @@ public class PQNodeTest {
 
     @Test
     public void setQNodeEndmostChildrenTest(){
-        PQNode qNode = new PQNode();
-        qNode.nodeType = PQNode.QNODE;
+        PQNode qNode = new QNode();
 
-        PQNode A = new PQNode();
-        PQNode B = new PQNode();
-        PQNode C = new PQNode();
-        PQNode D = new PQNode();
+        PQNode A = new LeafNode();
+        PQNode B = new LeafNode();
+        PQNode C = new LeafNode();
+        PQNode D = new LeafNode();
 
         List<PQNode> children = Arrays.asList(A, B, C, D);
         setCircularLinks(children);
@@ -268,12 +265,11 @@ public class PQNodeTest {
 
     @Test
     public void removeChildrenLeftMost(){
-        PQNode qNode = new PQNode();
-        qNode.nodeType = PQNode.QNODE;
-        PQNode A = new PQNode("A");
-        PQNode B = new PQNode("B");
-        PQNode C = new PQNode("C");
-        PQNode D = new PQNode("D");
+        PQNode qNode = new QNode();
+        PQNode A = new LeafNode("A");
+        PQNode B = new LeafNode("B");
+        PQNode C = new LeafNode("C");
+        PQNode D = new LeafNode("D");
         List<PQNode> children = Arrays.asList(A, B, C, D);
         setCircularLinks(children);
         qNode.setQNodeEndmostChildren(A, D);
@@ -297,12 +293,11 @@ public class PQNodeTest {
 
     @Test
     public void removeInteriorChildren(){
-        PQNode qNode = new PQNode();
-        qNode.nodeType = PQNode.QNODE;
-        PQNode A = new PQNode("A");
-        PQNode B = new PQNode("B");
-        PQNode C = new PQNode("C");
-        PQNode D = new PQNode("D");
+        PQNode qNode = new QNode();
+        PQNode A = new LeafNode("A");
+        PQNode B = new LeafNode("B");
+        PQNode C = new LeafNode("C");
+        PQNode D = new LeafNode("D");
         List<PQNode> children = Arrays.asList(A, B, C, D);
         setCircularLinks(children);
         qNode.setQNodeEndmostChildren(A, D);
@@ -322,12 +317,11 @@ public class PQNodeTest {
 
     @Test
     public void removeChildrenRightMost(){
-        PQNode qNode = new PQNode();
-        qNode.nodeType = PQNode.QNODE;
-        PQNode A = new PQNode("A");
-        PQNode B = new PQNode("B");
-        PQNode C = new PQNode("C");
-        PQNode D = new PQNode("D");
+        PQNode qNode = new QNode();
+        PQNode A = new LeafNode("A");
+        PQNode B = new LeafNode("B");
+        PQNode C = new LeafNode("C");
+        PQNode D = new LeafNode("D");
         List<PQNode> children = Arrays.asList(A, B, C, D);
         setCircularLinks(children);
         qNode.setQNodeEndmostChildren(A, D);
@@ -349,12 +343,11 @@ public class PQNodeTest {
 
     @Test
     public void removeChildrenLeftAndRightMost(){
-        PQNode qNode = new PQNode();
-        qNode.nodeType = PQNode.QNODE;
-        PQNode A = new PQNode("A");
-        PQNode B = new PQNode("B");
-        PQNode C = new PQNode("C");
-        PQNode D = new PQNode("D");
+        PQNode qNode = new QNode();
+        PQNode A = new LeafNode("A");
+        PQNode B = new LeafNode("B");
+        PQNode C = new LeafNode("C");
+        PQNode D = new LeafNode("D");
         List<PQNode> children = Arrays.asList(A, B, C, D);
         setCircularLinks(children);
         qNode.setQNodeEndmostChildren(A, D);
@@ -374,12 +367,11 @@ public class PQNodeTest {
 
     @Test
     public void removeLeftAndRightAndInterior(){
-        PQNode qNode = new PQNode();
-        qNode.nodeType = PQNode.QNODE;
-        PQNode A = new PQNode("A");
-        PQNode B = new PQNode("B");
-        PQNode C = new PQNode("C");
-        PQNode D = new PQNode("D");
+        PQNode qNode = new QNode();
+        PQNode A = new LeafNode("A");
+        PQNode B = new LeafNode("B");
+        PQNode C = new LeafNode("C");
+        PQNode D = new LeafNode("D");
         List<PQNode> children = Arrays.asList(A, B, C, D);
         setCircularLinks(children);
         qNode.setQNodeEndmostChildren(A, D);
@@ -396,12 +388,11 @@ public class PQNodeTest {
 
     @Test
     public void removeAllChildren(){
-        PQNode qNode = new PQNode();
-        qNode.nodeType = PQNode.QNODE;
-        PQNode A = new PQNode("A");
-        PQNode B = new PQNode("B");
-        PQNode C = new PQNode("C");
-        PQNode D = new PQNode("D");
+        PQNode qNode = new QNode();
+        PQNode A = new LeafNode("A");
+        PQNode B = new LeafNode("B");
+        PQNode C = new LeafNode("C");
+        PQNode D = new LeafNode("D");
         List<PQNode> children = Arrays.asList(A, B, C, D);
         setCircularLinks(children);
         qNode.setQNodeEndmostChildren(A, D);
