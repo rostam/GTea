@@ -85,11 +85,11 @@ public class PQMethod {
         Iterable<Edge> source = graph.getEdges();
         HashSet<PQNode> U = new HashSet<>();
 
-        PQNode T = new PQNode(PQNode.PNODE, PQNode.EMPTY);
+        PQNode T = new PNode(PQNode.EMPTY);
         T.id = "T";
         if(lowerAndHigherVerticesMap.get(0) != null) {
             for (Edge e : lowerAndHigherVerticesMap.get(0).first) {
-                PQNode leafNode = new PQNode(stMapping.get(e.source) + " -> " + stMapping.get(e.target));
+                PQNode leafNode = new LeafNode(stMapping.get(e.source) + " -> " + stMapping.get(e.target));
                 leafNode.parent = T;
                 U.add(leafNode);
             }
@@ -164,7 +164,7 @@ public class PQMethod {
                     }
                     // If leaf node does not exist yet, make it exist
                     if (leafNode == null) {
-                        leafNode = new PQNode(_id);
+                        leafNode = new LeafNode(_id);
                     }
                     Sp.add(leafNode);
 
@@ -180,10 +180,11 @@ public class PQMethod {
                 return false;
             }
 
-
+            //PQHelpers.printListIds(Sp, "S'");
             PQNode root = PQTree.root(T, S);
 
-            if (root.nodeType.equals(PQNode.QNODE) && Sp.size() > 0) {
+            //if (root.nodeType.equals(PQNode.QNODE) && Sp.size() > 0) {
+            if (root.getClass() == QNode.class) {
                 // replace the full children of ROOT(T, S) and their descendants by T(S', S')
                 replaceFullChildrenOfRoot(root, Sp);
                 root.setParentQNodeChildren();
@@ -249,7 +250,7 @@ public class PQMethod {
         else if(Sp.size() > 0) {
             // Otherwise, create a P node
 
-            PQNode replacementPNode = new PQNode(PQNode.PNODE, PQNode.EMPTY);
+            PQNode replacementPNode = new PNode(PQNode.EMPTY);
             replacementPNode.id = "rNode-2";
             replacementPNode.parent = root;
             replacementPNode.children.addAll(Sp);
@@ -284,9 +285,10 @@ public class PQMethod {
         //root.setParentQNodeChildren();
 
         // Q-Nodes are directional, but this only matters if they have 3+ children.
-        if(root.getChildren().size() < 3) {
+        // todo: once refactored p and q nodes update this
+        /*if(root.getChildren().size() < 3) {
             root.nodeType = PQNode.PNODE;
-        }
+        }*/
 
     }
 
@@ -300,7 +302,7 @@ public class PQMethod {
         }
         else {
             // Create an intermediary P-Node
-            replacementNode = new PQNode(PQNode.PNODE, PQNode.EMPTY);
+            replacementNode = new PNode(PQNode.EMPTY);
             replacementNode.id = "rNode";
             replacementNode.children.addAll(Sp);
             for(PQNode n : Sp){
@@ -313,7 +315,8 @@ public class PQMethod {
 
             replacementNode.parent = rParent;
 
-            if(rParent.nodeType.equals(PQNode.QNODE)){
+            //if(rParent.nodeType.equals(PQNode.QNODE)){
+            if (rParent.getClass() == QNode.class) {
                 // rParent is a Q-Node
 
                 // Places replacementPNode into the same index in the children list as the root

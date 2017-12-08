@@ -306,14 +306,13 @@ public class PQHelpersTest {
 
     @Test
     public void gatherQNodeChildrenTest(){
-        PQNode root = new PQNode();
+        PQNode root = new QNode();
         PQNode a = new PQNode();
         PQNode b = new PQNode();
         PQNode c = new PQNode();
         PQNode d = new PQNode();
         root.children.addAll(Arrays.asList(a, b, c, d));
         PQHelpers.setCircularLinks(root.children);
-        root.nodeType = PQNode.QNODE;
         for (PQNode n : root.children) {
             n.labelType = PQNode.EMPTY;
         }

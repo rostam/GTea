@@ -106,12 +106,10 @@ public class PQNode {
 
                 PQNode start = this.children.get(0);
                 PQNode iter = start.circularLink_next;
-                //if(start.nodeType.equals(type)) {
                 if(start.getClass() == type){
                     cList.add(start);
                 }
                 while(iter != start){
-                    //if(iter.nodeType.equals(type)) {
                     if(iter.getClass() == type){
                         cList.add(iter);
                     }
