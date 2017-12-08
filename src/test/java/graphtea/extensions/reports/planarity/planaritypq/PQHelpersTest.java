@@ -17,9 +17,9 @@ import static org.junit.Assert.*;
 public class PQHelpersTest {
     @Test
     public void setCircularLinksTest() throws Exception {
-        PQNode c1 = new PQNode();
-        PQNode c2 = new PQNode();
-        PQNode c3 = new PQNode();
+        PQNode c1 = new LeafNode();
+        PQNode c2 = new QNode();
+        PQNode c3 = new PNode();
         List<PQNode> children = new ArrayList<PQNode>();
         children.add(c1);
         children.add(c2);
@@ -218,12 +218,11 @@ public class PQHelpersTest {
 
     @Test
     public void rotateQNodeTest(){
-        PQNode qNode = new PQNode();
-        qNode.nodeType = PQNode.QNODE;
+        PQNode qNode = new QNode();
 
-        PQNode leftMost = new PQNode();
-        PQNode interior = new PQNode();
-        PQNode rightMost = new PQNode();
+        PQNode leftMost = new LeafNode();
+        PQNode interior = new LeafNode();
+        PQNode rightMost = new LeafNode();
 
         leftMost.id = "A";
         interior.id = "B";
