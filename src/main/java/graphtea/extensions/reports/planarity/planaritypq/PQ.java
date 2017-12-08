@@ -246,36 +246,17 @@ public class PQ {
 
     /**All children must be labelled identically (page 348)*/
     public boolean QNODE_TEMPLATE_1(PQNode x){
-        PQNode front = x.endmostChildren().get(0);
-
-        final String consistentLabel = front.labelType;
-        PQNode iter = front;
-
-        do {
-            if(iter.labelType.equals(consistentLabel)){
-                iter = iter.circularLink_next;
-            }
-            else {
-                return false;
-            }
-
-        } while (iter != front);
-
-        //System.out.println("TEMPLATE Q 1");
-        x.labelType = consistentLabel;
-        return true;
+        // Checking if all children have the same label
+        if (x.emptyChildren.size() == x.children.size() || x.fullChildren.size() == x.children.size() || x.partialChildren.size() == x.children.size()) {
+            x.labelType = x.children.get(0).labelType;
+            return true;
+        }
+        return false;
     }
 
     public boolean GENERALIZED_TEMPLATE_1(PQNode x){
-        if(!x.labelType.equals(PQNode.FULL)){
-            for(PQNode n : x.children){
-                if(!n.labelType.equals(PQNode.FULL)){
-                    return false;
-                }
-            }
-            x.labelType = PQNode.FULL;
-
-            System.out.println("TEMPLATE P (or Q) 1");
+        if (x.fullChildren.size() == x.children.size() || x.emptyChildren.size() == x.children.size()) {
+            x.labelType = x.children.get(0).labelType;
             return true;
         }
         return false;
@@ -370,10 +351,14 @@ public class PQ {
 
         //Add new pNode to root children list
         x.children.add(fullParent);
+        PQHelpers.insertChildIntoRespectiveLists(x, fullParent);
 
         //Adding the full children to a new P node
         fullParent.children = fullChildren;
+        fullParent.fullChildren = fullChildren;
+
         x.children.removeAll(fullChildren);
+        PQHelpers.removeChildrenFromRespectiveLists(x, fullChildren);
 
 
         //Pointing the children to the new P node
@@ -446,7 +431,11 @@ public class PQ {
         if(xParent.getClass() == PNode.class){
             // Easy PNode child replacement
             xParent.children.remove(x);
+            PQHelpers.removeChildrenFromRespectiveLists(xParent, x);
+
             xParent.children.add(replacementQNode);
+            PQHelpers.insertChildIntoRespectiveLists(xParent, replacementQNode);
+
             replacementQNode.parent = xParent;
         }
         else {
@@ -463,6 +452,7 @@ public class PQ {
             PQNode emptyNode = emptyChildren.get(0);
             PQNode fullNode = fullChildren.get(0);
             x.children.addAll(Arrays.asList(emptyNode, fullNode));
+            PQHelpers.insertChildrenIntoRespectiveLists(x, Arrays.asList(emptyNode, fullNode));
             setCircularLinks(x.children);
             emptyNode.parent = x;
             fullNode.parent = x;

@@ -369,7 +369,56 @@ public class PQHelpers {
         }
     }
 
-    public static void collectChildrenByLabel(PQNode parent, List<PQNode> emptiesList, List<PQNode> fullsList){
+    public static void insertChildIntoRespectiveLists(PQNode x, PQNode child) {
+        PQNode cur = child;
+        if (cur.labelType.equals(PQNode.EMPTY)) {
+            x.emptyChildren.add(cur);
+        }
+        else if (cur.labelType.equals(PQNode.FULL)) {
+            x.fullChildren.add(cur);
+        }
+        else if (cur.labelType.equals(PQNode.PARTIAL)){
+            x.partialChildren.add(cur);
+        }
+        else {
+            System.out.println("label not set on child!");
+        }
+    }
+
+    public static void removeChildrenFromRespectiveLists(PQNode x, List<PQNode> children) {
+        for (int i = 0; i < children.size(); i++) {
+            PQNode cur = children.get(i);
+            if (cur.labelType.equals(PQNode.EMPTY)) {
+                x.emptyChildren.remove(cur);
+            }
+            else if (cur.labelType.equals(PQNode.FULL)) {
+                x.fullChildren.remove(cur);
+            }
+            else if (cur.labelType.equals(PQNode.PARTIAL)) {
+                x.partialChildren.remove(cur);
+            }
+            else {
+                System.out.println("label not set on child!");
+            }
+        }
+    }
+
+    public static void removeChildrenFromRespectiveLists(PQNode x, PQNode child) {
+        PQNode cur = child;
+        if (cur.labelType.equals(PQNode.EMPTY)) {
+            x.emptyChildren.remove(cur);
+        }
+        else if (cur.labelType.equals(PQNode.FULL)) {
+            x.fullChildren.remove(cur);
+        }
+        else if (cur.labelType.equals(PQNode.PARTIAL)) {
+            x.partialChildren.remove(cur);
+        }
+        else {
+            System.out.println("label not set on child!");
+        }
+    }
+    /*public static void collectChildrenByLabel(PQNode parent, List<PQNode> emptiesList, List<PQNode> fullsList){
 
         //if(parent.nodeType.equals(PQNode.QNODE)){
         if (parent.getClass() == QNode.class) {
@@ -393,9 +442,9 @@ public class PQHelpers {
                 }
             }
         }
-    }
+    }*/
 
-    public static void collectChildrenByLabelFast(PQNode parent, List<PQNode> emptiesList, List<PQNode> fullsList){
+    public static void collectChildrenByLabel(PQNode parent, List<PQNode> emptiesList, List<PQNode> fullsList){
         emptiesList = parent.emptyChildren;
         fullsList = parent.fullChildren;
     }
