@@ -566,6 +566,7 @@ public class PQNode {
                 }
                 PQHelpers.insertNodeIntoCircularList(newChild, oldChild.circularLink_prev, oldChild.circularLink_next);
                 this.children.remove(oldChild);
+                this.setQNodeEndmostChildren(this.endmostChildren().get(0), this.endmostChildren().get(1));
             }
             else {
                 throw new IllegalNodeTypeException("Current node must be a Q-Node.");

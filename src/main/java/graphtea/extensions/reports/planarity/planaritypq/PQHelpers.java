@@ -387,8 +387,8 @@ public class PQHelpers {
         PQNode left = parentQNode.endmostChildren().get(0);
         PQNode right = parentQNode.endmostChildren().get(1);
 
-        PQNode newLeft = left;
-        PQNode newRight = right;
+        //PQNode newLeft = left;
+        //PQNode newRight = right;
 
         for(PQNode n : newNodes) {
 
@@ -408,38 +408,38 @@ public class PQHelpers {
                     parentQNode.children.add(0, newNode);
                     insertNodeIntoCircularList(newNode, left, right);
 
-                    newLeft.parent = null;
-                    newLeft = newNode;
+                    //newLeft.parent = null;
+                    //newLeft = newNode;
                 } else {
                     parentQNode.children.add(newNode);
                     insertNodeIntoCircularList(newNode, right, left);
 
-                    newRight.parent = null;
-                    newRight = newNode;
+                    //newRight.parent = null;
+                    //newRight = newNode;
                 }
             } else {
                 if (newNode.labelType.equals(PQNode.FULL)) {
                     parentQNode.children.add(newNode);
                     insertNodeIntoCircularList(newNode, left, right);
 
-                    newRight.parent = null;
-                    newRight = newNode;
+                    //newRight.parent = null;
+                    //newRight = newNode;
 
                 } else {
                     parentQNode.children.add(0, newNode);
                     insertNodeIntoCircularList(newNode, right, left);
 
-                    newLeft.parent = null;
-                    newLeft = newNode;
+                    //newLeft.parent = null;
+                    //newLeft = newNode;
                 }
             }
 
-            //newNode.parent = parentQNode;
+            newNode.parent = parentQNode;
         }
 
         //newLeft.parent = parentQNode;
         //newRight.parent = parentQNode;
-        parentQNode.setQNodeEndmostChildren(newLeft, newRight);
+        //parentQNode.setQNodeEndmostChildren(newLeft, newRight);
 
         return true;
     }
