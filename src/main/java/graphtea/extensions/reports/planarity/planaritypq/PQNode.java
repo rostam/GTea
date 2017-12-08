@@ -44,6 +44,11 @@ public class PQNode {
     PQNode leftMostSibling = null;
     PQNode rightMostSibling = null;
     List<PQNode> children = new ArrayList<>();
+    List<PQNode> fullChildren = new ArrayList<>();
+    List<PQNode> partialChildren = new ArrayList<>();
+    List<PQNode> emptyChildren = new ArrayList<>();
+    List<PQNode> pNodeChildren = new ArrayList<>();
+    List<PQNode> qNodeChildren = new ArrayList<>();
 
     public PQNode(){
         blocked = false;
@@ -543,6 +548,11 @@ public class PQNode {
         }
         else {
             this.children.removeAll(removalNodes);
+            this.emptyChildren.removeAll(removalNodes);
+            this.fullChildren.removeAll(removalNodes);
+            this.partialChildren.removeAll(removalNodes);
+            this.pNodeChildren.removeAll(removalNodes);
+            this.qNodeChildren.removeAll(removalNodes);
         }
     }
 

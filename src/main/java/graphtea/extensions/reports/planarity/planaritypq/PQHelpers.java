@@ -354,6 +354,21 @@ public class PQHelpers {
 
     }
 
+    public static void insertChildrenIntoRespectiveLists(PQNode x, List<PQNode> children) {
+        for (int i = 0; i < children.size(); i++) {
+            PQNode cur = children.get(i);
+            if (cur.labelType.equals(PQNode.EMPTY)) {
+                x.emptyChildren.add(cur);
+            }
+            else if (cur.labelType.equals(PQNode.FULL)) {
+                x.fullChildren.add(cur);
+            }
+            else {
+                x.partialChildren.add(cur);
+            }
+        }
+    }
+
     public static void collectChildrenByLabel(PQNode parent, List<PQNode> emptiesList, List<PQNode> fullsList){
 
         //if(parent.nodeType.equals(PQNode.QNODE)){
@@ -378,6 +393,11 @@ public class PQHelpers {
                 }
             }
         }
+    }
+
+    public static void collectChildrenByLabelFast(PQNode parent, List<PQNode> emptiesList, List<PQNode> fullsList){
+        emptiesList = parent.emptyChildren;
+        fullsList = parent.fullChildren;
     }
 
     public static boolean addNodesAsChildrenToQNode(List<PQNode> newNodes, PQNode parentQNode){
