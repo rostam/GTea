@@ -116,7 +116,6 @@ public class PQHelpers {
                 }
             }
         }
-        System.out.println(nodeBuf);
     }
 
     public static List<PQNode> frontier(PQNode x) {
@@ -242,7 +241,6 @@ public class PQHelpers {
                 }
             }
         }
-        System.out.println();
     }
 
     public static void printPreorderIds(PQNode _root){
