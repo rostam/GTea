@@ -401,14 +401,10 @@ public class PQHelpers {
     }
 
     public static boolean addNodesAsChildrenToQNode(List<PQNode> newNodes, PQNode parentQNode){
-        //if(!parentQNode.nodeType.equals(PQNode.QNODE)) return false;
         if (parentQNode.getClass() != QNode.class) return false;
 
         PQNode left = parentQNode.endmostChildren().get(0);
         PQNode right = parentQNode.endmostChildren().get(1);
-
-        //PQNode newLeft = left;
-        //PQNode newRight = right;
 
         for(PQNode n : newNodes) {
 
@@ -426,42 +422,37 @@ public class PQHelpers {
             if (fullLeft) {
                 if (newNode.labelType.equals(PQNode.FULL)) {
                     parentQNode.children.add(0, newNode);
-                    insertNodeIntoCircularList(newNode, left, right);
-
-                    //newLeft.parent = null;
-                    //newLeft = newNode;
                 } else {
                     parentQNode.children.add(newNode);
-                    insertNodeIntoCircularList(newNode, right, left);
-
-                    //newRight.parent = null;
-                    //newRight = newNode;
                 }
             } else {
                 if (newNode.labelType.equals(PQNode.FULL)) {
                     parentQNode.children.add(newNode);
-                    insertNodeIntoCircularList(newNode, left, right);
-
-                    //newRight.parent = null;
-                    //newRight = newNode;
-
                 } else {
                     parentQNode.children.add(0, newNode);
-                    insertNodeIntoCircularList(newNode, right, left);
-
-                    //newLeft.parent = null;
-                    //newLeft = newNode;
                 }
             }
+            insertNodeIntoCircularList(newNode, right, left);
 
             newNode.parent = parentQNode;
         }
 
-        //newLeft.parent = parentQNode;
-        //newRight.parent = parentQNode;
-        //parentQNode.setQNodeEndmostChildren(newLeft, newRight);
-
         return true;
+    }
+
+    public static void replaceParent(PQNode replacementNode, PQNode originalNode){
+        PQNode parent = originalNode.getParent();
+        if(parent.getClass() == PNode.class){
+            // Easy PNode child replacement
+            parent.children.remove(originalNode);
+            parent.children.add(replacementNode);
+            replacementNode.parent = parent;
+        }
+        else {
+            // More complex QNode child replacement
+            parent.replaceQNodeChild(replacementNode, originalNode);
+
+        }
     }
 
 }

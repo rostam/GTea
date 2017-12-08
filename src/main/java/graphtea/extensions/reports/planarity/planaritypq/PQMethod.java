@@ -183,7 +183,6 @@ public class PQMethod {
             //PQHelpers.printListIds(Sp, "S'");
             PQNode root = PQTree.root(T, S);
 
-            //if (root.nodeType.equals(PQNode.QNODE) && Sp.size() > 0) {
             if (root.getClass() == QNode.class) {
                 // replace the full children of ROOT(T, S) and their descendants by T(S', S')
                 replaceFullChildrenOfRoot(root, Sp);
@@ -286,9 +285,11 @@ public class PQMethod {
 
         // Q-Nodes are directional, but this only matters if they have 3+ children.
         // todo: once refactored p and q nodes update this
-        /*if(root.getChildren().size() < 3) {
-            root.nodeType = PQNode.PNODE;
-        }*/
+        if(root.getChildren().size() < 3) {
+            PQNode replacementPNode = new PNode(PQNode.EMPTY);
+            PQHelpers.replaceParent(replacementPNode, root);
+
+        }
 
     }
 
