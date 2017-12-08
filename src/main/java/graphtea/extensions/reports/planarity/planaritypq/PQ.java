@@ -257,7 +257,7 @@ public class PQ {
     public boolean GENERALIZED_TEMPLATE_1(PQNode x){
         if (x.fullChildren.size() == x.children.size() || x.emptyChildren.size() == x.children.size()) {
             x.labelType = x.children.get(0).labelType;
-            return true;
+           return true;
         }
         return false;
     }
@@ -341,7 +341,7 @@ public class PQ {
         // One full child
         if(fullChildren.size() == 1){
 
-            System.out.println("P2: One full child - 'skipped' with true");
+            //System.out.println("P2: One full child - 'skipped' with true");
             return true;
         }
 
@@ -369,7 +369,7 @@ public class PQ {
         //Setting the links again, otherwise the endmost children would point to the previous siblings (the empty ones)
         setCircularLinks(fullChildren);
 
-        System.out.println("TEMPLATE P2");
+        //System.out.println("TEMPLATE P2");
 
         return true;
     }
@@ -443,6 +443,7 @@ public class PQ {
             xParent.replaceQNodeChild(replacementQNode, x);
 
         }
+        PQHelpers.replaceParent(replacementQNode, x);
         x = replacementQNode;
 
         x.children = new ArrayList<>();
@@ -458,7 +459,7 @@ public class PQ {
             fullNode.parent = x;
             emptyNode.setEndmostSiblings(x.endmostChildren().get(0), x.endmostChildren().get(1));
             fullNode.setEndmostSiblings(x.endmostChildren().get(0), x.endmostChildren().get(1));
-            System.out.println("TEMPLATE P3 (alt form)");
+            //System.out.println("TEMPLATE P3 (alt form)");
             x.setParentQNodeChildren();
             return true;
         }
@@ -525,7 +526,7 @@ public class PQ {
 
         x.setParentQNodeChildren();
 
-        System.out.println("TEMPLATE P3");
+        //System.out.println("TEMPLATE P3");
         return true;
     }
 
@@ -662,7 +663,7 @@ public class PQ {
 
         qNode.setParentQNodeChildren();
 
-        System.out.println("TEMPLATE P4");
+        //System.out.println("TEMPLATE P4");
 
         return true;
     }
@@ -776,7 +777,7 @@ public class PQ {
 
         x = qNode;
         x.setParentQNodeChildren();
-        System.out.println("TEMPLATE P5");
+        //System.out.println("TEMPLATE P5");
 
         return true;
     }
@@ -989,16 +990,7 @@ public class PQ {
         // This should be changed to add the whole lists rather than traversing.
         mergingQNode.setQNodeEndmostChildren(leftMost1, rightMost2);
 
-        //Set parent links
-        /*for (PQNode n : mergingQNode.endmostChildren()) {
-            n.parent = mergingQNode;
-        }
-
-        for (PQNode n : mergingQNode.internalChildren()) {
-            n.parent = null;
-        }*/
-
-        System.out.println("TEMPLATE P6");
+        //System.out.println("TEMPLATE P6");
         mergingQNode.setParentQNodeChildren();
 
         return true;
@@ -1152,7 +1144,7 @@ public class PQ {
 
         PQHelpers.reduceChildQNodeIntoParentQNode(partialNode, x);
 
-        System.out.println("TEMPLATE Q2");
+        //System.out.println("TEMPLATE Q2");
         x.setParentQNodeChildren();
 
         return true;
@@ -1294,7 +1286,7 @@ public class PQ {
         x.children = replacementChildren;
         setCircularLinks(replacementChildren);
 
-        System.out.println("TEMPLATE Q3");
+        //System.out.println("TEMPLATE Q3");
         x.setParentQNodeChildren();
 
         return true;
