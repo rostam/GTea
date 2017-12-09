@@ -4,6 +4,7 @@ import java.util.*;
 
 import graphtea.extensions.reports.planarity.planaritypq.IllegalNodeTypeException;
 import sun.awt.image.ImageWatched;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * This class holds the required functions and variables for a PQNode which are used
@@ -97,117 +98,6 @@ public class PQNode {
         return nodeType.getClass() == checkType;
     }
 
-    public List<PQNode> getChildrenOfType(Class type) {
-        List<PQNode> cList = new ArrayList<PQNode>();
-
-        if(this.getClass() == QNode.class){
-            // QNode
-            if(this.children.size() > 0){
-
-                PQNode start = this.children.get(0);
-                PQNode iter = start.circularLink_next;
-                if(start.getClass() == type){
-                    cList.add(start);
-                }
-                while(iter != start){
-                    if(iter.getClass() == type){
-                        cList.add(iter);
-                    }
-                    iter = iter.circularLink_next;
-                }
-            }
-
-        }
-        else {
-            // PNode
-            for (PQNode v : this.children) {
-                //if (v.nodeType.equals(type)) {
-                if(v.getClass() == type){
-                    cList.add(v);
-                }
-            }
-        }
-        return cList;
-    }
-
-    public List<PQNode> getChildrenOfLabel(String label) {
-        List<PQNode> cList = new ArrayList<PQNode>();
-
-        //if(nodeType.equals(QNODE)){
-        if(this.getClass() == QNode.class){
-            // QNode
-            if(this.children.size() > 0){
-
-                PQNode start = this.children.get(0);
-                PQNode iter = start;
-                do {
-                    if(iter.labelType.equals(label)) {
-                        cList.add(iter);
-                    }
-                    iter = iter.circularLink_next;
-                } while(iter != start);
-            }
-        }
-        else {
-            // PNode
-            for (PQNode v : this.children) {
-                if (v.labelType.equals(label)) {
-                    cList.add(v);
-                }
-            }
-        }
-        return cList;
-    }
-
-    /*
-     * Note: only for q-nodes
-     */
-    public List<PQNode> endmostChildren(){
-        try {
-            //if (!this.nodeType.equals(QNODE)) {
-            if(this.getClass() != QNode.class){
-
-                throw new IllegalNodeTypeException("endmostChildren() is only valid for Q-Nodes");
-            }
-            //return this.children;
-            if(this.children.size() == 1){
-                return Arrays.asList(this.children.get(0));
-            }
-            else if(this.children.size() >= 2){
-                return Arrays.asList(this.children.get(0), this.children.get(this.children.size()-1));
-            }
-            else {
-                return Arrays.asList();
-            }
-        }
-        catch (IllegalNodeTypeException e) {
-
-        }
-        return new ArrayList<PQNode>();
-    }
-
-    public List<PQNode> internalChildren() {
-        try {
-            //if (!this.nodeType.equals(QNODE)) {
-            if(this.getClass() != QNode.class){
-
-                throw new IllegalNodeTypeException("internalChildren() is only valid for Q-Nodes");
-            }
-            //return this.children;
-            List<PQNode> internals = new ArrayList<PQNode>();
-            //Get nodes of index 1 ... (n-1)
-            List<PQNode> allChildren = this.getChildren();
-            for (int i = 1; i < allChildren.size()-1; i++) {
-                internals.add(allChildren.get(i));
-            }
-            return internals;
-        }
-        catch (IllegalNodeTypeException e) {
-
-        }
-        return new ArrayList<PQNode>();
-    }
-
     public PQNode emptySibling(){
         PQNode currNode = this.circularLink_next;
         while (true) {
@@ -226,140 +116,6 @@ public class PQNode {
         this.circularLink_prev.circularLink_next = this.circularLink_next;
         this.circularLink_next = null;
         this.circularLink_prev = null;
-    }
-
-    public List<PQNode> immediateSiblings(boolean treatAsContainer){
-        List<PQNode> adjacents = new ArrayList<PQNode>();
-
-        if(this.parent == null) return adjacents;
-
-        if(this.parent != null && this.parent.getClass() == PNode.class){
-            return adjacents;
-        }
-
-        // If only 2 in list
-        if(this.circularLink_prev == this.circularLink_next && this.circularLink_prev != null){
-            adjacents.add(this.circularLink_next);
-            return adjacents;
-        }
-
-        if(treatAsContainer) {
-            PQNode parent = this.getParent();
-            if(parent == null){
-                return adjacents;
-            }
-
-            // If current if leftmost
-            List<PQNode> containerNodes = parent.endmostChildren();
-            if (containerNodes.get(0) == this) {
-                adjacents.add(this.circularLink_next);
-                return adjacents;
-            }
-            // If current is rightmost
-            if (containerNodes.get(1) == this) {
-                adjacents.add(this.circularLink_prev);
-                return adjacents;
-            }
-        }
-
-        // Otherwise, current is interior
-        if(this.circularLink_prev != null)
-            adjacents.add(this.circularLink_prev);
-        if(this.circularLink_next != null)
-            adjacents.add(this.circularLink_next);
-        return adjacents;
-    }
-
-    // x is replaced by this
-    public void replaceInCircularLink(PQNode x){
-        this.circularLink_next.circularLink_prev = x;
-        this.circularLink_prev.circularLink_next = x;
-        x.circularLink_prev = this.circularLink_prev;
-        x.circularLink_next = this.circularLink_next;
-        this.circularLink_next = null;
-        this.circularLink_prev = null;
-    }
-
-    public void replaceInImmediateSiblings(PQNode x, PQNode y){
-        this.circularLink_prev = x;
-        this.circularLink_next = y;
-        // x is replaced by y
-    }
-
-    public void setQNodeEndmostChildren(PQNode leftMost, PQNode rightMost){
-        try {
-            if (this.getClass() != QNode.class) {
-                throw new IllegalNodeTypeException("endmostChildren() is only valid for Q-Nodes");
-            }
-            this.children = new ArrayList<>();
-            if(leftMost != null) {
-                if(this.children.contains(leftMost))
-                    this.children.remove(leftMost);
-                this.children.add(leftMost);
-                leftMost.parent = this;
-            }
-            if(rightMost != null) {
-                if(this.children.contains(rightMost))
-                    this.children.remove(rightMost);
-                this.children.add(rightMost);
-                rightMost.parent = this;
-            }
-        }
-        catch (IllegalNodeTypeException e) { }
-    }
-
-    public List<PQNode> fullChildren(){
-        List<PQNode> full = new ArrayList<PQNode>();
-
-        if(this.getClass() == QNode.class){
-
-            PQNode traversal = this.endmostChildren().get(0);
-            PQNode start = this.endmostChildren().get(0);
-
-            do {
-                if(traversal.labelType.equals(PQNode.FULL))
-                    full.add(traversal);
-                traversal = traversal.circularLink_next;
-            } while(traversal != start);
-        }
-        else {
-            for (PQNode c : children) {
-                if (c.labelType.equals(FULL)) {
-                    full.add(c);
-                }
-            }
-        }
-        return full;
-    }
-
-    public List<PQNode> fullAndPartialChildren(){
-        List<PQNode> full = new ArrayList<PQNode>();
-
-        if(this.getClass() == QNode.class){
-
-            PQNode traversal = this.endmostChildren().get(0);
-            PQNode start = this.endmostChildren().get(0);
-
-            do {
-                if(traversal.labelType.equals(PQNode.FULL))
-                    full.add(traversal);
-                else if (traversal.labelType.equals(PQNode.PARTIAL))
-                    full.add(traversal);
-                traversal = traversal.circularLink_next;
-            } while(traversal != start);
-        }
-        else {
-            for (PQNode c : children) {
-                if (c.labelType.equals(FULL)) {
-                    full.add(c);
-                }
-            }
-        }
-        return full;
-    }
-
-    public void setImmediateSiblings(List<PQNode> list){
-
     }
 
     public PQNode getImmediateSiblingOfNodeType(Class nodeType){
@@ -468,26 +224,6 @@ public class PQNode {
         }
     }
 
-    public List<PQNode> getChildren(){
-        if(this.getClass() != QNode.class){
-            return children;
-        }
-
-        // Qnode
-        List<PQNode> list = new ArrayList<>();
-        if(this.children.size() > 0) {
-            PQNode start = this.children.get(0);
-            PQNode iter = start.circularLink_next;
-            list.add(start);
-            while(iter != start){
-                list.add(iter);
-                iter = iter.circularLink_next;
-            }
-
-        }
-        return list;
-    }
-
     public PQNode getParent(){
         if(this.parent == null){
             if(leftMostSibling != null)
@@ -501,86 +237,6 @@ public class PQNode {
         return null;
     }
 
-    public void removeChildren(List<PQNode> removalNodes){
-        if(this.getClass() == QNode.class){
-
-            if(this.endmostChildren().size() == 0) return;
-
-            List<PQNode> survivors = new ArrayList<>();
-
-            PQNode traversal = this.endmostChildren().get(0);
-            PQNode start = traversal;
-            boolean updateStart = false;
-            do {
-                if(updateStart) {
-                    start = traversal;
-                    updateStart = false;
-                }
-
-                if(removalNodes.contains(traversal)){
-                    this.children.remove(traversal);
-                    traversal.circularLink_next.circularLink_prev = traversal.circularLink_prev;
-                    traversal.circularLink_prev.circularLink_next = traversal.circularLink_next;
-
-                    if(traversal == start){
-                        updateStart = true;
-                    }
-
-                }
-                else {
-                    survivors.add(traversal);
-                }
-                traversal = traversal.circularLink_next;
-            } while(traversal != start);
-
-            if(survivors.size() >= 2){
-                setQNodeEndmostChildren(survivors.get(0), survivors.get(survivors.size()-1));
-            }
-            else if(survivors.size() == 1){
-                setQNodeEndmostChildren(survivors.get(0), null);
-            }
-            else {
-                setQNodeEndmostChildren(null, null);
-            }
-
-        }
-        else {
-            this.children.removeAll(removalNodes);
-            this.emptyChildren.removeAll(removalNodes);
-            this.fullChildren.removeAll(removalNodes);
-            this.partialChildren.removeAll(removalNodes);
-            this.pNodeChildren.removeAll(removalNodes);
-            this.qNodeChildren.removeAll(removalNodes);
-        }
-    }
-
-    public void replaceQNodeChild(PQNode newChild, PQNode oldChild){
-        try {
-            if (this.getClass() == QNode.class) {
-                // Current node is a QNode
-                int index = 0;
-                for (PQNode n : this.endmostChildren()) {
-                    if (n == oldChild) {
-                        if (index == 0) {
-                            // place newChild at front, move oldChild to internals
-                            this.children.add(newChild);
-                        } else {
-                            // place newChild at end, move oldChild to internals
-                            this.children.add(this.children.size() - 1, newChild);
-                        }
-
-                    }
-                    index++;
-                }
-                PQHelpers.insertNodeIntoCircularList(newChild, oldChild.circularLink_prev, oldChild.circularLink_next);
-                this.children.remove(oldChild);
-                this.setQNodeEndmostChildren(this.endmostChildren().get(0), this.endmostChildren().get(1));
-            }
-            else {
-                throw new IllegalNodeTypeException("Current node must be a Q-Node.");
-            }
-        } catch (IllegalNodeTypeException e) { }
-    }
 
     public void setEndmostSiblings(PQNode left, PQNode right){
         if(left == null)
@@ -610,5 +266,146 @@ public class PQNode {
         this.children.removeAll(removalNodes);
     }
 
+    public List<PQNode> immediateSiblings(boolean treatAsContainer){
+        List<PQNode> adjacents = new ArrayList<PQNode>();
+
+        if(this.parent == null) return adjacents;
+
+        if(this.parent != null && this.parent.getClass() == PNode.class){
+            return adjacents;
+        }
+
+        // If only 2 in list
+        if(this.circularLink_prev == this.circularLink_next && this.circularLink_prev != null){
+            adjacents.add(this.circularLink_next);
+            return adjacents;
+        }
+
+        if(treatAsContainer) {
+            PQNode parent = this.getParent();
+            if(parent == null){
+                return adjacents;
+            }
+
+            // If current if leftmost
+            List<PQNode> containerNodes = parent.endmostChildren();
+            if (containerNodes.get(0) == this) {
+                adjacents.add(this.circularLink_next);
+                return adjacents;
+            }
+            // If current is rightmost
+            if (containerNodes.get(1) == this) {
+                adjacents.add(this.circularLink_prev);
+                return adjacents;
+            }
+        }
+
+        // Otherwise, current is interior
+        if(this.circularLink_prev != null)
+            adjacents.add(this.circularLink_prev);
+        if(this.circularLink_next != null)
+            adjacents.add(this.circularLink_next);
+        return adjacents;
+    }
+
+    public void replaceInImmediateSiblings(PQNode x, PQNode y){
+        this.circularLink_prev = x;
+        this.circularLink_next = y;
+        // x is replaced by y
+    }
+
+    public void replaceInCircularLink(PQNode x){
+        this.circularLink_next.circularLink_prev = x;
+        this.circularLink_prev.circularLink_next = x;
+        x.circularLink_prev = this.circularLink_prev;
+        x.circularLink_next = this.circularLink_next;
+        this.circularLink_next = null;
+        this.circularLink_prev = null;
+    }
+
+    /** Below are functions that are overridden in each subclass */
+
+    public List<PQNode> getChildrenOfType(Class type) {
+        try {
+            throw new NotImplementedException();
+        } catch (NotImplementedException e) {
+            System.err.println("getChildrenOfType(): " + e);
+            return null;
+        }
+    }
+
+    public List<PQNode> getChildrenOfLabel(String label) {
+        try {
+            throw new NotImplementedException();
+        } catch (NotImplementedException e) {
+            System.err.println("getChildrenOfLabel(): " + e);
+            return null;
+        }
+    }
+
+    public List<PQNode> endmostChildren(){
+        try {
+            throw new IllegalNodeTypeException("Current node must be a Q-Node.");
+        } catch (IllegalNodeTypeException e) {
+            System.err.println("endmostChildren(): " + e);
+            return null;
+        }
+    }
+
+    public List<PQNode> internalChildren(){
+        try {
+            throw new IllegalNodeTypeException("Current node must be a Q-Node.");
+        } catch (IllegalNodeTypeException e) {
+            System.err.println("internalChildren(): " + e);
+            return null;
+        }
+    }
+
+    public void setQNodeEndmostChildren(PQNode leftMost, PQNode rightMost){
+        try {
+            throw new IllegalNodeTypeException("Current node must be a Q-Node.");
+        } catch (IllegalNodeTypeException e) {
+            System.err.println("setQNodeEndmostChildren(): " + e);
+        }
+    }
+
+    public List<PQNode> fullChildren() {
+        try {
+            throw new NotImplementedException();
+        } catch (NotImplementedException e) {
+            System.err.println("fullChildren(): " + e);
+            return null;
+        }
+    }
+
+    public List<PQNode> fullAndPartialChildren() {
+        try {
+            throw new NotImplementedException();
+        } catch (NotImplementedException e) {
+            System.err.println("fullAndPartialChildren(): " + e);
+            return null;
+        }
+    }
+
+    public List<PQNode> getChildren() {
+        try {
+            throw new NotImplementedException();
+        } catch (NotImplementedException e) {
+            System.err.println("getChildren(): " + e);
+            return null;
+        }
+    }
+
+    public void setImmediateSiblings(List<PQNode> list){
+
+    }
+
+    public void removeChildren(List<PQNode> removalNodes) { }
+
+    public void replaceQNodeChild(PQNode newChild, PQNode oldChild) {
+        try {
+            throw new IllegalNodeTypeException("Current node must be a Q-Node.");
+        } catch (IllegalNodeTypeException e) { }
+    }
 
 }
