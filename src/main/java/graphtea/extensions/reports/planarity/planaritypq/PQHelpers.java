@@ -96,7 +96,6 @@ public class PQHelpers {
                     nodeBuf += "(.)";
                 }
             }
-            //else if (n.nodeType == PQNode.QNODE) {
             else if (n.getClass() == QNode.class) {
                 if (n.labelType == PQNode.EMPTY) {
                     nodeBuf += "[E]";
