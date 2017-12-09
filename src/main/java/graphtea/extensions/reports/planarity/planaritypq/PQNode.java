@@ -266,6 +266,63 @@ public class PQNode {
         this.children.removeAll(removalNodes);
     }
 
+    public List<PQNode> immediateSiblings(boolean treatAsContainer){
+        List<PQNode> adjacents = new ArrayList<PQNode>();
+
+        if(this.parent == null) return adjacents;
+
+        if(this.parent != null && this.parent.getClass() == PNode.class){
+            return adjacents;
+        }
+
+        // If only 2 in list
+        if(this.circularLink_prev == this.circularLink_next && this.circularLink_prev != null){
+            adjacents.add(this.circularLink_next);
+            return adjacents;
+        }
+
+        if(treatAsContainer) {
+            PQNode parent = this.getParent();
+            if(parent == null){
+                return adjacents;
+            }
+
+            // If current if leftmost
+            List<PQNode> containerNodes = parent.endmostChildren();
+            if (containerNodes.get(0) == this) {
+                adjacents.add(this.circularLink_next);
+                return adjacents;
+            }
+            // If current is rightmost
+            if (containerNodes.get(1) == this) {
+                adjacents.add(this.circularLink_prev);
+                return adjacents;
+            }
+        }
+
+        // Otherwise, current is interior
+        if(this.circularLink_prev != null)
+            adjacents.add(this.circularLink_prev);
+        if(this.circularLink_next != null)
+            adjacents.add(this.circularLink_next);
+        return adjacents;
+    }
+
+    public void replaceInImmediateSiblings(PQNode x, PQNode y){
+        this.circularLink_prev = x;
+        this.circularLink_next = y;
+        // x is replaced by y
+    }
+
+    public void replaceInCircularLink(PQNode x){
+        this.circularLink_next.circularLink_prev = x;
+        this.circularLink_prev.circularLink_next = x;
+        x.circularLink_prev = this.circularLink_prev;
+        x.circularLink_next = this.circularLink_next;
+        this.circularLink_next = null;
+        this.circularLink_prev = null;
+    }
+
     /** Below are functions that are overridden in each subclass */
 
     public List<PQNode> getChildrenOfType(Class type) {
@@ -301,31 +358,6 @@ public class PQNode {
         } catch (IllegalNodeTypeException e) {
             System.err.println("internalChildren(): " + e);
             return null;
-        }
-    }
-
-    public List<PQNode> immediateSiblings(boolean treatAsContainer) {
-        try {
-            throw new NotImplementedException();
-        } catch (NotImplementedException e) {
-            System.err.println("fullChildren(): " + e);
-            return null;
-        }
-    }
-
-    public void replaceInCircularLink(PQNode x){
-        try {
-            throw new IllegalNodeTypeException("Current node must be a Q-Node.");
-        } catch (IllegalNodeTypeException e) {
-            System.err.println("replaceInCircularLink(): " + e);
-        }
-    }
-
-    public void replaceInImmediateSiblings(PQNode x, PQNode y){
-        try {
-            throw new IllegalNodeTypeException("Current node must be a Q-Node.");
-        } catch (IllegalNodeTypeException e) {
-            System.err.println("replaceInImmediateSiblings(): " + e);
         }
     }
 

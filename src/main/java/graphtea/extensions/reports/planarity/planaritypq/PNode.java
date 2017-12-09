@@ -3,6 +3,14 @@ package graphtea.extensions.reports.planarity.planaritypq;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class holds the required functions and variables for a P-Node which are used
+ * in the PQTree data-structure.
+ *
+ * @author Alex Cregten
+ * @author Hannes Kr. Hannesson
+ * */
+
 public class PNode extends PQNode {
     public PNode(String labelType){
         this.labelType = labelType;
@@ -34,10 +42,6 @@ public class PNode extends PQNode {
         }
 
         return cList;
-    }
-
-    public List<PQNode> immediateSiblings(boolean treatAsContainer) {
-        return new ArrayList<>();
     }
 
     public List<PQNode> fullChildren(){

@@ -6,6 +6,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This class holds the required functions and variables for a Q-Node which are used
+ * in the PQTree data-structure.
+ *
+ * @author Alex Cregten
+ * @author Hannes Kr. Hannesson
+ * */
+
 public class QNode extends PQNode {
     public QNode(String labelType){
         this.labelType = labelType;
@@ -174,63 +182,6 @@ public class QNode extends PQNode {
             this.children.add(rightMost);
             rightMost.parent = this;
         }
-    }
-
-    public List<PQNode> immediateSiblings(boolean treatAsContainer){
-        List<PQNode> adjacents = new ArrayList<PQNode>();
-
-        if(this.parent == null) return adjacents;
-
-        if(this.parent != null && this.parent.getClass() == PNode.class){
-            return adjacents;
-        }
-
-        // If only 2 in list
-        if(this.circularLink_prev == this.circularLink_next && this.circularLink_prev != null){
-            adjacents.add(this.circularLink_next);
-            return adjacents;
-        }
-
-        if(treatAsContainer) {
-            PQNode parent = this.getParent();
-            if(parent == null){
-                return adjacents;
-            }
-
-            // If current if leftmost
-            List<PQNode> containerNodes = parent.endmostChildren();
-            if (containerNodes.get(0) == this) {
-                adjacents.add(this.circularLink_next);
-                return adjacents;
-            }
-            // If current is rightmost
-            if (containerNodes.get(1) == this) {
-                adjacents.add(this.circularLink_prev);
-                return adjacents;
-            }
-        }
-
-        // Otherwise, current is interior
-        if(this.circularLink_prev != null)
-            adjacents.add(this.circularLink_prev);
-        if(this.circularLink_next != null)
-            adjacents.add(this.circularLink_next);
-        return adjacents;
-    }
-
-    public void replaceInImmediateSiblings(PQNode x, PQNode y){
-        this.circularLink_prev = x;
-        this.circularLink_next = y;
-        // x is replaced by y
-    }
-
-    public void replaceInCircularLink(PQNode x){
-        this.circularLink_next.circularLink_prev = x;
-        this.circularLink_prev.circularLink_next = x;
-        x.circularLink_prev = this.circularLink_prev;
-        x.circularLink_next = this.circularLink_next;
-        this.circularLink_next = null;
-        this.circularLink_prev = null;
     }
 
     public void replaceQNodeChild(PQNode newChild, PQNode oldChild){
