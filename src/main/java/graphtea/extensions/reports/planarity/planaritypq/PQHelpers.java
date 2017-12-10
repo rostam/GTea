@@ -81,7 +81,6 @@ public class PQHelpers {
     public static void printChildren(PQNode x) {
         String nodeBuf = "";
         for (PQNode n : x.getChildren()) {
-            //if (n.nodeType == PQNode.PNODE) {
             if (n.getClass() == PNode.class) {
                 if (n.labelType == PQNode.EMPTY) {
                     nodeBuf += "(E)";
@@ -127,13 +126,13 @@ public class PQHelpers {
         }
     }
 
-    public static List<PQNode> frontier(PQNode x) {
+    /*public static List<PQNode> frontier(PQNode x) {
         List<PQNode> frontier = new ArrayList<PQNode>();
         frontierHelper(x, frontier);
         return frontier;
-    }
+    }*/
 
-    public static void frontierHelper(PQNode x, List<PQNode> frontier) {
+    /*public static void frontierHelper(PQNode x, List<PQNode> frontier) {
         if (x.children.size() != 0) {
             for (PQNode n : x.children) {
                 frontierHelper(n, frontier);
@@ -142,7 +141,7 @@ public class PQHelpers {
         else {
             frontier.add(x);
         }
-    }
+    }*/
 
     public static void gatherQNodeChildren(List<PQNode> emptyChildren, List<PQNode> fullChildren, PQNode qNode){
         if(qNode.getChildren().size() == 0){
@@ -179,11 +178,6 @@ public class PQHelpers {
 
     }
 
-    public static void rotateQNode(PQNode qNode){
-        reverseCircularLinks(qNode.endmostChildren().get(0));
-        Collections.reverse(qNode.children);
-    }
-
     public static boolean equalTrees(PQNode a, PQNode b) {
         return preorder(a).equals(preorder(b));
     }
@@ -197,7 +191,6 @@ public class PQHelpers {
            PQNode curNode = S.get(0);
            S.remove(0);
 
-           //if(curNode.nodeType.equals(PQNode.QNODE)){
            if (curNode.getClass() == QNode.class) {
                PQNode itr = curNode.endmostChildren().get(0);
 
@@ -226,7 +219,6 @@ public class PQHelpers {
         List<PQNode> output = preorder(_root);
         if(output.size() == 0) return;
 
-        //if(_root.nodeType.equals(PQNode.QNODE)){
         if (_root.getClass() == QNode.class) {
             PQNode itr = _root;
             while(itr.circularLink_next != _root){
@@ -258,7 +250,6 @@ public class PQHelpers {
         System.out.print("Preorder: ");
         if(output.size() == 0) return;
 
-        //if(_root.nodeType.equals(PQNode.QNODE)){
         if (_root.getClass() == QNode.class) {
             PQNode itr = _root;
             while(itr.circularLink_next != _root){
@@ -293,7 +284,7 @@ public class PQHelpers {
         rightNode.circularLink_prev = insertionNode;
     }
 
-    public static void reduceChildQNodeIntoParentQNode(PQNode partialNode, PQNode parentQNode){
+    public static void reduceChildQNodeIntoParentQNode(QNode partialNode, QNode parentQNode){
         PQNode leftmostChildOfParent = parentQNode.endmostChildren().get(0);
         PQNode rightmostChildOfParent = parentQNode.endmostChildren().get(1);
 
@@ -310,67 +301,24 @@ public class PQHelpers {
         } while(partialChildTraversal != leftMostChildOfQ);
 
         if(leftmostChildOfParent == partialNode){
-            parentQNode.children.remove(leftmostChildOfParent);
-            parentQNode.children.add(1, leftMostChildOfQ);
+            parentQNode.setQNodeEndmostChildren(leftMostChildOfQ, null);
+            leftMostChildOfQ.circularLink_prev = leftmostChildOfParent.circularLink_prev;
+            rightMostChildOfQ.circularLink_next = leftmostChildOfParent;
+            leftmostChildOfParent.circularLink_prev = rightmostChildOfParent;
         }
         else if(rightmostChildOfParent == partialNode){
-            parentQNode.children.remove(rightmostChildOfParent);
-            parentQNode.children.add(rightMostChildOfQ);
+            parentQNode.setQNodeEndmostChildren(null, rightMostChildOfQ);
+            rightMostChildOfQ.circularLink_next = rightmostChildOfParent.circularLink_next;
+            leftMostChildOfQ.circularLink_prev = rightmostChildOfParent;
+            rightmostChildOfParent.circularLink_next = leftMostChildOfQ;
         }
-        parentQNode.children.remove(partialNode);
+        parentQNode.removeChildren(Arrays.asList(partialNode));
+        parentQNode.setParentQNodeChildren();
 
-        for (PQNode n : parentQNode.endmostChildren()) {
-            n.parent = parentQNode;
-        }
-
-        List<PQNode> removalNodes = new ArrayList<>();
-        for (PQNode n : parentQNode.internalChildren()) {
-            n.parent = null;
-            removalNodes.add(n);
-        }
-        parentQNode.children.removeAll(removalNodes);
-
-    }
-
-    /** Places newNode into the same index in the children list as oldNode
-     * This is important because q-nodes are directional and ordered*/
-    public static void insertNodeIntoSameChildIndex(PQNode newNode, PQNode oldNode, PQNode parent){
-        try {
-            //if (parent.nodeType.equals(PQNode.QNODE)) {
-            if (parent.getClass() == QNode.class) {
-                PQNode end = parent.endmostChildren().get(1);
-                PQNode itr = parent.endmostChildren().get(0);
-                int index = 0;
-                while (itr != oldNode && itr != end) {
-                    itr = itr.circularLink_next;
-                }
-                parent.children.remove(oldNode);
-                parent.children.add(index, newNode);
-
-            } else throw new IllegalNodeTypeException("Parent must be a Q-Node");
-
-        } catch (IllegalNodeTypeException e) { }
-
-    }
-
-    public static void insertChildrenIntoRespectiveLists(PQNode x, List<PQNode> children) {
-        for (int i = 0; i < children.size(); i++) {
-            PQNode cur = children.get(i);
-            if (cur.labelType.equals(PQNode.EMPTY)) {
-                x.emptyChildren.add(cur);
-            }
-            else if (cur.labelType.equals(PQNode.FULL)) {
-                x.fullChildren.add(cur);
-            }
-            else {
-                x.partialChildren.add(cur);
-            }
-        }
     }
 
     public static void collectChildrenByLabel(PQNode parent, List<PQNode> emptiesList, List<PQNode> fullsList){
 
-        //if(parent.nodeType.equals(PQNode.QNODE)){
         if (parent.getClass() == QNode.class) {
             PQNode traversal = parent.endmostChildren().get(0);
             PQNode start = traversal;
@@ -394,12 +342,7 @@ public class PQHelpers {
         }
     }
 
-    public static void collectChildrenByLabelFast(PQNode parent, List<PQNode> emptiesList, List<PQNode> fullsList){
-        emptiesList = parent.emptyChildren;
-        fullsList = parent.fullChildren;
-    }
-
-    public static boolean addNodesAsChildrenToQNode(List<PQNode> newNodes, PQNode parentQNode){
+    public static boolean addNodesAsChildrenToQNode(List<PQNode> newNodes, QNode parentQNode){
         if (parentQNode.getClass() != QNode.class) return false;
 
         PQNode left = parentQNode.endmostChildren().get(0);
@@ -418,22 +361,20 @@ public class PQHelpers {
                 fullLeft = false;
             }
 
+            insertNodeIntoCircularList(newNode, right, left);
             if (fullLeft) {
                 if (newNode.labelType.equals(PQNode.FULL)) {
-                    parentQNode.children.add(0, newNode);
+                    parentQNode.addChild(newNode, true);
                 } else {
-                    parentQNode.children.add(newNode);
+                    parentQNode.addChild(newNode, false);
                 }
             } else {
                 if (newNode.labelType.equals(PQNode.FULL)) {
-                    parentQNode.children.add(newNode);
+                    parentQNode.addChild(newNode, false);
                 } else {
-                    parentQNode.children.add(0, newNode);
+                    parentQNode.addChild(newNode, true);
                 }
             }
-            insertNodeIntoCircularList(newNode, right, left);
-
-            newNode.parent = parentQNode;
         }
 
         return true;
@@ -441,17 +382,7 @@ public class PQHelpers {
 
     public static void replaceParent(PQNode replacementNode, PQNode originalNode){
         PQNode parent = originalNode.getParent();
-        if(parent.getClass() == PNode.class){
-            // Easy PNode child replacement
-            parent.children.remove(originalNode);
-            parent.children.add(replacementNode);
-            replacementNode.parent = parent;
-        }
-        else {
-            // More complex QNode child replacement
-            parent.replaceQNodeChild(replacementNode, originalNode);
-
-        }
+        parent.replaceChild(replacementNode, originalNode);
     }
 
 }

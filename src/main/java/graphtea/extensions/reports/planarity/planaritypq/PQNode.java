@@ -44,12 +44,7 @@ public class PQNode {
     PQNode parent;
     PQNode leftMostSibling = null;
     PQNode rightMostSibling = null;
-    List<PQNode> children = new ArrayList<>();
-    List<PQNode> fullChildren = new ArrayList<>();
-    List<PQNode> partialChildren = new ArrayList<>();
-    List<PQNode> emptyChildren = new ArrayList<>();
-    List<PQNode> pNodeChildren = new ArrayList<>();
-    List<PQNode> qNodeChildren = new ArrayList<>();
+    //List<PQNode> children = new ArrayList<>();
 
     public PQNode(){
         blocked = false;
@@ -238,7 +233,7 @@ public class PQNode {
     }
 
 
-    private void setEndmostSiblings(PQNode left, PQNode right){
+    protected void setEndmostSiblings(PQNode left, PQNode right){
         if(left == null)
             leftMostSibling = null;
         else leftMostSibling = left;
@@ -248,23 +243,6 @@ public class PQNode {
         else rightMostSibling = right;
     }
 
-    public void setParentQNodeChildren(){
-        for (PQNode n : this.endmostChildren()) {
-            n.parent = this;
-            n.setEndmostSiblings(this.endmostChildren().get(0), this.endmostChildren().get(1));
-        }
-
-        List<PQNode> internals = this.internalChildren();
-        List<PQNode> removalNodes = new ArrayList<>();
-
-        for (PQNode n : internals) {
-            n.parent = null;
-            n.setEndmostSiblings(this.endmostChildren().get(0), this.endmostChildren().get(1));
-            if(!endmostChildren().contains(n)) removalNodes.add(n);
-        }
-
-        this.children.removeAll(removalNodes);
-    }
 
     public List<PQNode> immediateSiblings(boolean treatAsContainer){
         List<PQNode> adjacents = new ArrayList<PQNode>();
@@ -324,6 +302,14 @@ public class PQNode {
     }
 
     /** Below are functions that are overridden in each subclass */
+
+    public void setParentQNodeChildren(){
+        try {
+            throw new IllegalNodeTypeException("Current node must be a Q-Node.");
+        } catch (IllegalNodeTypeException e) {
+            System.err.println("endmostChildren(): " + e);
+        }
+    }
 
     public List<PQNode> getChildrenOfType(Class type) {
         try {
@@ -400,12 +386,67 @@ public class PQNode {
 
     }
 
-    public void removeChildren(List<PQNode> removalNodes) { }
 
-    public void replaceQNodeChild(PQNode newChild, PQNode oldChild) {
+    /*public void replaceQNodeChild(PQNode newChild, PQNode oldChild) {
         try {
             throw new IllegalNodeTypeException("Current node must be a Q-Node.");
         } catch (IllegalNodeTypeException e) { }
+    }*/
+
+    public void addChildren(List<PQNode> children){
+        try {
+            throw new NotImplementedException();
+        } catch (NotImplementedException e) {
+            System.err.println("addChildren(): " + e);
+        }
+    }
+
+    public void addChild(PQNode child){
+        try {
+            throw new NotImplementedException();
+        } catch (NotImplementedException e) {
+            System.err.println("addChild(PQNode): " + e);
+        }
+    }
+
+    public void addChild(PQNode child, boolean left){
+        try {
+            throw new NotImplementedException();
+        } catch (NotImplementedException e) {
+            System.err.println("addChild(PQNode, boolean): " + e);
+        }
+    }
+
+    public void removeChildren(List<PQNode> removalNodes) {
+        try {
+            throw new NotImplementedException();
+        } catch (NotImplementedException e) {
+            System.err.println("removeChildren(): " + e);
+        }
+    }
+
+    public void removeChild(PQNode child){
+        try {
+            throw new NotImplementedException();
+        } catch (NotImplementedException e) {
+            System.err.println("removeChild(): " + e);
+        }
+    }
+
+    public void replaceChild(PQNode newChild, PQNode oldChild){
+        try {
+            throw new NotImplementedException();
+        } catch (NotImplementedException e) {
+            System.err.println("replaceChild(): " + e);
+        }
+    }
+
+    public void clearChildren(){
+        try {
+            throw new NotImplementedException();
+        } catch (NotImplementedException e) {
+            System.err.println("clearChildren(): " + e);
+        }
     }
 
 }
