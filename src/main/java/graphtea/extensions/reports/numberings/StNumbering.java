@@ -30,6 +30,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
     private HashMap<Vertex, Boolean> newVertex;
     private HashMap<Edge, Boolean> newEdge;
     private List<Edge> treeEdges;
+    private HashMap<Vertex, List<Vertex>> neighborMap;
 
     private GraphModel graph;
 
@@ -60,6 +61,26 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
         this.newEdge = new HashMap<Edge, Boolean>();
         this.stack = new Stack<Vertex>();
         this.treeEdges = new ArrayList<>();
+        this.neighborMap = new HashMap<Vertex, List<Vertex>>();
+    }
+
+    private void addEdgeMapping(Vertex src, Vertex trg){
+        if(this.neighborMap.get(src) == null){
+            List<Vertex> vlist = new ArrayList<>();
+            vlist.add(trg);
+            this.neighborMap.put(src, vlist);
+        }
+        else {
+            this.neighborMap.get(src).add(trg);
+        }
+    }
+
+    public void neighborPrecompute(){
+
+        for(Edge e : this.graph.getEdges()){
+            addEdgeMapping(e.source, e.target);
+            addEdgeMapping(e.target, e.source);
+        }
     }
 
     public HashMap<Vertex, Integer> stNumbering() {
@@ -73,6 +94,8 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
 
         graph.setDirected(false);
 
+        neighborPrecompute();
+
         this.preOrderNumbering();
 
         Vertex arbitraryVertex = null;
@@ -85,7 +108,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
         }
 
         Vertex t = arbitraryVertex;
-        Vertex s = this.graph.directNeighbors(t).get(0);
+        Vertex s = this.neighborMap.get(t).get(0);
         newVertex.put(s, false);
         for (Edge e : this.graph.getEdges()){
             //if(e.source == t && e.target == s){
@@ -126,7 +149,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
 
         // (a)
         // If there is a new cycle edge {u,w} with w *-> v
-        for(Vertex w : this.graph.directNeighbors(v)) {
+        for(Vertex w : this.neighborMap.get(v)) {
             Edge currentEdge = this.graph.getEdge(v, w);
             if(currentEdge == null) continue;
             if(newEdge.get(currentEdge) && !treeEdges.contains(currentEdge) &&
@@ -141,7 +164,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
 
         // (b)
         // Else if there is a new tree edge v -> w
-        for(Vertex w : this.graph.directNeighbors(v)){
+        for(Vertex w : this.neighborMap.get(v)){
             Edge currentEdge = this.graph.getEdge(v, w);
             if(currentEdge == null) continue;
 
@@ -158,7 +181,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
                 while(newVertex.get(currentVertex) && foundNextEdge){
                     // find a (new) edge {w,x} with x = L(w) or L(x) = L(w)
                     foundNextEdge = false;
-                    for(Vertex x : this.graph.directNeighbors(currentVertex)){
+                    for(Vertex x : this.neighborMap.get(currentVertex)){
                         Edge nextEdge = this.graph.getEdge(currentVertex, x);
                         if(nextEdge == null) continue;
 
@@ -182,7 +205,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
 
         // (c)
         // Else if there is a new edge {v, w} with v *-> w
-        for (Vertex w : this.graph.directNeighbors(v)) {
+        for (Vertex w : this.neighborMap.get(v)) {
             Edge currentEdge = this.graph.getEdge(v, w);
             if(currentEdge == null) continue;
             if(newEdge.get(currentEdge) && !treeEdges.contains(currentEdge) &&
@@ -196,7 +219,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
                 boolean foundNextEdge = true;
                 while (newVertex.get(currentVertex) && foundNextEdge){
                     foundNextEdge = false;
-                    for (Vertex x : this.graph.directNeighbors(currentVertex)){
+                    for (Vertex x : this.neighborMap.get(currentVertex)){
                         Edge nextEdge = this.graph.getEdge(currentVertex, x);
                         if(nextEdge == null) continue;
                         if (newEdge.get(nextEdge) && treeEdges.contains(nextEdge)) {
@@ -262,7 +285,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
     public int computeLHelper(Vertex v) {
         if (visited.get(v) == false) {
             this.visited.put(v, true);
-            for (Vertex u : this.graph.directNeighbors(v)) {
+            for (Vertex u : this.neighborMap.get(v)) {
                 if (this.visited.get(u) == true) {
                     this.LNumbering.put(v, Math.min(this.LNumbering.get(v), preOrderMapping.get(u)));
                 }
