@@ -1,7 +1,5 @@
 package graphtea.extensions.reports.planarity.planaritypq;
 
-import org.apache.commons.lang3.ObjectUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +13,10 @@ import java.util.List;
  * */
 
 public class QNode extends PQNode {
+    public PQNode leftmostChild = null;
+    public PQNode rightmostChild = null;
+
+
     public QNode(String labelType){
         this.labelType = labelType;
     }
@@ -26,35 +28,33 @@ public class QNode extends PQNode {
     public List<PQNode> getChildrenOfType(Class type) {
         List<PQNode> cList = new ArrayList<PQNode>();
 
-        if(this.children.size() > 0){
-            PQNode start = this.children.get(0);
-            PQNode iter = start.circularLink_next;
-            if(start.getClass() == type){
-                cList.add(start);
-            }
-            while(iter != start){
-                if(iter.getClass() == type){
-                    cList.add(iter);
-                }
-                iter = iter.circularLink_next;
-            }
+        PQNode start = this.leftmostChild;
+        PQNode iter = start.circularLink_next;
+        if(start.getClass() == type){
+            cList.add(start);
         }
+        while(iter != start){
+            if(iter.getClass() == type){
+                cList.add(iter);
+            }
+            iter = iter.circularLink_next;
+        }
+
         return cList;
     }
 
     public List<PQNode> getChildrenOfLabel(String label) {
         List<PQNode> cList = new ArrayList<PQNode>();
 
-        if(this.children.size() > 0){
-            PQNode start = this.children.get(0);
-            PQNode iter = start;
-            do {
-                if(iter.labelType.equals(label)) {
-                    cList.add(iter);
-                }
-                iter = iter.circularLink_next;
-            } while(iter != start);
-        }
+        PQNode start = this.leftmostChild;
+        PQNode iter = start;
+        do {
+            if(iter.labelType.equals(label)) {
+                cList.add(iter);
+            }
+            iter = iter.circularLink_next;
+        } while(iter != start);
+
 
         return cList;
     }
@@ -70,16 +70,7 @@ public class QNode extends PQNode {
     }
 
     public List<PQNode> endmostChildren(){
-        if(this.children.size() == 1){
-            return Arrays.asList(this.children.get(0));
-        }
-        else if(this.children.size() >= 2){
-            return Arrays.asList(this.children.get(0), this.children.get(this.children.size()-1));
-        }
-        else {
-            return Arrays.asList();
-        }
-
+        return Arrays.asList(this.leftmostChild, this.rightmostChild);
     }
 
     public List<PQNode> fullChildren(){
@@ -112,15 +103,13 @@ public class QNode extends PQNode {
 
     public List<PQNode> getChildren(){
         List<PQNode> list = new ArrayList<>();
-        if(this.children.size() > 0) {
-            PQNode start = this.children.get(0);
-            PQNode iter = start.circularLink_next;
-            list.add(start);
-            while(iter != start){
-                list.add(iter);
-                iter = iter.circularLink_next;
-            }
 
+        PQNode start = this.leftmostChild;
+        PQNode iter = start.circularLink_next;
+        list.add(start);
+        while(iter != start){
+            list.add(iter);
+            iter = iter.circularLink_next;
         }
         return list;
     }
@@ -141,7 +130,6 @@ public class QNode extends PQNode {
             }
 
             if(removalNodes.contains(traversal)){
-                this.children.remove(traversal);
                 traversal.circularLink_next.circularLink_prev = traversal.circularLink_prev;
                 traversal.circularLink_prev.circularLink_next = traversal.circularLink_next;
 
@@ -169,39 +157,64 @@ public class QNode extends PQNode {
     }
 
     public void setQNodeEndmostChildren(PQNode leftMost, PQNode rightMost){
-        this.children = new ArrayList<>();
         if(leftMost != null) {
-            if(this.children.contains(leftMost))
-                this.children.remove(leftMost);
-            this.children.add(leftMost);
-            leftMost.parent = this;
+            this.leftmostChild = leftMost;
+            this.leftmostChild.parent = this;
         }
         if(rightMost != null) {
-            if(this.children.contains(rightMost))
-                this.children.remove(rightMost);
-            this.children.add(rightMost);
-            rightMost.parent = this;
+            this.rightmostChild = rightMost;
+            this.rightmostChild.parent = this;
         }
     }
 
-    public void replaceQNodeChild(PQNode newChild, PQNode oldChild){
-        int index = 0;
-        for (PQNode n : this.endmostChildren()) {
-            if (n == oldChild) {
-                if (index == 0) {
-                    // place newChild at front, move oldChild to internals
-                    this.children.add(newChild);
-                } else {
-                    // place newChild at end, move oldChild to internals
-                    this.children.add(this.children.size() - 1, newChild);
-                }
-
-            }
-            index++;
+    public void replaceChild(PQNode newChild, PQNode oldChild){
+        if(oldChild == this.leftmostChild){
+            this.setQNodeEndmostChildren(newChild, null);
+        }
+        else if (oldChild == this.rightmostChild){
+            this.setQNodeEndmostChildren(null, newChild);
         }
         PQHelpers.insertNodeIntoCircularList(newChild, oldChild.circularLink_prev, oldChild.circularLink_next);
-        this.children.remove(oldChild);
-        this.setQNodeEndmostChildren(this.endmostChildren().get(0), this.endmostChildren().get(1));
     }
+
+    public void setParentQNodeChildren(){
+        for (PQNode n : this.endmostChildren()) {
+            n.parent = this;
+            n.setEndmostSiblings(this.leftmostChild, this.rightmostChild);
+        }
+
+        // Traverse internals
+        PQNode itr = this.leftmostChild.circularLink_next;
+        while(itr != this.rightmostChild){
+            itr.parent = null;
+            itr.setEndmostSiblings(this.leftmostChild, this.rightmostChild);
+            itr = itr.circularLink_next;
+        }
+    }
+
+    public void rotate(){
+        PQHelpers.reverseCircularLinks(this.endmostChildren().get(0));
+        PQNode tmp = this.leftMostSibling;
+        this.leftMostSibling = this.rightMostSibling;
+        this.rightMostSibling = tmp;
+    }
+
+    public void addChild(PQNode child, boolean left){
+        if(left){
+            // Add left side
+            //PQHelpers.insertNodeIntoCircularList(child, this.rightmostChild, this.leftmostChild);
+            PQHelpers.insertNodeIntoCircularList(child, this.rightmostChild, this.leftmostChild);
+            this.setQNodeEndmostChildren(child, null);
+
+        }
+        else if(!left){
+            // Add right side
+            //PQHelpers.insertNodeIntoCircularList(child, this.leftmostChild, this.rightmostChild);
+            PQHelpers.insertNodeIntoCircularList(child, this.rightmostChild, this.leftmostChild);
+            this.setQNodeEndmostChildren(null, child);
+        }
+        setParentQNodeChildren();
+    }
+
 
 }

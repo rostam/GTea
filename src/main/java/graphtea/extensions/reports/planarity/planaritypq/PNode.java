@@ -12,6 +12,8 @@ import java.util.List;
  * */
 
 public class PNode extends PQNode {
+    List<PQNode> children = new ArrayList<>();
+
     public PNode(String labelType){
         this.labelType = labelType;
     }
@@ -70,12 +72,32 @@ public class PNode extends PQNode {
 
     public void removeChildren(List<PQNode> removalNodes){
         this.children.removeAll(removalNodes);
-        this.emptyChildren.removeAll(removalNodes);
-        this.fullChildren.removeAll(removalNodes);
-        this.partialChildren.removeAll(removalNodes);
-        this.pNodeChildren.removeAll(removalNodes);
-        this.qNodeChildren.removeAll(removalNodes);
     }
 
+    public void removeChild(PQNode child){
+        this.children.remove(child);
+    }
+
+    public void addChildren(List<PQNode> children){
+        for (PQNode n : children){
+            this.children.add(n);
+            n.parent = this;
+        }
+    }
+
+    public void addChild(PQNode child){
+        this.children.add(child);
+        child.parent = this;
+    }
+
+    public void replaceChild(PQNode newChild, PQNode oldChild){
+        this.removeChild(oldChild);
+        this.addChild(newChild);
+        newChild.parent = this;
+    }
+
+    public void clearChildren(){
+        this.children.clear();
+    }
 
 }
