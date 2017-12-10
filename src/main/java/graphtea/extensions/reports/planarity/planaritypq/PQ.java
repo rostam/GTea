@@ -382,7 +382,7 @@ public class PQ {
         }
 
         //Setting the links again, otherwise the endmost children would point to the previous siblings (the empty ones)
-        setCircularLinks(fullChildren);
+        //setCircularLinks(fullChildren);
 
         //System.out.println("TEMPLATE P2");
 
@@ -455,10 +455,9 @@ public class PQ {
             setCircularLinks(x.children);
             emptyNode.parent = x;
             fullNode.parent = x;
-            emptyNode.setEndmostSiblings(x.endmostChildren().get(0), x.endmostChildren().get(1));
-            fullNode.setEndmostSiblings(x.endmostChildren().get(0), x.endmostChildren().get(1));
-            //System.out.println("TEMPLATE P3 (alt form)");
+            x.setQNodeEndmostChildren(emptyNode, fullNode);
             x.setParentQNodeChildren();
+            //System.out.println("TEMPLATE P3 (alt form)");
             return true;
         }
 
@@ -580,7 +579,6 @@ public class PQ {
         }
 
         //If partial node is not a Q node
-        //if (partialChildren.get(0).nodeType != PQNode.QNODE) {
         if (partialChildren.get(0).getClass() != QNode.class) {
             return false;
         }
@@ -669,7 +667,7 @@ public class PQ {
     /**
      * Tries to match the subtree at x (x must NOT be the root of the pertinent subtree) to template P5, if successful,
      * we apply it.
-     * Note: This case is very similiar to TEMPLATE_P4.
+     * Note: This case is very similar to TEMPLATE_P4.
      *       The matching is nearly identical, the only different being that x cannot be a root.
      * TEMPLATE:
      *
@@ -898,7 +896,7 @@ public class PQ {
         PQNode pNode = new PNode(PQNode.FULL);
         if(fullRootChildList.size() > 1) {
 
-            setCircularLinks(fullRootChildList);
+            //setCircularLinks(fullRootChildList);
             fullRootChildList.forEach(n -> n.parent = pNode);
             pNode.children = fullRootChildList;
         }

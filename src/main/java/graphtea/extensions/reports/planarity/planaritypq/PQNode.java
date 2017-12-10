@@ -238,7 +238,7 @@ public class PQNode {
     }
 
 
-    public void setEndmostSiblings(PQNode left, PQNode right){
+    private void setEndmostSiblings(PQNode left, PQNode right){
         if(left == null)
             leftMostSibling = null;
         else leftMostSibling = left;
