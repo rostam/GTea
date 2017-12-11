@@ -46,11 +46,17 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
         return -1;
 	}
 
-	public StNumbering(GraphModel g) throws NotBiconnectedException {
-        KConnected kc = new KConnected();
-        if (kc.kconn(g) < 2 && g.getVerticesCount() > 2) {
-            throw new NotBiconnectedException("Graph must be biconnected for StNumbering to work!");
+	public boolean biConnected(GraphModel g) {
+        for (Vertex v : g) {
+            if (neighborMap.get(v) != null && neighborMap.get(v).size() < 2) {
+                return false;
+            }
         }
+        return true;
+    }
+
+	public StNumbering(GraphModel g) throws NotBiconnectedException {
+
         this.graph = g;
         this.highestId = 0;
         this.preOrderMapping = new HashMap<Vertex, Integer>();
@@ -62,6 +68,13 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
         this.stack = new Stack<Vertex>();
         this.treeEdges = new ArrayList<>();
         this.neighborMap = new HashMap<Vertex, List<Vertex>>();
+
+        graph.setDirected(false);
+        //Neighbor precompute must be run before biConnected
+        neighborPrecompute();
+        if (!biConnected(g)) {
+            throw new NotBiconnectedException("Graph must be biconnected for StNumbering to work!");
+        }
     }
 
     private void addEdgeMapping(Vertex src, Vertex trg){
@@ -92,9 +105,8 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
             return stMapping;
         }
 
-        graph.setDirected(false);
 
-        neighborPrecompute();
+
 
         this.preOrderNumbering();
 
