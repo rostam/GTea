@@ -248,9 +248,9 @@ public class PQTest {
     @Test
     public void reduceTest(){
         PNode _root = new PNode();
-        PQNode A = new PQNode();
-        PQNode B = new PQNode();
-        PQNode C = new PQNode();
+        PQNode A = new LeafNode();
+        PQNode B = new LeafNode();
+        PQNode C = new LeafNode();
 
         // Create tree
         A.nodeType = PQNode.PSEUDO_NODE;
@@ -1680,8 +1680,8 @@ public class PQTest {
     private List<List<PQNode>> templateQ3Tree(){
         PQNode _root = new QNode();
         PQNode mainQNode = new QNode();
-        PQNode partialLeftQNode = new QNode();
-        PQNode partialRightQNode = new QNode();
+        PQNode partialLeftQNode = new QNode(PQNode.PARTIAL);
+        PQNode partialRightQNode = new QNode(PQNode.PARTIAL);
 
         List<PQNode> emptyLeft = new ArrayList<PQNode>();
         List<PQNode> partialLeft = new ArrayList<PQNode>();
@@ -1775,6 +1775,11 @@ public class PQTest {
         mainQNode.setChildren(circular);
         partialLeftQNode.setChildren(partialLeft);
         partialRightQNode.setChildren(partialRight);
+
+        List<PQNode> QNodes = new ArrayList<>();
+        QNodes.add(partialLeftQNode);
+        QNodes.add(partialRightQNode);
+
         List<List<PQNode>> retList = new ArrayList<>();
 
         retList.add(Arrays.asList(mainQNode));
@@ -1783,11 +1788,12 @@ public class PQTest {
         retList.add(fullMid);
         retList.add(partialRight);
         retList.add(emptyRight);
+        retList.add(QNodes);
         return retList;
     }
 
     @Test
-    public void templateQ3Test() {
+    public void templateQ3Test1() {
         List<List<PQNode>> nodesList = new ArrayList<>(templateQ3Tree());
         PQNode mainQNode = nodesList.get(0).get(0);
         List<PQNode> emptyLeft = new ArrayList<>(nodesList.get(1));
@@ -1801,15 +1807,95 @@ public class PQTest {
         assertTrue(rt);
         int sumOfParts = emptyLeft.size() + partialLeft.size() + fullMid.size() + partialRight.size() + emptyRight.size();
         assertTrue(mainQNode.getChildren().size() == sumOfParts);
-        List<PQNode> parts = new ArrayList<PQNode>();
-        parts.addAll(emptyLeft);
-        parts.addAll(partialLeft);
-        parts.addAll(fullMid);
-        parts.addAll(partialRight);
-        parts.addAll(emptyRight);
-        assertTrue(mainQNode.getChildren().equals(parts));
+        assertTrue(PQHelpers.checkIfConsecutive(mainQNode.getChildren()));
+    }
 
+    @Test
+    public void templateQ3Test2() {
+        List<List<PQNode>> nodesList = new ArrayList<>(templateQ3Tree());
+        PQNode mainQNode = nodesList.get(0).get(0);
+        List<PQNode> emptyLeft = new ArrayList<>(nodesList.get(1));
+        List<PQNode> partialLeft = new ArrayList<>(nodesList.get(2));
+        List<PQNode> fullMid = new ArrayList<>(nodesList.get(3));
+        List<PQNode> partialRight = new ArrayList<>(nodesList.get(4));
+        List<PQNode> emptyRight = new ArrayList<>(nodesList.get(5));
 
+        List<PQNode> QNodes = new ArrayList<>(nodesList.get(6));
+        QNode leftQNode = (QNode) QNodes.get(0);
+        QNode rightQNode = (QNode) QNodes.get(1);
+
+        leftQNode.rotate();
+
+        PQ PQTree = new PQ();
+        boolean rt = PQTree.TEMPLATE_Q3(mainQNode);
+        assertTrue(rt);
+
+        //for(PQNode n : mainQNode.getChildren()){
+        //    System.out.print(n.labelType + " ");
+        //}
+
+        int sumOfParts = emptyLeft.size() + partialLeft.size() + fullMid.size() + partialRight.size() + emptyRight.size();
+        assertTrue(mainQNode.getChildren().size() == sumOfParts);
+        assertTrue(PQHelpers.checkIfConsecutive(mainQNode.getChildren()));
+    }
+
+    @Test
+    public void templateQ3Test3() {
+        List<List<PQNode>> nodesList = new ArrayList<>(templateQ3Tree());
+        PQNode mainQNode = nodesList.get(0).get(0);
+        List<PQNode> emptyLeft = new ArrayList<>(nodesList.get(1));
+        List<PQNode> partialLeft = new ArrayList<>(nodesList.get(2));
+        List<PQNode> fullMid = new ArrayList<>(nodesList.get(3));
+        List<PQNode> partialRight = new ArrayList<>(nodesList.get(4));
+        List<PQNode> emptyRight = new ArrayList<>(nodesList.get(5));
+
+        List<PQNode> QNodes = new ArrayList<>(nodesList.get(6));
+        QNode leftQNode = (QNode) QNodes.get(0);
+        QNode rightQNode = (QNode) QNodes.get(1);
+
+        rightQNode.rotate();
+
+        PQ PQTree = new PQ();
+        boolean rt = PQTree.TEMPLATE_Q3(mainQNode);
+        assertTrue(rt);
+
+        //for(PQNode n : mainQNode.getChildren()){
+        //    System.out.print(n.labelType + " ");
+        //}
+
+        int sumOfParts = emptyLeft.size() + partialLeft.size() + fullMid.size() + partialRight.size() + emptyRight.size();
+        assertTrue(mainQNode.getChildren().size() == sumOfParts);
+        assertTrue(PQHelpers.checkIfConsecutive(mainQNode.getChildren()));
+    }
+
+    @Test
+    public void templateQ3Test4() {
+        List<List<PQNode>> nodesList = new ArrayList<>(templateQ3Tree());
+        PQNode mainQNode = nodesList.get(0).get(0);
+        List<PQNode> emptyLeft = new ArrayList<>(nodesList.get(1));
+        List<PQNode> partialLeft = new ArrayList<>(nodesList.get(2));
+        List<PQNode> fullMid = new ArrayList<>(nodesList.get(3));
+        List<PQNode> partialRight = new ArrayList<>(nodesList.get(4));
+        List<PQNode> emptyRight = new ArrayList<>(nodesList.get(5));
+
+        List<PQNode> QNodes = new ArrayList<>(nodesList.get(6));
+        QNode leftQNode = (QNode) QNodes.get(0);
+        QNode rightQNode = (QNode) QNodes.get(1);
+
+        leftQNode.rotate();
+        rightQNode.rotate();
+
+        PQ PQTree = new PQ();
+        boolean rt = PQTree.TEMPLATE_Q3(mainQNode);
+        assertTrue(rt);
+
+        //for(PQNode n : mainQNode.getChildren()){
+        //    System.out.print(n.labelType + " ");
+        //}
+
+        int sumOfParts = emptyLeft.size() + partialLeft.size() + fullMid.size() + partialRight.size() + emptyRight.size();
+        assertTrue(mainQNode.getChildren().size() == sumOfParts);
+        assertTrue(PQHelpers.checkIfConsecutive(mainQNode.getChildren()));
     }
 
     @Test

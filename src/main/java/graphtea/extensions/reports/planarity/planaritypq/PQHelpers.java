@@ -385,4 +385,23 @@ public class PQHelpers {
         parent.replaceChild(replacementNode, originalNode);
     }
 
+    public static boolean rotateIfNeeded(QNode qNode){
+        if(qNode.circularLink_next.labelType.equals(PQNode.FULL) && qNode.circularLink_prev.labelType.equals(PQNode.EMPTY)){
+            if(qNode.leftmostChild.labelType.equals(PQNode.FULL)){
+                qNode.rotate();
+            }
+            return true;
+        }
+        else if(qNode.circularLink_prev.labelType.equals(PQNode.FULL) && qNode.circularLink_next.labelType.equals(PQNode.EMPTY)){
+            if(qNode.rightmostChild.labelType.equals(PQNode.FULL)){
+                qNode.rotate();
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+
 }
