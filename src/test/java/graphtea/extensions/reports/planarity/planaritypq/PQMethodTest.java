@@ -167,7 +167,7 @@ public class PQMethodTest {
     @Test
     public void CompleteGraphMultipleTest() {
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
-        for (int i = 1; i < 300; i*=2) {
+        for (int i = 1; i < 20; i++) {
             GraphModel gm = gen.generateCompleteGraph(i);
 
             if (i < 5) {
