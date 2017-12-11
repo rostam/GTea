@@ -159,9 +159,9 @@ public class PQMethodTest {
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
         int i = 50;
         GraphModel gm = gen.generateCompleteGraph(i);
-        Stopwatch sw = new Stopwatch();
+        //Stopwatch sw = new Stopwatch();
         genericIsPlanarTest(gm, false);
-        System.out.println(i + " " + sw.elapsedTime());
+        //System.out.println(i + " " + sw.elapsedTime());
     }
 
     @Test
@@ -191,11 +191,11 @@ public class PQMethodTest {
     @Test
     public void CircleGraphMutltipleTest() {
         CircleGenerator gen = new CircleGenerator();
-        for (int i = 1; i < 8192; i*=2) {
+        for (int i = 1; i < 10; i++) {
             GraphModel gm = gen.generateCircle(i);
-            Stopwatch sw = new Stopwatch();
+            //Stopwatch sw = new Stopwatch();
             genericIsPlanarTest(gm, true);
-            System.out.println(i + " " + sw.elapsedTime());
+            //System.out.println(i + " " + sw.elapsedTime());
         }
     }
 
@@ -248,7 +248,7 @@ public class PQMethodTest {
     public void GearGraphTest() {
         GearGenerator gen = new GearGenerator();
         for (int i = 1; i < 5; i++) {
-            System.out.println("Testing for n = " + i);
+            //System.out.println("Testing for n = " + i);
             GraphModel gm = gen.generateGear(i);
             genericIsPlanarTest(gm, true);
         }
