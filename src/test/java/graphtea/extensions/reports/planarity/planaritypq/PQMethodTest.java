@@ -167,15 +167,16 @@ public class PQMethodTest {
     @Test
     public void CompleteGraphMultipleTest() {
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
-        for (int i = 1; i < 35; i++) {
-            System.out.println(i);
+        for (int i = 1; i < 300; i*=2) {
             GraphModel gm = gen.generateCompleteGraph(i);
 
             if (i < 5) {
                 genericIsPlanarTest(gm, true);
             }
             else {
+                Stopwatch sw = new Stopwatch();
                 genericIsPlanarTest(gm, false);
+                System.out.println(i + " " + sw.elapsedTime());
             }
         }
     }
@@ -183,7 +184,7 @@ public class PQMethodTest {
     @Test
     public void CircleGraphTest() {
         CircleGenerator gen = new CircleGenerator();
-        GraphModel gm = gen.generateCircle(5);
+        GraphModel gm = gen.generateCircle(2000);
         genericIsPlanarTest(gm, true);
 
     }

@@ -1169,6 +1169,17 @@ public class PQ {
 
         x.labelType = PQNode.PARTIAL;
         List<PQNode> partials = x.getChildrenOfLabel(PQNode.PARTIAL);
+        QNode leftQNode = (QNode) partials.get(0);
+        QNode rightQNode = (QNode) partials.get(1);
+        PQNode leftMostChildOfX = x.endmostChildren().get(0);
+        PQNode rightMostChildOfX = x.endmostChildren().get(1);
+
+        if(!PQHelpers.rotateIfNeeded(leftQNode))
+            return false;
+        if(!PQHelpers.rotateIfNeeded(rightQNode)){
+            return false;
+        }
+
 
         List<PQNode> replacementChildren = new ArrayList<PQNode>();
         replacementChildren.addAll(leftEmpties);
@@ -1189,17 +1200,6 @@ public class PQ {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
