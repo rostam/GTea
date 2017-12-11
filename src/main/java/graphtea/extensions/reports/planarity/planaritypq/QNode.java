@@ -146,14 +146,23 @@ public class QNode extends PQNode {
 
         if(survivors.size() >= 2){
             setQNodeEndmostChildren(survivors.get(0), survivors.get(survivors.size()-1));
+            //setParentQNodeChildren();
         }
         else if(survivors.size() == 1){
-            setQNodeEndmostChildren(survivors.get(0), null);
+            setQNodeEndmostChildren(survivors.get(0), survivors.get(0));
+            //setParentQNodeChildren();
         }
         else {
-            setQNodeEndmostChildren(null, null);
+            //setQNodeEndmostChildren(null, null);
+            setEmptyEndmostChildren();
+            //setParentQNodeChildren();
         }
 
+    }
+
+    private void setEmptyEndmostChildren(){
+        this.leftmostChild = null;
+        this.rightmostChild = null;
     }
 
     public void setQNodeEndmostChildren(PQNode leftMost, PQNode rightMost){
@@ -194,22 +203,25 @@ public class QNode extends PQNode {
 
     public void rotate(){
         PQHelpers.reverseCircularLinks(this.endmostChildren().get(0));
-        PQNode tmp = this.leftMostSibling;
-        this.leftMostSibling = this.rightMostSibling;
-        this.rightMostSibling = tmp;
+        this.setQNodeEndmostChildren(this.rightmostChild, this.leftmostChild);
+        this.setParentQNodeChildren();
+    }
+
+    public void setChildren(List<PQNode> children){
+        PQHelpers.setCircularLinks(children);
+        this.setQNodeEndmostChildren(children.get(0), children.get(1));
+        this.setEmptyEndmostChildren();
     }
 
     public void addChild(PQNode child, boolean left){
         if(left){
             // Add left side
-            //PQHelpers.insertNodeIntoCircularList(child, this.rightmostChild, this.leftmostChild);
             PQHelpers.insertNodeIntoCircularList(child, this.rightmostChild, this.leftmostChild);
             this.setQNodeEndmostChildren(child, null);
 
         }
         else if(!left){
             // Add right side
-            //PQHelpers.insertNodeIntoCircularList(child, this.leftmostChild, this.rightmostChild);
             PQHelpers.insertNodeIntoCircularList(child, this.rightmostChild, this.leftmostChild);
             this.setQNodeEndmostChildren(null, child);
         }
