@@ -10,11 +10,11 @@ import java.util.List;
 import graphtea.extensions.reports.planarity.planaritypq.PQHelpers;
 
 import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.reverseCircularLinks;
-import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.rotateQNode;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.*;
 
 public class PQHelpersTest {
+
     @Test
     public void setCircularLinksTest() throws Exception {
         PQNode c1 = new LeafNode();
@@ -122,14 +122,17 @@ public class PQHelpersTest {
 
     @Test
     public void frontierTestPath() {
-        PQNode _root = new PQNode("_root");
-        PQNode child1 = new PQNode("child1");
-        PQNode child2 = new PQNode("child2");
-        PQNode child3 = new PQNode("child3");
+        PQNode _root = new PNode("_root");
+        PQNode child1 = new PNode("child1");
+        PQNode child2 = new PNode("child2");
+        PQNode child3 = new PNode("child3");
 
-        _root.children.add(child1);
-        child1.children.add(child2);
-        child2.children.add(child3);
+        _root.addChild(child1);
+        child1.addChild(child2);
+        child2.addChild(child3);
+        //_root.children.add(child1);
+        //child1.children.add(child2);
+        //child2.children.add(child3);
 
         List<PQNode> front = PQHelpers.frontier(_root);
         assertTrue(PQHelpers.frontier(_root).equals(Arrays.asList(child3)));
@@ -137,22 +140,28 @@ public class PQHelpersTest {
 
     @Test
     public void frontierTestSimpleBinaryTree() {
-        PQNode _root = new PQNode("_root");
-        PQNode childL = new PQNode("childL");
-        PQNode childR = new PQNode("childR");
-        PQNode childLL = new PQNode("childLL");
-        PQNode childLR= new PQNode("childLR");
-        PQNode childLLL = new PQNode("childLLL");
-        PQNode childLLR = new PQNode("childLLR");
+        PQNode _root = new PNode("_root");
+        PQNode childL = new PNode("childL");
+        PQNode childR = new PNode("childR");
+        PQNode childLL = new PNode("childLL");
+        PQNode childLR= new PNode("childLR");
+        PQNode childLLL = new PNode("childLLL");
+        PQNode childLLR = new PNode("childLLR");
 
-        _root.children.add(childL);
-        _root.children.add(childR);
+        //_root.children.add(childL);
+        //_root.children.add(childR);
+        _root.addChild(childL);
+        _root.addChild(childR);
 
-        childL.children.add(childLL);
-        childL.children.add(childLR);
+        //childL.children.add(childLL);
+        //childL.children.add(childLR);
+        childL.addChild(childLL);
+        childL.addChild(childLR);
 
-        childLL.children.add(childLLL);
-        childLL.children.add(childLLR);
+        //childLL.children.add(childLLL);
+        //childLL.children.add(childLLR);
+        childLL.addChild(childLLL);
+        childLL.addChild(childLLR);
 
         List<PQNode> front = PQHelpers.frontier(_root);
         assertTrue(PQHelpers.frontier(_root).equals(Arrays.asList(childLLL, childLLR, childLR, childR)));
@@ -199,7 +208,7 @@ public class PQHelpersTest {
 
         List<PQNode> saveList = new ArrayList<>(list);
 
-        /** Function we are testing */
+        // Function we are testing
         reverseCircularLinks(list.get(0));
 
         assertTrue(leftMost.circularLink_next == rightMost);
@@ -218,7 +227,7 @@ public class PQHelpersTest {
 
     @Test
     public void rotateQNodeTest(){
-        PQNode qNode = new QNode();
+        QNode qNode = new QNode();
 
         PQNode leftMost = new LeafNode();
         PQNode interior = new LeafNode();
@@ -226,28 +235,21 @@ public class PQHelpersTest {
 
         leftMost.id = "A";
         interior.id = "B";
-        interior.id = "C";
+        rightMost.id = "C";
 
         leftMost.parent = qNode;
         rightMost.parent = qNode;
-
-        leftMost.circularLink_prev = rightMost;
-        leftMost.circularLink_next = interior;
-
-        interior.circularLink_prev = leftMost;
-        interior.circularLink_next = rightMost;
-
-        rightMost.circularLink_prev = interior;
-        rightMost.circularLink_next = leftMost;
 
         List<PQNode> children = new ArrayList<>();
         children.add(leftMost);
         children.add(interior);
         children.add(rightMost);
 
-        qNode.children = children;
+        PQHelpers.setCircularLinks(children);
+        qNode.setQNodeEndmostChildren(children.get(0), children.get(children.size()-1));
+        qNode.setParentQNodeChildren();
 
-        rotateQNode(qNode);
+        qNode.rotate();
 
         assertTrue(qNode.endmostChildren().get(0) == rightMost);
         assertTrue(qNode.endmostChildren().get(1) == leftMost);
@@ -256,12 +258,13 @@ public class PQHelpersTest {
 
     @Test
     public void equalTreesTestIdentical1() {
-        PQNode root = new PQNode();
+        PQNode root = new PNode();
 
         for (int i = 0; i < 10; i++) {
-            PQNode child = new PQNode();
+            PQNode child = new LeafNode();
             child.parent = root;
-            root.children.add(child);
+            //root.children.add(child);
+            root.addChild(child);
         }
 
         assertTrue(PQHelpers.equalTrees(root, root));
@@ -269,18 +272,20 @@ public class PQHelpersTest {
 
     @Test
     public void equalTreesTestDifferent1() {
-        PQNode rootA = new PQNode();
-        PQNode rootB = new PQNode();
+        PQNode rootA = new PNode();
+        PQNode rootB = new PNode();
 
         for (int i = 0; i < 10; i++) {
-            PQNode child = new PQNode();
+            PQNode child = new LeafNode();
             child.parent = rootA;
-            rootA.children.add(child);
+            //rootA.children.add(child);
+            rootA.addChild(child);
         }
         for (int i = 0; i < 10; i++) {
-            PQNode child = new PQNode();
+            PQNode child = new LeafNode();
             child.parent = rootB;
-            rootB.children.add(child);
+            //rootB.children.add(child);
+            rootB.addChild(child);
         }
 
         assertFalse(PQHelpers.equalTrees(rootA, rootB));
@@ -288,19 +293,22 @@ public class PQHelpersTest {
 
     @Test
     public void equalTreesTestDifferent2() {
-        PQNode root = new PQNode();
+        PQNode root = new PNode();
 
         for (int i = 0; i < 10; i++) {
-            PQNode child = new PQNode();
+            PQNode child = new LeafNode();
             child.parent = root;
-            root.children.add(child);
+            //root.children.add(child);
+            root.addChild(child);
         }
 
-        PQNode rootCopy = new PQNode();
+        PQNode rootCopy = new PNode();
         for (int i = 0; i < 10; i++) {
-            rootCopy.children.add(root.children.get(i));
+            //rootCopy.children.add(root.children.get(i));
+            rootCopy.addChild(root.getChildren().get(i));
         }
-        rootCopy.children.add(new PQNode());
+        //rootCopy.children.add(new PQNode());
+        rootCopy.addChild(new LeafNode());
         assertFalse(PQHelpers.equalTrees(root, rootCopy));
     }
 
@@ -311,9 +319,13 @@ public class PQHelpersTest {
         PQNode b = new PQNode();
         PQNode c = new PQNode();
         PQNode d = new PQNode();
-        root.children.addAll(Arrays.asList(a, b, c, d));
-        PQHelpers.setCircularLinks(root.children);
-        for (PQNode n : root.children) {
+        //root.children.addAll(Arrays.asList(a, b, c, d));
+        root.addChildren(Arrays.asList(a, b, c, d));
+        PQHelpers.setCircularLinks(Arrays.asList(a, b, c, d));
+        root.setQNodeEndmostChildren(a, d);
+        root.setParentQNodeChildren();
+        //for (PQNode n : root.children) {
+        for (PQNode n : root.getChildren()) {
             n.labelType = PQNode.EMPTY;
         }
         List<PQNode> empties = new ArrayList<>();
@@ -342,6 +354,7 @@ public class PQHelpersTest {
 
 
     }
+
 
 }
 

@@ -38,7 +38,8 @@ public class PQNodeTest {
         first.parent = _root;
         fourth.parent = _root;
 
-        _root.children = Arrays.asList(first, second, third, fourth);
+        //_root.children = Arrays.asList(first, second, third, fourth);
+        _root.setQNodeEndmostChildren(first, fourth);
         setCircularLinks(Arrays.asList(first, second, third, fourth));
 
         List<PQNode> expected = Arrays.asList(first, fourth);
@@ -63,8 +64,10 @@ public class PQNodeTest {
         first.parent = _root;
         fourth.parent = _root;
 
-        _root.children = Arrays.asList(first, second, third, fourth);
+        //_root.children = Arrays.asList(first, second, third, fourth);
         setCircularLinks(Arrays.asList(first, second, third, fourth));
+        _root.setQNodeEndmostChildren(first, fourth);
+        _root.setParentQNodeChildren();
 
         List<PQNode> expected = Arrays.asList(second, third);
         assertTrue(expected.equals(_root.internalChildren()));
@@ -158,7 +161,9 @@ public class PQNodeTest {
         List<PQNode> fullChildren = new ArrayList<PQNode>();
         fullChildren.add(c1);
         fullChildren.add(c3);
-        root.children = fullChildren;
+
+        root.addChildren(fullChildren);
+
         Set<PQNode> functionCallReturn = new HashSet<PQNode>(root.fullChildren());
         Set<PQNode> fullChildrenSet = new HashSet<PQNode>(fullChildren);
         assertTrue(functionCallReturn.equals(fullChildrenSet));
@@ -235,7 +240,9 @@ public class PQNodeTest {
         children.add(c8);
         children.add(c9);
 
-        root.children = children;
+        //root.children = children;
+        root.setQNodeEndmostChildren(children.get(0), children.get(0));
+        root.setParentQNodeChildren();
 
         Set<PQNode> results = c4.maximalConsecutiveSetOfSiblingsAdjacent(true);
         assertTrue(results.contains(c5) && results.contains(c6) && results.contains(c7));
@@ -253,7 +260,9 @@ public class PQNodeTest {
         List<PQNode> children = Arrays.asList(A, B, C, D);
         setCircularLinks(children);
 
-        qNode.children = children;
+        //qNode.children = children;
+        qNode.setQNodeEndmostChildren(children.get(0), children.get(1));
+        qNode.setParentQNodeChildren();
 
         qNode.setQNodeEndmostChildren(D, A);
 
@@ -372,9 +381,12 @@ public class PQNodeTest {
         PQNode B = new LeafNode("B");
         PQNode C = new LeafNode("C");
         PQNode D = new LeafNode("D");
+
         List<PQNode> children = Arrays.asList(A, B, C, D);
+
         setCircularLinks(children);
         qNode.setQNodeEndmostChildren(A, D);
+        qNode.setParentQNodeChildren();
 
         List<PQNode> removeThese = new ArrayList<>(Arrays.asList(A, B, D));
         qNode.removeChildren(removeThese);
@@ -383,7 +395,8 @@ public class PQNodeTest {
         assertTrue(C.circularLink_prev == C);
 
         assertTrue(qNode.endmostChildren().get(0) ==  C);
-        assertTrue(qNode.endmostChildren().size() == 1);
+        assertTrue(qNode.endmostChildren().get(1) ==  C);
+        assertTrue(qNode.endmostChildren().size() == 2);
     }
 
     @Test
@@ -394,13 +407,16 @@ public class PQNodeTest {
         PQNode C = new LeafNode("C");
         PQNode D = new LeafNode("D");
         List<PQNode> children = Arrays.asList(A, B, C, D);
+
         setCircularLinks(children);
         qNode.setQNodeEndmostChildren(A, D);
+        qNode.setParentQNodeChildren();
 
         List<PQNode> removeThese = new ArrayList<>(children);
         qNode.removeChildren(removeThese);
 
-        assertTrue(qNode.endmostChildren().size() == 0);
+        assertTrue(qNode.endmostChildren().get(0) == null);
+        assertTrue(qNode.endmostChildren().get(1) == null);
     }
 
 

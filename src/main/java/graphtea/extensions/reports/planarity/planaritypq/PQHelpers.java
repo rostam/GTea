@@ -126,22 +126,22 @@ public class PQHelpers {
         }
     }
 
-    /*public static List<PQNode> frontier(PQNode x) {
+    public static List<PQNode> frontier(PQNode x) {
         List<PQNode> frontier = new ArrayList<PQNode>();
         frontierHelper(x, frontier);
         return frontier;
-    }*/
+    }
 
-    /*public static void frontierHelper(PQNode x, List<PQNode> frontier) {
-        if (x.children.size() != 0) {
-            for (PQNode n : x.children) {
+    public static void frontierHelper(PQNode x, List<PQNode> frontier) {
+        if (x.getChildren().size() != 0) {
+            for (PQNode n : x.getChildren()) {
                 frontierHelper(n, frontier);
             }
         }
         else {
             frontier.add(x);
         }
-    }*/
+    }
 
     public static void gatherQNodeChildren(List<PQNode> emptyChildren, List<PQNode> fullChildren, PQNode qNode){
         if(qNode.getChildren().size() == 0){

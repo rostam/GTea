@@ -449,4 +449,12 @@ public class PQNode {
         }
     }
 
+    public void setChildren(List<PQNode> children){
+        try {
+            throw new IllegalNodeTypeException("Current node must be a P-Node.");
+        } catch (IllegalNodeTypeException e) {
+            System.err.println("setChildren(): " + e);
+        }
+    }
+
 }

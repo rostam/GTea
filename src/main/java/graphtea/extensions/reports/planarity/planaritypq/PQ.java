@@ -579,7 +579,7 @@ public class PQ {
             }
             else {
                 PQHelpers.insertNodeIntoCircularList(pNodeParent, rightMost, leftMost);
-                qNode.setQNodeEndmostChildren(pNodeParent, null);
+                qNode.setQNodeEndmostChildren(null, pNodeParent);
                 qNode.setParentQNodeChildren();
             }
         }

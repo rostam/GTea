@@ -136,6 +136,8 @@ public class PQMethod {
                 return false;
             }
 
+            //PQHelpers.printPreorderIds(T);
+
             // The set of edges whose lower numbered vertex is j
             // These edges are added to Sp
             ArrayList<PQNode> Sp = new ArrayList<>();
@@ -244,28 +246,13 @@ public class PQMethod {
             // ROOT(T, S) is not the root of the whole tree
 
             replacementNode.parent = rParent;
-
-            if (rParent.getClass() == QNode.class) {
-                // rParent is a Q-Node
-                rParent.replaceChild(replacementNode, root);
-
-            }
-            else {
-                // rParent is a P-Node
-                rParent.replaceChild(replacementNode, root);
-            }
+            rParent.replaceChild(replacementNode, root);
 
         }
         else {
             // ROOT(T, S) is the root of the whole tree.
-
-            //PQHelpers.printPreorderIds(root);
-            //PQHelpers.printPreorderIds(replacementNode);
-
             List<PQNode> removedNodes = root.fullChildren();
             root.removeChildren(removedNodes);
-
-            //root.children.add(replacementNode);
             root.addChild(replacementNode);
 
         }

@@ -209,8 +209,8 @@ public class QNode extends PQNode {
 
     public void setChildren(List<PQNode> children){
         PQHelpers.setCircularLinks(children);
-        this.setQNodeEndmostChildren(children.get(0), children.get(1));
-        this.setEmptyEndmostChildren();
+        this.setQNodeEndmostChildren(children.get(0), children.get(children.size()-1));
+        this.setParentQNodeChildren();
     }
 
     public void addChild(PQNode child, boolean left){

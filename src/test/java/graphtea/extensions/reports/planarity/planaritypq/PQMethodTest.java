@@ -1,5 +1,6 @@
 package graphtea.extensions.reports.planarity.planaritypq;
 
+import graphtea.extensions.algs4.Stopwatch;
 import graphtea.extensions.generators.*;
 import graphtea.extensions.reports.connectivity.KConnected;
 import graphtea.extensions.reports.numberings.NotBiconnectedException;
@@ -126,8 +127,6 @@ public class PQMethodTest {
     public void k33Test(){
         KmnGenerator gen = new KmnGenerator();
         GraphModel gm = gen.generateGraph();
-        //PQMethod pc = new PQMethod();
-        //assertFalse(pc.isPlanar(gm));
         genericIsPlanarTest(gm, false);
     }
 
@@ -135,8 +134,6 @@ public class PQMethodTest {
     public void k5Test(){
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
         GraphModel gm = gen.generateCompleteGraph(5);
-        //PQMethod pc = new PQMethod();
-        //assertFalse(pc.isPlanar(gm));
         genericIsPlanarTest(gm, false);
     }
 
@@ -158,19 +155,26 @@ public class PQMethodTest {
     }
 
     @Test
+    public void CompleteGraphTest() {
+        CompleteGraphGenerator gen = new CompleteGraphGenerator();
+        int i = 50;
+        GraphModel gm = gen.generateCompleteGraph(i);
+        Stopwatch sw = new Stopwatch();
+        genericIsPlanarTest(gm, false);
+        System.out.println(i + " " + sw.elapsedTime());
+    }
+
+    @Test
     public void CompleteGraphMultipleTest() {
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
         for (int i = 1; i < 35; i++) {
             System.out.println(i);
             GraphModel gm = gen.generateCompleteGraph(i);
-            //PQMethod pc = new PQMethod();
 
             if (i < 5) {
-                //assertTrue( pc.isPlanar(gm));
                 genericIsPlanarTest(gm, true);
             }
             else {
-                //assertFalse( pc.isPlanar(gm));
                 genericIsPlanarTest(gm, false);
             }
         }
@@ -179,9 +183,7 @@ public class PQMethodTest {
     @Test
     public void CircleGraphTest() {
         CircleGenerator gen = new CircleGenerator();
-        GraphModel gm = gen.generateCircle(4);
-        //PQMethod pc = new PQMethod();
-        //assertTrue( pc.isPlanar(gm));
+        GraphModel gm = gen.generateCircle(5);
         genericIsPlanarTest(gm, true);
 
     }
@@ -189,13 +191,11 @@ public class PQMethodTest {
     @Test
     public void CircleGraphMutltipleTest() {
         CircleGenerator gen = new CircleGenerator();
-        for (int i = 1; i < 13; i++) {
-            System.out.println("Testing for n = " + i);
-
+        for (int i = 1; i < 8192; i*=2) {
             GraphModel gm = gen.generateCircle(i);
-            //PQMethod pc = new PQMethod();
-            //assertTrue( pc.isPlanar(gm));
+            Stopwatch sw = new Stopwatch();
             genericIsPlanarTest(gm, true);
+            System.out.println(i + " " + sw.elapsedTime());
         }
     }
 
@@ -205,8 +205,6 @@ public class PQMethodTest {
         BananaTreeGenerator gen = new BananaTreeGenerator();
         for(int i=0; i<100; i++) {
             GraphModel gm = gen.generateGraph();
-            //PQMethod pc = new PQMethod();
-            //assertTrue( pc.isPlanar(gm));
             genericIsPlanarTest(gm, true);
         }
     }
