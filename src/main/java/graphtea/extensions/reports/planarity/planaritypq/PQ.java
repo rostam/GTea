@@ -228,7 +228,6 @@ public class PQ {
         if (x.getClass() == PNode.class || x.getClass() == QNode.class) {
             return false;
         }
-        //System.out.println("TEMPLATE L1");
         return true;
     }
 
@@ -249,7 +248,6 @@ public class PQ {
 
         } while (iter != front);
 
-        //System.out.println("TEMPLATE Q 1");
         x.labelType = consistentLabel;
         return true;
     }
@@ -263,7 +261,6 @@ public class PQ {
             }
             x.labelType = PQNode.FULL;
 
-            //System.out.println("TEMPLATE P (or Q) 1");
             return true;
         }
         return false;
@@ -349,7 +346,6 @@ public class PQ {
         // One full child
         if(fullChildren.size() == 1){
 
-            //System.out.println("P2: One full child - 'skipped' with true");
             return true;
         }
 
@@ -364,7 +360,6 @@ public class PQ {
         fullParent.addChildren(fullChildren);
         x.removeChildren(fullChildren);
 
-        //System.out.println("TEMPLATE P2");
 
         return true;
     }
@@ -432,7 +427,6 @@ public class PQ {
             xQ.setQNodeEndmostChildren(emptyNode, fullNode);
             xQ.setParentQNodeChildren();
 
-            //System.out.println("TEMPLATE P3 (alt form)");
             return true;
         }
 
@@ -468,7 +462,6 @@ public class PQ {
 
         xQ.setParentQNodeChildren();
 
-        //System.out.println("TEMPLATE P3");
         return true;
     }
 
@@ -595,7 +588,6 @@ public class PQ {
 
         qNode.setParentQNodeChildren();
 
-        //System.out.println("TEMPLATE P4");
 
         return true;
     }
@@ -695,7 +687,6 @@ public class PQ {
 
         qNode.setParentQNodeChildren();
 
-        //System.out.println("TEMPLATE P5");
 
         return true;
     }
@@ -893,7 +884,6 @@ public class PQ {
         mergingQNode.setQNodeEndmostChildren(leftMost1, rightMost2);
         mergingQNode.setParentQNodeChildren();
 
-        //System.out.println("TEMPLATE P6");
 
         return true;
     }
@@ -1044,7 +1034,6 @@ public class PQ {
 
         x.setParentQNodeChildren();
 
-        //System.out.println("TEMPLATE Q2");
         return true;
     }
 
@@ -1195,7 +1184,6 @@ public class PQ {
         x.setQNodeEndmostChildren(replacementChildren.get(0), replacementChildren.get(replacementChildren.size()-1));
         x.setParentQNodeChildren();
 
-        System.out.println("TEMPLATE Q3");
         return true;
     }
 

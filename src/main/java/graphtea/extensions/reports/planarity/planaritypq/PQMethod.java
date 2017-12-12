@@ -183,7 +183,6 @@ public class PQMethod {
 
             //PQHelpers.printPreorderIds(T);
         }
-        //System.out.println("DONE!");
         return true;
     }
 
