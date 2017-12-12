@@ -49,8 +49,15 @@ public class Planarity extends Algorithm implements GraphReportExtension {
 
         // Check planarity
         System.out.println("Checking planarity ... ");
-        WagnerMethod wm = new WagnerMethod();
-        boolean p = wm.isPlanar(g);
+        PQMethod pq = new PQMethod();
+        boolean p = false;
+        try {
+			p = pq.isPlanar(g);
+		}
+		catch (NotBiconnectedException e) {
+        	System.out.println(e);
+        	return false;
+		}
         return p;
     }
 
