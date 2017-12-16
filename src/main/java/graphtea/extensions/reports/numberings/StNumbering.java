@@ -72,7 +72,7 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
         graph.setDirected(false);
         //Neighbor precompute must be run before biConnected
         neighborPrecompute();
-        if (!biConnected(g)) {
+        if (!biConnected(g) && g.getVertexArray().length > 2) {
             throw new NotBiconnectedException("Graph must be biconnected for StNumbering to work!");
         }
     }

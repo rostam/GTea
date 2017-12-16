@@ -1,4 +1,6 @@
-package graphtea.extensions.reports.planarity.planaritypq;
+package graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes;
+
+import graphtea.extensions.reports.planarity.planaritypq.pqtree.helpers.PQHelpers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +20,7 @@ public class QNode extends PQNode {
 
 
     public QNode(String labelType){
-        this.labelType = labelType;
+        this.setLabel(labelType);
     }
 
     public QNode(){
@@ -29,7 +31,7 @@ public class QNode extends PQNode {
         List<PQNode> cList = new ArrayList<PQNode>();
 
         PQNode start = this.leftmostChild;
-        PQNode iter = start.circularLink_next;
+        PQNode iter = start.getCircularLink_next();
         if(start.getClass() == type){
             cList.add(start);
         }
@@ -37,7 +39,7 @@ public class QNode extends PQNode {
             if(iter.getClass() == type){
                 cList.add(iter);
             }
-            iter = iter.circularLink_next;
+            iter = iter.getCircularLink_next();
         }
 
         return cList;
@@ -49,10 +51,10 @@ public class QNode extends PQNode {
         PQNode start = this.leftmostChild;
         PQNode iter = start;
         do {
-            if(iter.labelType.equals(label)) {
+            if(iter.getLabel().equals(label)) {
                 cList.add(iter);
             }
-            iter = iter.circularLink_next;
+            iter = iter.getCircularLink_next();
         } while(iter != start);
 
 
@@ -79,9 +81,9 @@ public class QNode extends PQNode {
         PQNode start = this.endmostChildren().get(0);
 
         do {
-            if(traversal.labelType.equals(PQNode.FULL))
+            if(traversal.getLabel().equals(PQNode.FULL))
                 full.add(traversal);
-            traversal = traversal.circularLink_next;
+            traversal = traversal.getCircularLink_next();
         } while(traversal != start);
         return full;
     }
@@ -92,11 +94,11 @@ public class QNode extends PQNode {
         PQNode start = this.endmostChildren().get(0);
 
         do {
-            if(traversal.labelType.equals(PQNode.FULL))
+            if(traversal.getLabel().equals(PQNode.FULL))
                 full.add(traversal);
-            else if (traversal.labelType.equals(PQNode.PARTIAL))
+            else if (traversal.getLabel().equals(PQNode.PARTIAL))
                 full.add(traversal);
-            traversal = traversal.circularLink_next;
+            traversal = traversal.getCircularLink_next();
         } while(traversal != start);
         return full;
     }
@@ -105,11 +107,11 @@ public class QNode extends PQNode {
         List<PQNode> list = new ArrayList<>();
 
         PQNode start = this.leftmostChild;
-        PQNode iter = start.circularLink_next;
+        PQNode iter = start.getCircularLink_next();
         list.add(start);
         while(iter != start){
             list.add(iter);
-            iter = iter.circularLink_next;
+            iter = iter.getCircularLink_next();
         }
         return list;
     }
@@ -130,8 +132,8 @@ public class QNode extends PQNode {
             }
 
             if(removalNodes.contains(traversal)){
-                traversal.circularLink_next.circularLink_prev = traversal.circularLink_prev;
-                traversal.circularLink_prev.circularLink_next = traversal.circularLink_next;
+                traversal.getCircularLink_next().setCircularLink_prev(traversal.getCircularLink_prev());
+                traversal.getCircularLink_prev().setCircularLink_next(traversal.getCircularLink_next());
 
                 if(traversal == start){
                     updateStart = true;
@@ -141,7 +143,7 @@ public class QNode extends PQNode {
             else {
                 survivors.add(traversal);
             }
-            traversal = traversal.circularLink_next;
+            traversal = traversal.getCircularLink_next();
         } while(traversal != start);
 
         if(survivors.size() >= 2){
@@ -168,11 +170,11 @@ public class QNode extends PQNode {
     public void setQNodeEndmostChildren(PQNode leftMost, PQNode rightMost){
         if(leftMost != null) {
             this.leftmostChild = leftMost;
-            this.leftmostChild.parent = this;
+            this.leftmostChild.setParent(this);
         }
         if(rightMost != null) {
             this.rightmostChild = rightMost;
-            this.rightmostChild.parent = this;
+            this.rightmostChild.setParent(this);
         }
     }
 
@@ -183,21 +185,21 @@ public class QNode extends PQNode {
         else if (oldChild == this.rightmostChild){
             this.setQNodeEndmostChildren(null, newChild);
         }
-        PQHelpers.insertNodeIntoCircularList(newChild, oldChild.circularLink_prev, oldChild.circularLink_next);
+        PQHelpers.insertNodeIntoCircularList(newChild, oldChild.getCircularLink_prev(), oldChild.getCircularLink_next());
     }
 
     public void setParentQNodeChildren(){
         for (PQNode n : this.endmostChildren()) {
-            n.parent = this;
+            n.setParent(this);
             n.setEndmostSiblings(this.leftmostChild, this.rightmostChild);
         }
 
         // Traverse internals
-        PQNode itr = this.leftmostChild.circularLink_next;
+        PQNode itr = this.leftmostChild.getCircularLink_next();
         while(itr != this.rightmostChild){
-            itr.parent = null;
+            itr.setParent(null);
             itr.setEndmostSiblings(this.leftmostChild, this.rightmostChild);
-            itr = itr.circularLink_next;
+            itr = itr.getCircularLink_next();
         }
     }
 

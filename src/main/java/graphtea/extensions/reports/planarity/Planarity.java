@@ -1,7 +1,7 @@
 package graphtea.extensions.reports.planarity;
 
 import graphtea.extensions.reports.numberings.NotBiconnectedException;
-import graphtea.extensions.reports.planarity.planaritypq.PQMethod;
+import graphtea.extensions.reports.planarity.planaritypq.PlanarityTester;
 import graphtea.graph.graph.GraphModel;
 import graphtea.library.algorithms.Algorithm;
 import graphtea.plugins.reports.extension.GraphReportExtension;
@@ -25,15 +25,12 @@ public class Planarity extends Algorithm implements GraphReportExtension {
 	}
 
 	public Object calculate(GraphModel g) {
-		//WagnerMethod wm = new WagnerMethod();
-        //return wm.isPlanar(g);
-		PQMethod pq = new PQMethod();
+		PlanarityTester pq = new PlanarityTester();
 		try {
 			return pq.isPlanar(g);
 		} catch (NotBiconnectedException e) {
 			return null;
 		}
-        //return doAlgorithm();
 	}
 
 	@Override
@@ -49,7 +46,7 @@ public class Planarity extends Algorithm implements GraphReportExtension {
 
         // Check planarity
         System.out.println("Checking planarity ... ");
-        PQMethod pq = new PQMethod();
+        PlanarityTester pq = new PlanarityTester();
         boolean p = false;
         try {
 			p = pq.isPlanar(g);

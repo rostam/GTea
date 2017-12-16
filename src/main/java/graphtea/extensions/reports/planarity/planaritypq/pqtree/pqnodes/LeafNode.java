@@ -1,4 +1,4 @@
-package graphtea.extensions.reports.planarity.planaritypq;
+package graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +13,14 @@ import java.util.List;
 
 public class LeafNode extends PQNode {
     public LeafNode(String id){
-        this.id = id;
+        this.setId(id);
     }
     public LeafNode(){
         super();
+    }
+
+    public void setParent(PQNode parent){
+        super.setParent(parent);
     }
 
     public List<PQNode> getChildrenOfType(Class type) {

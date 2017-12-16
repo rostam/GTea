@@ -1,30 +1,23 @@
 package graphtea.extensions.reports.planarity.planaritypq;
 
-import graphtea.extensions.algs4.Stopwatch;
 import graphtea.extensions.generators.*;
 import graphtea.extensions.reports.connectivity.KConnected;
 import graphtea.extensions.reports.numberings.NotBiconnectedException;
-import graphtea.extensions.reports.numberings.StNumbering;
-import graphtea.extensions.reports.planarity.WagnerMethod;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
-import graphtea.library.algorithms.graphdecomposition.BiconnectedComponents;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.*;
 
-public class PQMethodTest {
+public class PlanarityTesterTest {
 
     private void genericIsPlanarTest(GraphModel gm, boolean assertVal){
         try {
-            PQMethod pc = new PQMethod();
+            PlanarityTester pc = new PlanarityTester();
 
             if(assertVal)
                 assertTrue(pc.isPlanar(gm));
@@ -117,8 +110,6 @@ public class PQMethodTest {
         gm.addEdge(e7);
         gm.addEdge(e8);
 
-        //PQMethod pc = new PQMethod();
-        //assertFalse(pc.isPlanar(gm));
         genericIsPlanarTest(gm, false);
     }
 
@@ -141,8 +132,6 @@ public class PQMethodTest {
     public void kTest(){
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
         GraphModel gm = gen.generateCompleteGraph(20);
-        //PQMethod pc = new PQMethod();
-        //assertFalse(pc.isPlanar(gm));
         genericIsPlanarTest(gm, false);
     }
 
@@ -159,9 +148,7 @@ public class PQMethodTest {
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
         int i = 50;
         GraphModel gm = gen.generateCompleteGraph(i);
-        //Stopwatch sw = new Stopwatch();
         genericIsPlanarTest(gm, false);
-        //System.out.println(i + " " + sw.elapsedTime());
     }
 
     @Test
@@ -174,9 +161,7 @@ public class PQMethodTest {
                 genericIsPlanarTest(gm, true);
             }
             else {
-                Stopwatch sw = new Stopwatch();
                 genericIsPlanarTest(gm, false);
-                System.out.println(i + " " + sw.elapsedTime());
             }
         }
     }
@@ -194,9 +179,7 @@ public class PQMethodTest {
         CircleGenerator gen = new CircleGenerator();
         for (int i = 1; i < 10; i++) {
             GraphModel gm = gen.generateCircle(i);
-            //Stopwatch sw = new Stopwatch();
             genericIsPlanarTest(gm, true);
-            //System.out.println(i + " " + sw.elapsedTime());
         }
     }
 
@@ -228,14 +211,7 @@ public class PQMethodTest {
         GearGenerator gen = new GearGenerator();
         GraphModel gm = gen.generateGear(3);
 
-        KConnected kc = new KConnected();
-        //if(kc.kconn(gm) > 1){
-            //PQMethod pc = new PQMethod();
-            //assertTrue(pc.isPlanar(gm));
-            genericIsPlanarTest(gm, true);
-        //} else {
-        //    System.out.println("NOT BICONNECTED");
-        //}
+        genericIsPlanarTest(gm, true);
     }
 
     @Test
@@ -249,7 +225,6 @@ public class PQMethodTest {
     public void GearGraphTest() {
         GearGenerator gen = new GearGenerator();
         for (int i = 1; i < 5; i++) {
-            //System.out.println("Testing for n = " + i);
             GraphModel gm = gen.generateGear(i);
             genericIsPlanarTest(gm, true);
         }
@@ -298,14 +273,6 @@ public class PQMethodTest {
     public void HelmTest2() {
         HelmGraph gen = new HelmGraph();
         GraphModel gm = gen.generateHelm(2);
-
-        //KConnected kc = new KConnected();
-        //if(kc.kconn(gm) > 1){
-        //    PQMethod pc = new PQMethod();
-        //    assertTrue(pc.isPlanar(gm));
-        //} else {
-        //    System.out.println("NOT BICONNECTED");
-        //}
         genericIsPlanarTest(gm, true);
 
     }
@@ -315,14 +282,6 @@ public class PQMethodTest {
     public void HelmTest3() {
         HelmGraph gen = new HelmGraph();
         GraphModel gm = gen.generateHelm(3);
-
-        //KConnected kc = new KConnected();
-        //if(kc.kconn(gm) > 1){
-        //    PQMethod pc = new PQMethod();
-        //    assertTrue(pc.isPlanar(gm));
-        //} else {
-        //   System.out.println("NOT BICONNECTED");
-        //}
         genericIsPlanarTest(gm, true);
 
     }
@@ -335,7 +294,7 @@ public class PQMethodTest {
 
         KConnected kc = new KConnected();
         if(kc.kconn(gm) > 1){
-            PQMethod pc = new PQMethod();
+            PlanarityTester pc = new PlanarityTester();
             //assertTrue(pc.isPlanar(gm));
         } else {
             System.out.println("NOT BICONNECTED");
@@ -360,7 +319,7 @@ public class PQMethodTest {
 
         KConnected kc = new KConnected();
         if(kc.kconn(gm) > 1){
-            PQMethod pc = new PQMethod();
+            PlanarityTester pc = new PlanarityTester();
             //assertTrue(pc.isPlanar(gm));
         } else {
             System.out.println("NOT BICONNECTED");
@@ -372,7 +331,7 @@ public class PQMethodTest {
     public void RandomBinaryTreeTest2() {
         RandomTreeGenerator gen = new RandomTreeGenerator();
         GraphModel gm = gen.generateRandomTree(20, 30, 3);
-        PQMethod pc = new PQMethod();
+        PlanarityTester pc = new PlanarityTester();
         //assertTrue(pc.isPlanar(gm));
     }
 
@@ -381,7 +340,7 @@ public class PQMethodTest {
     public void RandomBinaryTreeTest3() {
         RandomTreeGenerator gen = new RandomTreeGenerator();
         GraphModel gm = gen.generateRandomTree(50, 30, 3);
-        PQMethod pc = new PQMethod();
+        PlanarityTester pc = new PlanarityTester();
         //assertTrue(pc.isPlanar(gm));
     }
 
@@ -390,7 +349,7 @@ public class PQMethodTest {
     public void RandomTreeTest1() {
         RandomTreeGenerator gen = new RandomTreeGenerator();
         GraphModel gm = gen.generateRandomTree(20, 50, 300);
-        PQMethod pc = new PQMethod();
+        PlanarityTester pc = new PlanarityTester();
         //assertTrue(pc.isPlanar(gm));
     }
 
@@ -399,7 +358,7 @@ public class PQMethodTest {
     public void RandomTreeTest2() {
         RandomTreeGenerator gen = new RandomTreeGenerator();
         GraphModel gm = gen.generateRandomTree(50, 50, 300);
-        PQMethod pc = new PQMethod();
+        PlanarityTester pc = new PlanarityTester();
         //assertTrue(pc.isPlanar(gm));
     }
 
@@ -437,14 +396,6 @@ public class PQMethodTest {
 
         gm.addEdge(new Edge(vertices.get(6), vertices.get(7)));
 
-
-        //KConnected kc = new KConnected();
-        //if(kc.kconn(gm) > 1){
-        //    PQMethod pc = new PQMethod();
-        //    assertFalse(pc.isPlanar(gm));
-        //} else {
-        //    System.out.println("NOT BICONNECTED");
-        //}
         genericIsPlanarTest(gm, false);
     }
 
@@ -483,7 +434,7 @@ public class PQMethodTest {
 
         KConnected kc = new KConnected();
         if(kc.kconn(gm) > 1){
-            PQMethod pc = new PQMethod();
+            PlanarityTester pc = new PlanarityTester();
             //assertTrue(pc.isPlanar(gm));
         } else {
             System.out.println("NOT BICONNECTED");
@@ -521,7 +472,7 @@ public class PQMethodTest {
         gm.addEdge(new Edge(vertices.get(5), vertices.get(8)));
 
 
-        PQMethod pc = new PQMethod();
+        PlanarityTester pc = new PlanarityTester();
         //assertFalse(pc.isPlanar(gm));
     }
 
@@ -555,7 +506,7 @@ public class PQMethodTest {
 
         gm.addEdge(new Edge(vertices.get(7), vertices.get(6)));
 
-        PQMethod pc = new PQMethod();
+        PlanarityTester pc = new PlanarityTester();
         //assertTrue(pc.isPlanar(gm));
 
     }
@@ -597,7 +548,7 @@ public class PQMethodTest {
 
         KConnected kc = new KConnected();
         if(kc.kconn(gm) > 1){
-            PQMethod pc = new PQMethod();
+            PlanarityTester pc = new PlanarityTester();
             //assertFalse(pc.isPlanar(gm));
         } else {
             System.out.println("NOT BICONNECTED");

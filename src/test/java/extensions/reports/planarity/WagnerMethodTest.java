@@ -132,7 +132,7 @@ public class WagnerMethodTest {
     @Test
     public void CompleteGraphMultipleTest() {
         CompleteGraphGenerator gen = new CompleteGraphGenerator();
-        for (int i = 1; i < 35; i++) {
+        for (int i = 1; i < 20; i++) {
             System.out.println(i);
             GraphModel gm = gen.generateCompleteGraph(i);
             WagnerMethod pc = new WagnerMethod();

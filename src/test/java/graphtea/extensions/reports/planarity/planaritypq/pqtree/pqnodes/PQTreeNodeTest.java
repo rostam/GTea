@@ -1,17 +1,19 @@
-package graphtea.extensions.reports.planarity.planaritypq;
+package graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes;
 
-import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.setCircularLinks;
+import static graphtea.extensions.reports.planarity.planaritypq.pqtree.helpers.PQHelpers.setCircularLinks;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
+
+import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.LeafNode;
+import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.PNode;
+import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.PQNode;
+import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.QNode;
 import org.junit.Test;
-import graphtea.extensions.reports.planarity.planaritypq.PQNode;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
 
-
-public class PQNodeTest {
+public class PQTreeNodeTest {
     @Test
     public void nodeType() throws Exception {
 
@@ -35,8 +37,8 @@ public class PQNodeTest {
         PQNode fourth = new LeafNode("D");
 
         //Setting parent links
-        first.parent = _root;
-        fourth.parent = _root;
+        first.setParent(_root);
+        fourth.setParent(_root);
 
         //_root.children = Arrays.asList(first, second, third, fourth);
         _root.setQNodeEndmostChildren(first, fourth);
@@ -55,14 +57,14 @@ public class PQNodeTest {
         PQNode third = new LeafNode();
         PQNode fourth = new LeafNode();
 
-        first.id = "first";
-        second.id = "second";
-        third.id = "third";
-        fourth.id = "fourth";
+        first.setId("first");
+        second.setId("second");
+        third.setId("third");
+        fourth.setId("fourth");
 
         //Setting parent links
-        first.parent = _root;
-        fourth.parent = _root;
+        first.setParent(_root);
+        fourth.setParent(_root);
 
         //_root.children = Arrays.asList(first, second, third, fourth);
         setCircularLinks(Arrays.asList(first, second, third, fourth));
@@ -78,16 +80,16 @@ public class PQNodeTest {
         PQNode mid = new LeafNode();
         PQNode prev = new LeafNode();
         PQNode next = new LeafNode();
-        next.labelType = PQNode.EMPTY;
+        next.setLabel(PQNode.EMPTY);
 
-        prev.circularLink_prev = next;
-        prev.circularLink_next = mid;
+        prev.setCircularLink_prev(next);
+        prev.setCircularLink_next( mid);
 
-        mid.circularLink_next = next;
-        mid.circularLink_prev = prev;
+        mid.setCircularLink_next( next);
+        mid.setCircularLink_prev(prev);
 
-        next.circularLink_prev = mid;
-        next.circularLink_next = prev;
+        next.setCircularLink_prev(mid);
+        next.setCircularLink_next( prev);
 
         assertTrue(prev.emptySibling().equals(next));
         assertTrue(mid.emptySibling().equals(next));
@@ -100,20 +102,20 @@ public class PQNodeTest {
         PQNode prev = new LeafNode();
         PQNode next = new LeafNode();
 
-        prev.circularLink_prev = next;
-        prev.circularLink_next = mid;
+        prev.setCircularLink_prev(next);
+        prev.setCircularLink_next( mid);
 
-        mid.circularLink_next = next;
-        mid.circularLink_prev = prev;
+        mid.setCircularLink_next( next);
+        mid.setCircularLink_prev(prev);
 
-        next.circularLink_next = prev;
-        next.circularLink_prev = mid;
+        next.setCircularLink_next( prev);
+        next.setCircularLink_prev(mid);
 
         mid.removeFromCircularLink();
-        assertTrue(prev.circularLink_prev == next);
-        assertTrue(prev.circularLink_next == next);
-        assertTrue(next.circularLink_prev == prev);
-        assertTrue(next.circularLink_next == prev);
+        assertTrue(prev.getCircularLink_prev() == next);
+        assertTrue(prev.getCircularLink_next() == next);
+        assertTrue(next.getCircularLink_prev() == prev);
+        assertTrue(next.getCircularLink_next() == prev);
 
     }
 
@@ -124,20 +126,20 @@ public class PQNodeTest {
         PQNode next = new LeafNode();
         PQNode x = new LeafNode();
 
-        prev.circularLink_prev = next;
-        prev.circularLink_next = mid;
+        prev.setCircularLink_prev(next);
+        prev.setCircularLink_next( mid);
 
-        mid.circularLink_next = next;
-        mid.circularLink_prev = prev;
+        mid.setCircularLink_next( next);
+        mid.setCircularLink_prev(prev);
 
-        next.circularLink_next = prev;
-        next.circularLink_prev = mid;
+        next.setCircularLink_next( prev);
+        next.setCircularLink_prev(mid);
 
         mid.replaceInCircularLink(x);
-        assertTrue(prev.circularLink_prev == next);
-        assertTrue(prev.circularLink_next == x);
-        assertTrue(next.circularLink_prev == x);
-        assertTrue(next.circularLink_next == prev);
+        assertTrue(prev.getCircularLink_prev() == next);
+        assertTrue(prev.getCircularLink_next() == x);
+        assertTrue(next.getCircularLink_prev() == x);
+        assertTrue(next.getCircularLink_next() == prev);
 
     }
 
@@ -156,8 +158,8 @@ public class PQNodeTest {
         PQNode c2 = new LeafNode();
         PQNode c3 = new LeafNode();
         PQNode c4 = new LeafNode();
-        c1.labelType = PQNode.FULL;
-        c3.labelType = PQNode.FULL;
+        c1.setLabel(PQNode.FULL);
+        c3.setLabel(PQNode.FULL);
         List<PQNode> fullChildren = new ArrayList<PQNode>();
         fullChildren.add(c1);
         fullChildren.add(c3);
@@ -209,24 +211,24 @@ public class PQNodeTest {
         c8.blocked = false;
         c9.blocked = true;
 
-        c1.circularLink_next = c2;
-        c1.circularLink_prev = c9;
-        c2.circularLink_next = c3;
-        c2.circularLink_prev = c1;
-        c3.circularLink_next = c4;
-        c3.circularLink_prev = c2;
-        c4.circularLink_next = c5;
-        c4.circularLink_prev = c4;
-        c5.circularLink_next = c6;
-        c5.circularLink_prev = c5;
-        c6.circularLink_next = c7;
-        c6.circularLink_prev = c5;
-        c7.circularLink_next = c8;
-        c7.circularLink_prev = c6;
-        c8.circularLink_next = c9;
-        c8.circularLink_prev = c7;
-        c9.circularLink_next = c1;
-        c9.circularLink_prev = c8;
+        c1.setCircularLink_next( c2);
+        c1.setCircularLink_prev(c9);
+        c2.setCircularLink_next( c3);
+        c2.setCircularLink_prev(c1);
+        c3.setCircularLink_next( c4);
+        c3.setCircularLink_prev(c2);
+        c4.setCircularLink_next( c5);
+        c4.setCircularLink_prev(c4);
+        c5.setCircularLink_next( c6);
+        c5.setCircularLink_prev(c5);
+        c6.setCircularLink_next( c7);
+        c6.setCircularLink_prev(c5);
+        c7.setCircularLink_next( c8);
+        c7.setCircularLink_prev(c6);
+        c8.setCircularLink_next( c9);
+        c8.setCircularLink_prev(c7);
+        c9.setCircularLink_next( c1);
+        c9.setCircularLink_prev(c8);
 
 
         List<PQNode> children = new ArrayList<PQNode>();
@@ -286,15 +288,15 @@ public class PQNodeTest {
         List<PQNode> removeThese = new ArrayList<>(Arrays.asList(A));
         qNode.removeChildren(removeThese);
 
-        //assertTrue(A.circularLink_next == B);
-        assertTrue(B.circularLink_next == C);
-        assertTrue(C.circularLink_next == D);
-        assertTrue(D.circularLink_next == B);
+        //assertTrue(A.getCircularLink_next() == B);
+        assertTrue(B.getCircularLink_next() == C);
+        assertTrue(C.getCircularLink_next() == D);
+        assertTrue(D.getCircularLink_next() == B);
 
-        //assertTrue(A.circularLink_prev == D);
-        assertTrue(D.circularLink_prev == C);
-        assertTrue(C.circularLink_prev == B);
-        assertTrue(B.circularLink_prev == D);
+        //assertTrue(A.getCircularLink_prev() == D);
+        assertTrue(D.getCircularLink_prev() == C);
+        assertTrue(C.getCircularLink_prev() == B);
+        assertTrue(B.getCircularLink_prev() == D);
 
         assertTrue(qNode.endmostChildren().get(0) ==  B);
         assertTrue(qNode.endmostChildren().get(1) ==  D);
@@ -314,11 +316,11 @@ public class PQNodeTest {
         List<PQNode> removeThese = new ArrayList<>(Arrays.asList(B, C));
         qNode.removeChildren(removeThese);
 
-        assertTrue(A.circularLink_next == D);
-        assertTrue(D.circularLink_next == A);
+        assertTrue(A.getCircularLink_next() == D);
+        assertTrue(D.getCircularLink_next() == A);
 
-        assertTrue(A.circularLink_prev == D);
-        assertTrue(D.circularLink_prev == A);
+        assertTrue(A.getCircularLink_prev() == D);
+        assertTrue(D.getCircularLink_prev() == A);
 
         assertTrue(qNode.endmostChildren().get(0) ==  A);
         assertTrue(qNode.endmostChildren().get(1) ==  D);
@@ -338,13 +340,13 @@ public class PQNodeTest {
         List<PQNode> removeThese = new ArrayList<>(Arrays.asList(D));
         qNode.removeChildren(removeThese);
 
-        assertTrue(A.circularLink_next == B);
-        assertTrue(B.circularLink_next == C);
-        assertTrue(C.circularLink_next == A);
+        assertTrue(A.getCircularLink_next() == B);
+        assertTrue(B.getCircularLink_next() == C);
+        assertTrue(C.getCircularLink_next() == A);
 
-        assertTrue(A.circularLink_prev == C);
-        assertTrue(C.circularLink_prev == B);
-        assertTrue(B.circularLink_prev == A);
+        assertTrue(A.getCircularLink_prev() == C);
+        assertTrue(C.getCircularLink_prev() == B);
+        assertTrue(B.getCircularLink_prev() == A);
 
         assertTrue(qNode.endmostChildren().get(0) ==  A);
         assertTrue(qNode.endmostChildren().get(1) ==  C);
@@ -364,11 +366,11 @@ public class PQNodeTest {
         List<PQNode> removeThese = new ArrayList<>(Arrays.asList(A, D));
         qNode.removeChildren(removeThese);
 
-        assertTrue(B.circularLink_next == C);
-        assertTrue(C.circularLink_next == B);
+        assertTrue(B.getCircularLink_next() == C);
+        assertTrue(C.getCircularLink_next() == B);
 
-        assertTrue(C.circularLink_prev == B);
-        assertTrue(B.circularLink_prev == C);
+        assertTrue(C.getCircularLink_prev() == B);
+        assertTrue(B.getCircularLink_prev() == C);
 
         assertTrue(qNode.endmostChildren().get(0) ==  B);
         assertTrue(qNode.endmostChildren().get(1) ==  C);
@@ -391,8 +393,8 @@ public class PQNodeTest {
         List<PQNode> removeThese = new ArrayList<>(Arrays.asList(A, B, D));
         qNode.removeChildren(removeThese);
 
-        assertTrue(C.circularLink_next == C);
-        assertTrue(C.circularLink_prev == C);
+        assertTrue(C.getCircularLink_next() == C);
+        assertTrue(C.getCircularLink_prev() == C);
 
         assertTrue(qNode.endmostChildren().get(0) ==  C);
         assertTrue(qNode.endmostChildren().get(1) ==  C);

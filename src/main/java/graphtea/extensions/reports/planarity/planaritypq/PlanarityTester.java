@@ -2,15 +2,19 @@ package graphtea.extensions.reports.planarity.planaritypq;
 
 import graphtea.extensions.reports.numberings.NotBiconnectedException;
 import graphtea.extensions.reports.numberings.StNumbering;
+import graphtea.extensions.reports.planarity.planaritypq.pqtree.*;
+import graphtea.extensions.reports.planarity.planaritypq.pqtree.exceptions.NodeNotFoundException;
+import graphtea.extensions.reports.planarity.planaritypq.pqtree.helpers.PQHelpers;
+import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.LeafNode;
+import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.PNode;
+import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.PQNode;
+import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.QNode;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.library.util.Pair;
 
-import java.lang.reflect.Array;
 import java.util.*;
-
-import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.*;
 
 /**
  * This class takes a biconnected graph, applies an st-numbering, and then runs the edges
@@ -23,11 +27,11 @@ import static graphtea.extensions.reports.planarity.planaritypq.PQHelpers.*;
  * @author Alex Cregten
  * @author Hannes Kr. Hannesson
  * */
-public class PQMethod {
+public class PlanarityTester {
 
     private HashMap<Vertex, Integer> stMapping;
 
-    public PQMethod() {
+    public PlanarityTester() {
     }
     private boolean configureSTMapping(GraphModel graph) {
         try {
@@ -82,23 +86,21 @@ public class PQMethod {
 
         HashMap<Integer, Pair<List<Edge>, List<Edge>>> lowerAndHigherVerticesMap = precomputeLowerAndHigherVertices(graph);
 
-        Iterable<Edge> source = graph.getEdges();
         HashSet<PQNode> U = new HashSet<>();
 
         PNode T = new PNode(PQNode.EMPTY);
-        T.id = "T";
         if(lowerAndHigherVerticesMap.get(0) != null) {
             for (Edge e : lowerAndHigherVerticesMap.get(0).first) {
                 PQNode leafNode = new LeafNode(stMapping.get(e.source) + " -> " + stMapping.get(e.target));
-                leafNode.parent = T;
+                leafNode.setParent(T);
                 U.add(leafNode);
             }
         }
 
-        PQ PQTree = new PQ();
+        PQTree PQTree = new PQTree();
 
         // Same as T(U, U) because all U are set to full and T (a p-node) can reach all of U in any order
-        T.children.addAll(U);
+        T.addChildren(new ArrayList<>(U));
 
         for(int j=1; j<graph.getVertexArray().length-1; j++){
             PQHelpers.reset(T, true, true);
@@ -112,9 +114,9 @@ public class PQMethod {
                 String _id = sourceId + " -> " + targetId;
                 PQNode leafNode = null;
                 for(PQNode pq : U){
-                    if(pq.id.equals(_id)){
+                    if(pq.getId().equals(_id)){
                         leafNode = pq;
-                        leafNode.labelType = PQNode.FULL; // All descendants in S
+                        leafNode.setLabel(PQNode.FULL);
                         S.add(0, leafNode);
                     }
                 }
@@ -127,16 +129,12 @@ public class PQMethod {
 
             }
 
-            //PQHelpers.printListIds(S, "S");
-
             T = PQTree.bubble(T, S);
             T = PQTree.reduce(T, S);
 
             if (T == null) {
                 return false;
             }
-
-            //PQHelpers.printPreorderIds(T);
 
             // The set of edges whose lower numbered vertex is j
             // These edges are added to Sp
@@ -150,7 +148,7 @@ public class PQMethod {
                     PQNode leafNode = null;
                     // Check if leaf node already exists in the universal set
                     for (PQNode pq : U) {
-                        if (pq.id.equals(_id)) {
+                        if (pq.getId().equals(_id)) {
                             leafNode = pq;
                             break;
                         }
@@ -164,7 +162,6 @@ public class PQMethod {
                 }
             }
 
-            //PQHelpers.printListIds(Sp, "S'");
             PQNode root = PQTree.root(T, S);
 
             if (root.getClass() == QNode.class) {
@@ -180,8 +177,6 @@ public class PQMethod {
             // U := U - S union S' ->  U := (U - S) union S'
             U.removeAll(S);
             U.addAll(Sp);
-
-            //PQHelpers.printPreorderIds(T);
         }
         return true;
     }
@@ -196,7 +191,7 @@ public class PQMethod {
         if(Sp.size() == 1){
             // No need for a P-Node, so we simplify and leave it out
             PQNode nodeSp = Sp.get(0);
-            nodeSp.parent = root;
+            nodeSp.setParent(root);
 
             // Replace arbitrary full node - they will get removed anyway
             root.replaceChild(nodeSp, fullChildren.get(0));
@@ -207,8 +202,7 @@ public class PQMethod {
             // Otherwise, create a P node
 
             PQNode replacementPNode = new PNode(PQNode.EMPTY);
-            replacementPNode.id = "rNode-2";
-            replacementPNode.parent = root;
+            replacementPNode.setParent(root);
             replacementPNode.addChildren(Sp);
 
             root.replaceChild(replacementPNode, fullChildren.get(0));
@@ -222,7 +216,6 @@ public class PQMethod {
             PQNode replacementPNode = new PNode(PQNode.EMPTY);
             PQHelpers.replaceParent(replacementPNode, root);
             replacementPNode.addChildren(root.getChildren());
-            root = replacementPNode;
         }
 
     }
@@ -237,14 +230,12 @@ public class PQMethod {
         else {
             // Create an intermediary P-Node
             replacementNode = new PNode(PQNode.EMPTY);
-            replacementNode.id = "rNode";
             replacementNode.addChildren(Sp);
         }
 
         if(rParent != null) {
             // ROOT(T, S) is not the root of the whole tree
-
-            replacementNode.parent = rParent;
+            replacementNode.setParent(rParent);
             rParent.replaceChild(replacementNode, root);
 
         }

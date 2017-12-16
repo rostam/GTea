@@ -659,9 +659,9 @@ public class StNumberingTest {
         assertTrue(genericStNumberingTest(gm));
     }
 
-    // Not biconnected
+    // Biconnected
     @Test
-    public void NotBi_ManualGraphTest2() {
+    public void Bi_ManualGraphTest2() {
         GraphModel gm = new GraphModel();
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         for (int i = 0; i < 8; i++) {
@@ -692,8 +692,7 @@ public class StNumberingTest {
 
         gm.addEdge(new Edge(vertices.get(6), vertices.get(7)));
 
-        // Assert false
-        assertFalse(genericStNumberingTest(gm));
+        assertTrue(genericStNumberingTest(gm));
     }
 
     // Not biconnected
@@ -765,9 +764,9 @@ public class StNumberingTest {
 
     }
 
-    // Not biconnected
+    // Biconnected
     @Test
-    public void NotBi_ManualGraphTest5() {
+    public void Bi_ManualGraphTest5() {
         GraphModel gm = new GraphModel();
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         for (int i = 0; i < 8; i++) {
@@ -797,8 +796,7 @@ public class StNumberingTest {
 
         gm.addEdge(new Edge(vertices.get(7), vertices.get(6)));
 
-        // Assert false
-        assertFalse(genericStNumberingTest(gm));
+        assertTrue(genericStNumberingTest(gm));
 
     }
 

@@ -1,4 +1,4 @@
-package graphtea.extensions.reports.planarity.planaritypq;
+package graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,18 +15,21 @@ public class PNode extends PQNode {
     List<PQNode> children = new ArrayList<>();
 
     public PNode(String labelType){
-        this.labelType = labelType;
+        this.setLabel(labelType);
     }
 
     public PNode(){
         super();
     }
 
+    public void setParent(PQNode parent){
+        super.setParent(parent);
+    }
+
     public List<PQNode> getChildrenOfType(Class type) {
         List<PQNode> cList = new ArrayList<PQNode>();
 
         for (PQNode v : this.children) {
-            //if (v.nodeType.equals(type)) {
             if(v.getClass() == type){
                 cList.add(v);
             }
@@ -38,7 +41,7 @@ public class PNode extends PQNode {
         List<PQNode> cList = new ArrayList<PQNode>();
 
         for (PQNode v : this.children) {
-            if (v.labelType.equals(label)) {
+            if (v.getLabel().equals(label)) {
                 cList.add(v);
             }
         }
@@ -49,7 +52,7 @@ public class PNode extends PQNode {
     public List<PQNode> fullChildren(){
         List<PQNode> full = new ArrayList<PQNode>();
         for (PQNode c : children) {
-            if (c.labelType.equals(FULL)) {
+            if (c.getLabel().equals(FULL)) {
                 full.add(c);
             }
         }
@@ -59,7 +62,7 @@ public class PNode extends PQNode {
     public List<PQNode> fullAndPartialChildren(){
         List<PQNode> full = new ArrayList<PQNode>();
         for (PQNode c : children) {
-            if (c.labelType.equals(FULL)) {
+            if (c.getLabel().equals(FULL)) {
                 full.add(c);
             }
         }
@@ -81,19 +84,19 @@ public class PNode extends PQNode {
     public void addChildren(List<PQNode> children){
         for (PQNode n : children){
             this.children.add(n);
-            n.parent = this;
+            n.setParent(this);
         }
     }
 
     public void addChild(PQNode child){
         this.children.add(child);
-        child.parent = this;
+        child.setParent(this);
     }
 
     public void replaceChild(PQNode newChild, PQNode oldChild){
         this.removeChild(oldChild);
         this.addChild(newChild);
-        newChild.parent = this;
+        newChild.setParent(this);
     }
 
     public void clearChildren(){
