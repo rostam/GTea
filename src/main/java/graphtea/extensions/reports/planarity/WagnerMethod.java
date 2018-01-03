@@ -10,6 +10,10 @@ import graphtea.library.algorithms.util.BipartiteChecker;
 import java.util.ArrayList;
 
 public class WagnerMethod {
+    /**
+     * Note that this method is very slow, and runs in O(V+E^(V+E)) time, this was only made
+     * to have something to compare PQMethod to.
+     */
 
     private boolean quitEarly;
     public WagnerMethod() {
