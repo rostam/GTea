@@ -21,7 +21,7 @@ import java.awt.*;
  */
 //@CommandAttitude(name = "generate_tree" , abbreviation = "_g_t"
 //        ,description = "generate a tree with depth and degree")
-public class BacwardTreeGenerator implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
+public class BackwardTreeGenerator implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
     @Parameter(name = "Height")
     public static Integer depth = 3;
     @Parameter(name = "Degree")
@@ -104,9 +104,9 @@ public class BacwardTreeGenerator implements GraphGeneratorExtension, Parametriz
      * generates a Complete Tree with given parameters
      */
     public static GraphModel generateTree(int depth, int degree) {
-        BacwardTreeGenerator.depth = depth;
-        BacwardTreeGenerator.degree = degree;
-        return GraphGenerator.getGraph(false, new BacwardTreeGenerator());
+        BackwardTreeGenerator.depth = depth;
+        BackwardTreeGenerator.degree = degree;
+        return GraphGenerator.getGraph(false, new BackwardTreeGenerator());
     }
 
     @Override
