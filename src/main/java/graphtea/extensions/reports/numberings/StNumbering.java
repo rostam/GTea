@@ -77,6 +77,10 @@ public class StNumbering extends Algorithm implements GraphReportExtension {
         }
     }
 
+    public StNumbering() {
+
+    }
+
     private void addEdgeMapping(Vertex src, Vertex trg){
         if(this.neighborMap.get(src) == null){
             List<Vertex> vlist = new ArrayList<>();
