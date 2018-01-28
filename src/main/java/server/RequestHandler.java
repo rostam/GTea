@@ -7,7 +7,9 @@ import graphtea.extensions.Centrality;
 import graphtea.extensions.G6Format;
 import graphtea.extensions.RandomTree;
 import graphtea.extensions.io.LatexWriter;
+import graphtea.extensions.io.LoadMtx;
 import graphtea.extensions.io.SaveGraph;
+import graphtea.extensions.reports.coloring.ColumnIntersectionGraph;
 import graphtea.graph.graph.*;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 import graphtea.plugins.main.saveload.core.GraphIOException;
@@ -425,36 +427,46 @@ public class RequestHandler {
                 g = G6Format.stringToGraphModel(graph);
                 break;
             case "adjadj":
-                String[] rows = graph.split("-");
-                for (String row : rows) g.addVertex(new Vertex());
-                for (int i = 0; i < rows.length; i++) {
-                    String tmp[] = rows[i].split(",");
-                    for (int j = 0; j < tmp.length; j++) {
-                        if (tmp[j].equals("1")) {
-                            g.addEdge(new Edge(g.getVertex(i), g.getVertex(j)));
+                if(graph.contains(".mtx")) {
+                    File mat = new File(RequestHandler.class.getResource("/mats/").getFile()+"/"+graph);
+                    try {
+                        g = new LoadMtx().read(mat);
+                    } catch (GraphIOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    String[] rows = graph.split("-");
+                    for (String row : rows) g.addVertex(new Vertex());
+                    for (int i = 0; i < rows.length; i++) {
+                        String tmp[] = rows[i].split(",");
+                        for (int j = 0; j < tmp.length; j++) {
+                            if (tmp[j].equals("1")) {
+                                g.addEdge(new Edge(g.getVertex(i), g.getVertex(j)));
+                            }
                         }
                     }
                 }
                 break;
             case "adjcig":
-                String[] rows2 = graph.split("-");
-                Matrix m = new Matrix(rows2.length, rows2.length);
-                for (int i = 0; i < rows2.length; i++) {
-                    String tmp[] = rows2[i].split(",");
-                    for (int j = 0; j < tmp.length; j++) {
-                        m.set(j, i, Double.parseDouble(tmp[j]));
+                if(graph.contains(".mtx")) {
+                    File mat = new File(RequestHandler.class.getResource("/mats/").getFile()+"/"+graph);
+                    GraphModel g1 = null;
+                    try {
+                        g1 = new LoadMtx().read(mat);
+                    } catch (GraphIOException e) {
+                        e.printStackTrace();
                     }
-                }
-                for (String row : rows2) g.addVertex(new Vertex());
-                for (int i = 0; i < m.getColumnDimension(); i++) {
-                    for (int j = 0; j < m.getColumnDimension(); j++) {
-                        for (int k = 0; k < m.getRowDimension(); k++) {
-                            if (m.get(i, k) != 0 && m.get(j, k) != 0) {
-                                g.addEdge(new Edge(g.getVertex(i), g.getVertex(j)));
-                                break;
-                            }
+                    g = ColumnIntersectionGraph.from(g1);
+                } else {
+                    String[] rows2 = graph.split("-");
+                    Matrix m = new Matrix(rows2.length, rows2.length);
+                    for (int i = 0; i < rows2.length; i++) {
+                        String tmp[] = rows2[i].split(",");
+                        for (int j = 0; j < tmp.length; j++) {
+                            m.set(j, i, Double.parseDouble(tmp[j]));
                         }
                     }
+                    g = ColumnIntersectionGraph.from(m);
                 }
                 break;
             case "adjrcig":
@@ -656,6 +668,18 @@ public class RequestHandler {
         }
 
         return Response.ok(jsonObject.toString()).header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
+    @Path("/mats")
+    @Produces("application/json;charset=utf-8")
+    public Response getMats() {
+        JSONArray jsonArray = new JSONArray();
+        File matsFolder = new File(RequestHandler.class.getResource("/mats/").getFile());
+        String[] mats = matsFolder.list((current,name) -> !(new File(current,name).isDirectory()));
+        Arrays.sort(mats);
+        for(String m : mats) jsonArray.put(m);
+        return Response.ok(jsonArray.toString()).header("Access-Control-Allow-Origin","*").build();
     }
 
     /**

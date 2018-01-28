@@ -17,7 +17,9 @@
     <title>GraphTea</title>
 </head>
 <body>
+<div id="parent_canvas">
 <div id="canvas" class="main"></div>
+</div>
 <div id="tools2" class="tools2" hidden>
     <i class="fa fa-times" aria-hidden="true" style="float: right;" onclick="$('#tools2').hide()"></i>
     <div id="results-body"></div>
@@ -30,7 +32,7 @@
         <select id="loaders" onchange="selectLoader()">
             <option>Generators</option>
             <option>Edge list</option>
-            <option>Adjacency matrix</option>
+            <option>From matrix</option>
             <option>G6 format</option>
             <option>Freehand drawing</option>
             <option>File</option>
@@ -54,23 +56,6 @@
                 <span id="props_keys">n</span> : <input type="text" id="props_vals"
                                                         placeholder="Integer">
             </div>
-
-            <p id="strings-layout"></p>
-            <select id="layouts">
-                <option>Force Directed</option>
-                <option>Circular</option>
-                <option>Grid</option>
-                <option>Preset</option>
-                <option>Botanical Tree</option>
-            </select>
-            <select id="actions">
-                <option>Load and Draw</option>
-                <option>Load Only</option>
-                <option>Fit Canvas</option>
-                <option>Clear Canvas</option>
-                <option>Canvas to Image</option>
-            </select>
-            <button onclick="do_actions()">Go</button>
             <!--<button onclick="cy.layout({name:'cose'});">Update</button>-->
             <!--<button onclick="load_generator(false)">Load Only</button>-->
             <!--<button onclick="load_generator(true)">Load and Draw</button>-->
@@ -80,12 +65,15 @@
             <p id="strings-elformat"></p>
             <br/><textarea id="elstring" name="Text1" cols="20" rows="5"></textarea>
             <br/>
-            <button onclick="load_graph('el',false)">Load Only</button>
-            <button onclick="load_graph('el',true)">Load and Draw</button>
         </div>
         <div id="adjMatformat" class="loaders">
             <p id="strings-adjMatformat"></p>
-            <textarea id="adjstring" name="Text1" cols="20" rows="5"></textarea>
+            <textarea id="adjstring" name="Text1" cols="20" rows="2"></textarea>
+            <br/>
+            Existing matrices:<br/>
+            <select id="existing_mat">
+                <option>No selection</option>
+            </select>
             <br/>
             <select id="adjmat-type">
                 <option value="adj">Adjacency Matrix</option>
@@ -95,26 +83,40 @@
                 <option value="rcig">rho-Column-Intersection Graph</option>
             </select>
             <br/>
-            <button onclick="load_graph('adj',false)">Load Only</button>
-            <button onclick="load_graph('adj',true)">Load and Draw</button>
         </div>
         <div id="g6format" class="loaders">
             <p id="strings-g6format"></p>
             G6 Format: <input id="g6string" type="text">
             <br/>
-            <button onclick="load_graph('g6',false)">Load Only</button>
-            <button onclick="load_graph('g6',true)">Load and Draw</button>
         </div>
         <div id="fileformat" class="loaders">
             <p id="strings-fileformat"></p>
             <form action="upload" method="post" enctype="multipart/form-data">
-                Select a file : <input type="file" name="file" size="45"/><br/>
+                Select a file :<br/> <input type="file" name="file" size="45"/><br/>
                 <input type="submit" value="Upload It"/>
             </form>
         </div>
         <div id="freehandformat" class="loaders">
             <p id="strings-freehand"></p>
         </div>
+        <p id="strings-layout"></p>
+        <select id="layouts">
+            <option>Force Directed</option>
+            <option>Circular</option>
+            <option>Grid</option>
+            <option>Preset</option>
+            <option>Botanical Tree</option>
+        </select>
+        <select id="actions">
+            <option>Load and Draw</option>
+            <option>Load Only</option>
+            <option>Fit Canvas</option>
+            <option>Clear Canvas</option>
+            <option>Canvas to Image</option>
+            <option>WebGL</option>
+        </select>
+        <button onclick="do_actions()">Go</button>
+        <div style="visibility: hidden" id="act_name">gen</div>
         <hr>
         <p id="strings-report"></p>
         <select id="reports"></select>
@@ -173,5 +175,8 @@
 <script src="strings.js"></script>
 <script src="distinctColors.js"></script>
 <script src="actions.js"></script>
+<script src="js/forVivaCirclularNode.js"></script>
+<script src="vivagraph.min.js"></script>
+<script src="js/viva_action.js"></script>
 </body>
 </html>

@@ -606,4 +606,22 @@ public class GraphModel extends ListGraph<Vertex, Edge> implements StorableOnExi
 		}
 		return vs;
 	}
+
+	public Vector<Integer> directNeighborsInts(Vertex v) {
+		Iterator<Edge> eit = this.edgeIterator();
+		Vector<Integer> vs = new Vector<>();
+		while (eit.hasNext()) {
+			Edge e = eit.next();
+			if (e.source.getId() == v.getId()) {
+				if(!vs.contains(e.target.getId())) {
+					vs.add(e.target.getId());
+				}
+			} else if (e.target.getId() == v.getId()) {
+				if(!vs.contains(e.source.getId())) {
+					vs.add(e.source.getId());
+				}
+			}
+		}
+		return vs;
+	}
 }

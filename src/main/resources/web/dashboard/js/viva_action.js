@@ -1,5 +1,7 @@
 var renderer, layout, prev_node_id = undefined, prev_node_color, prev_node_size;
 function viva_action(data) {
+    var lay = $('#layouts').find('option:selected').text();
+
     useDefaultLabel = true;
     useForceLayout = true;
     $("#infos").empty();
@@ -12,7 +14,7 @@ function viva_action(data) {
     var graph = Viva.Graph.graph();
     var uniqueVertexIds = {};
 
-    if (data.nodes[0].position.x != undefined) {
+    if (lay == "Preset" && data.nodes[0].position.x != undefined) {
         data.nodes.forEach(function (t) {
             t.x = t.position.x;
             t.y = t.position.y;
@@ -42,9 +44,7 @@ function viva_action(data) {
             return new WebglCircle(nodeSize, nodeColor);
     });
 
-    $('#parent_canvas').empty();
-    $('#parent_canvas').append('<div id="canvas" class="col-12"></div>');
-    if (data.nodes[0].position.x != undefined) {
+    if (lay == "Preset" && data.nodes[0].position.x != undefined) {
         layout = Viva.Graph.Layout.constant(graph);
         renderer = Viva.Graph.View.renderer(graph, {
             container: document.getElementById('canvas'),
@@ -90,7 +90,7 @@ function viva_action(data) {
         // renderer.run();
     });
 
-    if (data.nodes[0].position.x != undefined) {
+    if (lay == "Preset" && data.nodes[0].position.x != undefined) {
         layout.placeNode(function (node) {
             // node.id - points to its position but you can do your
             // random logic here. E.g. read from specific node.data
@@ -100,7 +100,7 @@ function viva_action(data) {
     }
 
     renderer.run();
-    if (data.nodes[0].position.x != undefined) {
+    if (lay == "Preset" && data.nodes[0].position.x != undefined) {
         renderer.moveTo(data.nodes[0].position.x, data.nodes[0].position.y);
     }
 }

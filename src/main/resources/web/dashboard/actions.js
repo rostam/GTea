@@ -1,16 +1,30 @@
 function do_actions() {
     var action = $('#actions').find('option:selected').text();
-    if(action == "Load and Draw") {
-        load_generator(true);
-    } else if(action == "Load Only") {
-        load_generator(false);
-    } else if(action == "Fit Canvas") {
+    var act_name = $('#act_name').html();
+    $('#parent_canvas').empty();
+    $('#parent_canvas').append('<div id="canvas" class="main"></div>');
+    if (action == "Load and Draw") {
+        if (act_name == 'gen') load_generator(true,false);
+        else if (act_name == 'g6') load_graph('g6', true,false);
+        else if (act_name == 'adj') load_graph('adj', true,false);
+        else if (act_name == 'el') load_graph('el', true,false);
+    } else if (action == "Load Only") {
+        if (act_name == 'gen') load_generator(false,false);
+        else if (act_name == 'g6') load_graph('g6', false,false);
+        else if (act_name == 'adj') load_graph('adj', false, false);
+        else if (act_name == 'el') load_graph('el', false, false);
+    } else if (action == "Fit Canvas") {
         cy.fit();
-    } else if(action == "Clear Canvas") {
+    } else if (action == "Clear Canvas") {
         clearCanvas();
-    } else if(action == "Canvas to Image") {
+    } else if (action == "Canvas to Image") {
         var jpg64 = cy.jpg();
         window.open(jpg64);
+    } else if (action == "WebGL") {
+        if (act_name == 'gen') load_generator(true,true);
+        else if (act_name == 'g6') load_graph('g6', true,true);
+        else if (act_name == 'adj') load_graph('adj', true,true);
+        else if (act_name == 'el') load_graph('el', true,true);
     }
 }
 

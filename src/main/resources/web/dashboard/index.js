@@ -7,8 +7,6 @@ var directed = 'triangle', undirected = 'none';
 //var parallels = [];
 var report_results;
 
-initCytoscape(undirected, serverAddr, uuid);
-
 var original_data = {};
 $.get(serverAddr + 'graphs/')
     .done(function (data) {
@@ -70,6 +68,13 @@ $.get(serverAddr + 'graphs/')
         alert(errorThrown);
     });
 
+$.get(serverAddr + 'mats/')
+    .done(function (data) {
+        data.forEach(function (d) {
+            $('#existing_mat').append("<option>" + d + "</option>");
+        });
+    });
+
 function Report() {
     $('#reportResults').html('computing...');
     var reportProps = "";
@@ -122,7 +127,7 @@ function Report() {
         });
 }
 
-function load_generator(isDraw) {
+function load_generator(isDraw,webgl) {
     var lay = $('#layouts').find('option:selected').text();
     var type = $('#graphType').find('option:selected').text();
     if (lay == "Botanical Tree") {
@@ -136,69 +141,26 @@ function load_generator(isDraw) {
         + "--" + type
         + "--" + uuid,function (data) {
             if (isDraw) {
-                nodeId = 0; //resets counter for freehand vertices
-                var nodes = data.nodes;
-                var edges = data.edges;
-                cy.elements().remove();
-                cy.add(nodes);
-                cy.add(edges);
-                nodeId += nodes.length; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
-                setVertexIds();
-                applyLayout();
+                if(!webgl) {
+                    $('#parent_canvas').empty();
+                    $('#parent_canvas').append("<div id='canvas' class='main'>")
+                    initCytoscape(undirected, serverAddr, uuid);
+                    nodeId = 0; //resets counter for freehand vertices
+                    var nodes = data.nodes;
+                    var edges = data.edges;
+                    cy.elements().remove();
+                    cy.add(nodes);
+                    cy.add(edges);
+                    nodeId += nodes.length; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
+                    setVertexIds();
+                    applyLayout();
+                } else {
+                    viva_action(data);
+                }
             }
         })
 }
 
-cy.on('tap', function(event) {
-    var evtTarget = event.target;
-
-    if(evtTarget === selectedNode) {
-        // If node is already selected, deselect the node
-        cy.$('#'+selectedNode.data('id')).classes('node');
-        selectedNode = null;
-        return;
-    }
-
-    var loader = $('#loaders').find('option:selected').text();
-    if(loader == "Freehand drawing") {
-        if (evtTarget === cy) {
-            addSingleVertex(event);
-        }
-        else if (evtTarget.isNode()) {
-            if (selectedNode == null) {
-                // Update the selectedNode and change the color of it
-                selectedNode = evtTarget;
-                cy.$('#' + selectedNode.data('id')).classes('selected');
-
-            }
-            else {
-                // Adds an edge between the selected node and the newly selected node.
-                // Resets the color.
-                addSingleEdge(selectedNode.data('label'), evtTarget.data('label'));
-                cy.$('#' + selectedNode.data('label')).classes('node');
-
-                selectedNode = null;
-            }
-        }
-    }
-});
-
-cy.on('cxttapend', 'node', function(event) {
-    var evtTarget = event.target;
-    removeSingleVertex(evtTarget);
-
-});
-
-cy.on('cxttapend', 'edge', function(event) {
-    var evtTarget = event.target;
-    removeSingleEdge(evtTarget);
-});
-
-cy.on('layoutstop', function() {
-    cy.maxZoom(2.5);
-    cy.fit();
-    cy.maxZoom(100);
-});
 
 function getSelectedCategory() {
     return $('#categories').find('option:selected').text();
@@ -264,28 +226,35 @@ function selectLoader() {
     switch (loader) {
         case "Generators":
             $('#generators').show();
+            $('#act_name').html("gen");
             break;
         case "Edge list":
             $('#elformat').show();
+            $('#act_name').html("el");
             break;
-        case "Adjacency matrix":
+        case "From matrix":
             $('#adjMatformat').show();
+            $('#act_name').html("adj");
             break;
         case "G6 format":
             $('#g6format').show();
+            $('#act_name').html("g6");
             break;
         case "File":
             $('#fileformat').show();
+            $('#act_name').html("file");
             break;
         case "Freehand drawing":
             $('#freehandformat').show();
+            $('#act_name').html("free");
     }
 }
 
-function load_graph(type,isDraw) {
+function load_graph(type,isDraw,webgl) {
     var str = $('#' + type + 'string').val().replace(/\n/g, "-");
     var isDirected = $('#graphType').find('option:selected').text();
     var adjMatType = $('#adjmat-type').find('option:selected').val();
+    var matName = $('#existing_mat').find('option:selected').text()
     if (type == "g6") {
         var str2 = "";
         for (var i = 0; i < str.length; i++)
@@ -294,27 +263,37 @@ function load_graph(type,isDraw) {
         str = str2;
     }
     if(type == 'adj') type += adjMatType;
+    if(matName!= 'No selection') {
+        str = matName;
+    }
     server(serverAddr + 'loadGraph' + '/' + type + "--"
         + str + "--" + isDirected + "--" + uuid, function (data) {
         if (isDraw) {
-            cy = cytoscape({
-                container: document.getElementById('canvas'),
-                style: [ // the stylesheet for the graph
-                    {
-                        selector: 'node',
-                        style: {
-                            'background-color': 'lightgray',
-                            'label': 'data(id)',
-                            'text-valign': 'center'
-                        }
-                    }]
-            });
-            var nodes = data.nodes;
-            var edges = data.edges;
-            cy.elements().remove();
-            cy.add(nodes);
-            cy.add(edges);
-            cy.layout({name: 'cose'}).run();
+            if(!webgl) {
+                // cy = cytoscape({
+                //     container: document.getElementById('canvas'),
+                //     style: [ // the stylesheet for the graph
+                //         {
+                //             selector: 'node',
+                //             style: {
+                //                 'background-color': 'lightgray',
+                //                 'label': 'data(id)',
+                //                 'text-valign': 'center'
+                //             }
+                //         }]
+                // });
+                $('#parent_canvas').empty();
+                $('#parent_canvas').append("<div id='canvas' class='main'>")
+                initCytoscape(undirected, serverAddr, uuid);
+                var nodes = data.nodes;
+                var edges = data.edges;
+                cy.elements().remove();
+                cy.add(nodes);
+                cy.add(edges);
+                cy.layout({name: 'cose'}).run();
+            } else {
+                viva_action(data);
+            }
         }
     });
 }

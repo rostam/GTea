@@ -36,7 +36,7 @@ function initCytoscape(arrow, _serverAddr, _uuid) {
                     'background-color': 'lightgray',
                     'label': 'data(label)',
                     'text-valign': 'center',
-                    'background-opacity':0.6
+                    'background-opacity':0.7
                 }
             },
             {
@@ -55,6 +55,58 @@ function initCytoscape(arrow, _serverAddr, _uuid) {
                 }
             }]
     });
+
+    cy.on('tap', function(event) {
+        var evtTarget = event.target;
+
+        if(evtTarget === selectedNode) {
+            // If node is already selected, deselect the node
+            cy.$('#'+selectedNode.data('id')).classes('node');
+            selectedNode = null;
+            return;
+        }
+
+        var loader = $('#loaders').find('option:selected').text();
+        if(loader == "Freehand drawing") {
+            if (evtTarget === cy) {
+                addSingleVertex(event);
+            }
+            else if (evtTarget.isNode()) {
+                if (selectedNode == null) {
+                    // Update the selectedNode and change the color of it
+                    selectedNode = evtTarget;
+                    cy.$('#' + selectedNode.data('id')).classes('selected');
+
+                }
+                else {
+                    // Adds an edge between the selected node and the newly selected node.
+                    // Resets the color.
+                    addSingleEdge(selectedNode.data('label'), evtTarget.data('label'));
+                    cy.$('#' + selectedNode.data('label')).classes('node');
+
+                    selectedNode = null;
+                }
+            }
+        }
+    });
+
+    cy.on('cxttapend', 'node', function(event) {
+        var evtTarget = event.target;
+        removeSingleVertex(evtTarget);
+
+    });
+
+    cy.on('cxttapend', 'edge', function(event) {
+        var evtTarget = event.target;
+        removeSingleEdge(evtTarget);
+    });
+
+    cy.on('layoutstop', function() {
+        cy.maxZoom(2.5);
+        cy.fit();
+        cy.maxZoom(100);
+    });
+
 }
 
 
