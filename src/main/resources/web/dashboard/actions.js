@@ -1,18 +1,23 @@
+function startLoaderIcon() {
+    document.getElementById("loading-go").style.visibility = 'visible';
+}
+
+function endLoaderIcon() {
+    document.getElementById("loading-go").style.visibility = 'hidden';
+}
+
 function do_actions() {
     var action = $('#actions').find('option:selected').text();
     var act_name = $('#act_name').html();
     $('#parent_canvas').empty();
     $('#parent_canvas').append('<div id="canvas" class="main"></div>');
+    startLoaderIcon();
     if (action == "Load and Draw") {
-        if (act_name == 'gen') load_generator(true,false);
-        else if (act_name == 'g6') load_graph('g6', true,false);
-        else if (act_name == 'adj') load_graph('adj', true,false);
-        else if (act_name == 'el') load_graph('el', true,false);
+        if (act_name == 'gen') load_generator(true, false, endLoaderIcon);
+        else load_graph(act_name, true, false, endLoaderIcon);
     } else if (action == "Load Only") {
-        if (act_name == 'gen') load_generator(false,false);
-        else if (act_name == 'g6') load_graph('g6', false,false);
-        else if (act_name == 'adj') load_graph('adj', false, false);
-        else if (act_name == 'el') load_graph('el', false, false);
+        if (act_name == 'gen') load_generator(false, false, endLoaderIcon);
+        else load_graph(act_name, false, false, endLoaderIcon);
     } else if (action == "Fit Canvas") {
         cy.fit();
     } else if (action == "Clear Canvas") {
@@ -21,10 +26,8 @@ function do_actions() {
         var jpg64 = cy.jpg();
         window.open(jpg64);
     } else if (action == "WebGL") {
-        if (act_name == 'gen') load_generator(true,true);
-        else if (act_name == 'g6') load_graph('g6', true,true);
-        else if (act_name == 'adj') load_graph('adj', true,true);
-        else if (act_name == 'el') load_graph('el', true,true);
+        if (act_name == 'gen') load_generator(true, true, endLoaderIcon);
+        else load_graph(act_name, true, true, endLoaderIcon);
     }
 }
 

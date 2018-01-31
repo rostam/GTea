@@ -127,13 +127,14 @@ function Report() {
         });
 }
 
-function load_generator(isDraw,webgl) {
+function load_generator(isDraw,webgl,ended) {
     var lay = $('#layouts').find('option:selected').text();
     var type = $('#graphType').find('option:selected').text();
     if (lay == "Botanical Tree") {
         drawBotanical();
         return;
     }
+
     server(serverAddr + 'draw/'
         + $('#categories').find('option:selected').text() + "--"
         + $('#reports').find('option:selected').text() + "--" +
@@ -154,8 +155,11 @@ function load_generator(isDraw,webgl) {
                     nodeId += nodes.length; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
                     setVertexIds();
                     applyLayout();
+                    ended();
+
                 } else {
                     viva_action(data);
+                    ended();
                 }
             }
         })
@@ -250,7 +254,7 @@ function selectLoader() {
     }
 }
 
-function load_graph(type,isDraw,webgl) {
+function load_graph(type,isDraw,webgl,ended) {
     var str = $('#' + type + 'string').val().replace(/\n/g, "-");
     var isDirected = $('#graphType').find('option:selected').text();
     var adjMatType = $('#adjmat-type').find('option:selected').val();
@@ -291,8 +295,10 @@ function load_graph(type,isDraw,webgl) {
                 cy.add(nodes);
                 cy.add(edges);
                 cy.layout({name: 'cose'}).run();
+                ended();
             } else {
                 viva_action(data);
+                ended();
             }
         }
     });
