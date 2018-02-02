@@ -48,6 +48,12 @@ public class RenderTable extends PriorityQueue<Vector<Object>> {
     }
 
     public boolean add(Vector<Object> v) {
+//        Vector<Object> tmp = new Vector<>();
+//        for(Object o : v) {
+//            if(o instanceof Double) {
+//
+//            }
+//        }
         boolean ret = super.add(v);
         if(noFilter) return ret;
         if(super.size() > maxSize) super.poll();

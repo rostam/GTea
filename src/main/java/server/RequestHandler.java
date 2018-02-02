@@ -316,14 +316,10 @@ public class RequestHandler {
         StreamingOutput fileStream = new StreamingOutput() {
             @Override
             public void write(java.io.OutputStream output) throws IOException, WebApplicationException {
-                try {
-                    java.nio.file.Path path = Paths.get(name+".tex");
-                    byte[] data = Files.readAllBytes(path);
-                    output.write(data);
-                    output.flush();
-                } catch (Exception e) {
-                    throw e;
-                }
+                java.nio.file.Path path = Paths.get(name+".tex");
+                byte[] data = Files.readAllBytes(path);
+                output.write(data);
+                output.flush();
             }
         };
         return Response
@@ -373,16 +369,18 @@ public class RequestHandler {
         String report = infos[1];
         String[] props = infos[2].replaceAll(" ","").split(":");
         String[] reportProps = infos[3].replaceAll(" ","").split(":");
-
         String sessionID = infos[4];
         handleSession(sessionID);
 
         try {
             if(sessionToGraph.get(sessionID).getVerticesCount() == 0)
                 sessionToGraph.put(sessionID, generateGraph(props, graph));
-                        //= generateGraph(props,graph);
+
             if(!report.contains("No ")) {
                 GraphReportExtension gre = ((GraphReportExtension) extensionNameToClass.get(report).newInstance());
+                String[] propsNameSplitted = reportProps[0].split(",");
+                String[] propsValueSplitted = reportProps[1].split(",");
+                PropsTypeValueFill.fill(gre,propsNameSplitted,propsValueSplitted);
                 Object o = gre.calculate(sessionToGraph.get(sessionID));
                 if(o instanceof JSONObject) {
                     return Response.ok(o.toString()).header("Access-Control-Allow-Origin", "*").build();
@@ -396,11 +394,7 @@ public class RequestHandler {
             } else {
                 return Response.ok("").header("Access-Control-Allow-Origin", "*").build();
             }
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
