@@ -29,7 +29,7 @@ public class Server {
   /**
    * Path to demo application
    */
-  private static final String APPLICATION_PATH = "server/dashboard/index.html";
+  private static final String APPLICATION_PATH = "server/index.html";
 
   /**
    * Creates the base URI.
