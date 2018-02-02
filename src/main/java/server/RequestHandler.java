@@ -1,8 +1,6 @@
 package server;
 
 import Jama.Matrix;
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.FormDataParam;
 import graphtea.extensions.Centrality;
 import graphtea.extensions.G6Format;
 import graphtea.extensions.RandomTree;
@@ -17,14 +15,14 @@ import graphtea.plugins.reports.extension.GraphReportExtension;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONString;
 import org.reflections.Reflections;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -38,32 +36,15 @@ public class RequestHandler {
     private static HashMap<String,Class> extensionNameToClass = new HashMap<>();
     private static HashMap<String, GraphModel> sessionToGraph = new HashMap<>();
 
-
     public GraphModel generateGraph(String[] props, String graph) {
         try {
             GraphGeneratorExtension gge =
                     ((GraphGeneratorExtension) extensionNameToClass.get(graph).newInstance());
             String[] propsNameSplitted = props[0].split(",");
             String[] propsValueSplitted = props[1].split(",");
-            for(int i=0;i < propsNameSplitted.length;i++) {
-                try {
-                    if(propsValueSplitted.equals("true") || propsValueSplitted.equals("false")) {
-                        gge.getClass().getField(propsNameSplitted[i])
-                                .set(gge, Boolean.parseBoolean(propsValueSplitted[i]));
-                    } else {
-                        gge.getClass().getField(propsNameSplitted[i])
-                                .set(gge, Integer.parseInt(propsValueSplitted[i]));
-                    }
-                } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
+            PropsTypeValueFill.fill(gge,propsNameSplitted,propsValueSplitted);
             return gge.generateGraph();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
+        } catch (IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
         return new GraphModel();
@@ -123,19 +104,16 @@ public class RequestHandler {
         handleSession(sessionID);
 
         try {
-
             for(String id : ids) {
                 String[] sId = id.split(",");
                 int _source = Integer.parseInt(sId[0]);
                 int _target = Integer.parseInt(sId[1]);
-
 
                 Vertex vertex = sessionToGraph.get(sessionID).getVertex(_source);
                 Vertex opposingVertex = sessionToGraph.get(sessionID).getVertex(_target);
 
                 Edge parallelEdge = sessionToGraph.get(sessionID).getEdge(vertex, opposingVertex);
                 sessionToGraph.get(sessionID).removeEdge(parallelEdge);
-
             }
 
             String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));

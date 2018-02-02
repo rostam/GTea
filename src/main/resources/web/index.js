@@ -140,29 +140,28 @@ function load_generator(isDraw,webgl,ended) {
         + $('#reports').find('option:selected').text() + "--" +
         ($('#props_keys').html() + ":" + $('#props_vals').val())
         + "--" + type
-        + "--" + uuid,function (data) {
-            if (isDraw) {
-                if(!webgl) {
-                    $('#parent_canvas').empty();
-                    $('#parent_canvas').append("<div id='canvas' class='main'>")
-                    initCytoscape(undirected, serverAddr, uuid);
-                    nodeId = 0; //resets counter for freehand vertices
-                    var nodes = data.nodes;
-                    var edges = data.edges;
-                    cy.elements().remove();
-                    cy.add(nodes);
-                    cy.add(edges);
-                    nodeId += nodes.length; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
-                    setVertexIds();
-                    applyLayout();
-                    ended();
-
-                } else {
-                    viva_action(data);
-                    ended();
-                }
+        + "--" + uuid, function (data) {
+        if (isDraw) {
+            if (!webgl) {
+                $('#parent_canvas').empty();
+                $('#parent_canvas').append("<div id='canvas' class='main'>")
+                initCytoscape(undirected, serverAddr, uuid);
+                nodeId = 0; //resets counter for freehand vertices
+                var nodes = data.nodes;
+                var edges = data.edges;
+                cy.elements().remove();
+                cy.add(nodes);
+                cy.add(edges);
+                nodeId += nodes.length; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
+                setVertexIds();
+                applyLayout();
+                ended();
+            } else {
+                viva_action(data);
+                ended();
             }
-        })
+        }
+    })
 }
 
 
@@ -305,6 +304,8 @@ function load_graph(type,isDraw,webgl,ended) {
 }
 
 function showOnGraph() {
+    var act_name = $('#act_name').html();
+
     if (report_results.colors != undefined) {
         var colors = report_results.colors;
         cy.nodes().forEach(function (n) {
@@ -313,7 +314,7 @@ function showOnGraph() {
             n.style('background-color', actualColor);
             n.style('background-opacity', 0.8);
         });
-        cy.nodes().style('background-opacity',0.8);
+        cy.nodes().style('background-opacity', 0.8);
     }
 }
 
