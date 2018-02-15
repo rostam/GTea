@@ -203,9 +203,8 @@ public class CytoJSONBuilder {
     for(int i=0;i<g.numOfVertices();i++) {
       JSONObject vertexObject = new JSONObject();
       JSONObject vertexData = new JSONObject();
-
       vertexData.put(IDENTIFIER,i);
-      vertexData.put(LABEL,i+"");
+      vertexData.put(LABEL,g.getVertex(i).getLabel());
       JSONObject pos = new JSONObject();
       JSONObject vertexProperties = new JSONObject();
       GPoint points =g.getVertex(i).getLocation();

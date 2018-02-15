@@ -6,6 +6,7 @@ import graphtea.extensions.G6Format;
 import graphtea.extensions.RandomTree;
 import graphtea.extensions.io.LatexWriter;
 import graphtea.extensions.io.LoadMtx;
+import graphtea.extensions.io.LoadSpecialGML;
 import graphtea.extensions.io.SaveGraph;
 import graphtea.extensions.reports.coloring.ColumnIntersectionGraph;
 import graphtea.graph.graph.*;
@@ -383,6 +384,7 @@ public class RequestHandler {
     @Path("/loadGraph/{info}")
     @Produces("application/json;charset=utf-8")
     public Response edgeList(@PathParam("info") String info) {
+        System.out.println(info);
         String[] data = info.split("--");
         String loadType = data[0];
         String graph = data[1];
@@ -462,6 +464,13 @@ public class RequestHandler {
                             }
                         }
                     }
+                }
+                break;
+            case "adjspecial":
+                try {
+                    g = new LoadSpecialGML().read(new File("/home/rostam/kara/GD2018/got-graph.graphml"));
+                } catch (GraphIOException e) {
+                    e.printStackTrace();
                 }
                 break;
         }
