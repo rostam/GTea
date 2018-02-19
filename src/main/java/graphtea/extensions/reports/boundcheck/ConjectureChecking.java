@@ -86,7 +86,7 @@ public class ConjectureChecking implements GraphReportExtension, Parametrizable 
                     size,boundType.getValue(),generators.getValue(), PostP.getValue(),
                     Filters.getCorrectFilter(gfilters));
             Vector<GraphModel> gs = itg.wrapper_generate();
-            String nameOfFile = JOptionPane.showInputDialog("Please enter tthe name of a file in which the " +
+            String nameOfFile = JOptionPane.showInputDialog("Please enter the name of a file in which the " +
                     "graphs will be saved.:");
             SaveGraph6Format sgf = new SaveGraph6Format();
             File f = new File(nameOfFile);
