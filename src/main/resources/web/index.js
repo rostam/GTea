@@ -23,7 +23,7 @@ $.get(serverAddr + 'graphs/')
             original_data[category].props.forEach(function (d) {
                 var propNamesTypes = d.split(":");
                 keys += propNamesTypes[0] + ", ";
-                vals += propNamesTypes[1] + ", ";
+                vals += propNamesTypes[2] + ", ";
             });
             keys = keys.substr(0, keys.length - 2);
             vals = vals.substr(0, vals.length - 2);
@@ -53,7 +53,7 @@ $.get(serverAddr + 'graphs/')
             var keys="",vals="";
             original_data[report].props.forEach(function (d) {
                 var propNamesTypes = d.split(":");
-                keys+=propNamesTypes[0]+", ";vals+=propNamesTypes[1]+", ";
+                keys+=propNamesTypes[0]+", ";vals+=propNamesTypes[2]+", ";
             });
             keys=keys.substr(0,keys.length-2);
             vals=vals.substr(0,vals.length-2);
@@ -141,12 +141,12 @@ function Report() {
                 $('#reportResults').html(JSON.stringify(data));
                 var titles = data.titles.substr(1, data.titles.indexOf("]") - 1);
                 var tts = titles.split(",");
-                var builtHTML = "<table><tr>";
+                var builtHTML = "<table class='fixed_headers'><thead><tr>";
                 tts.forEach(function (t) {
                     builtHTML += "<th>" + t + "</th>";
                 });
                 var results = JSON.parse(data.results);
-                builtHTML += "</tr>";
+                builtHTML += "</tr></thead><tbody>";
                 results.forEach(function (row) {
                     builtHTML += "<tr>";
                     row.forEach(function (col) {
@@ -154,7 +154,7 @@ function Report() {
                     })
                     builtHTML += "</tr>";
                 });
-                builtHTML += "</tr></table>";
+                builtHTML += "</tr></tbody></table>";
                 $('#results-body').html(builtHTML);
             } else {
                 var res = "";

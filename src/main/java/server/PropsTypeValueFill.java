@@ -7,8 +7,9 @@ import java.lang.reflect.Field;
 
 public class PropsTypeValueFill {
     public static void fill(Extension gre, String[] propsNameSplitted, String[] propsValueSplitted) {
-        for(int i=0;i < propsNameSplitted.length;i++)
-            PropsTypeValueFill.fill(gre,propsNameSplitted[i],propsValueSplitted[i]);
+        for (int i = 0; i < propsNameSplitted.length; i++)
+            if (!propsNameSplitted[i].equals("undefined"))
+                PropsTypeValueFill.fill(gre, propsNameSplitted[i], propsValueSplitted[i]);
     }
 
     public static void fill(Extension gre, String name, String val) {

@@ -38,6 +38,7 @@ public class IncrementalZagrebIndex implements GraphReportExtension, Parametriza
     }
 
     public Object calculate(GraphModel g) {
+        System.out.println(start_alpha+ " " + end_alpha+ " "+ inc);
         RenderTable ret = new RenderTable();
         Vector<String> titles = new Vector<>();
         titles.add("Alpha");

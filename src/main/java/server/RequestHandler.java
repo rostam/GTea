@@ -632,8 +632,15 @@ public class RequestHandler {
             Field[] fs = c.getFields();
             JSONArray properties = new JSONArray();
             for(Field f : fs)
-                if(f.getAnnotations().length!=0)
-                    properties.put(f.getName()+":"+f.getType().getSimpleName());
+                if(f.getAnnotations().length!=0) {
+                    try {
+                        properties.put(f.getName()+":"+f.getType().getSimpleName()+":"+f.get(c.newInstance()));
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    }
+                }
             try {
                 jo.put("properties",properties);
             } catch (JSONException e) {
