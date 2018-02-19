@@ -20,12 +20,12 @@ public class Server {
   /**
    * URI that specifies where the server is run.
    */
-  private static final URI BASE_URI = getBaseURI();
+//  private static final URI BASE_URI = getBaseURI();
   /**
    * Default port
    */
-  private static final int PORT = 2342;
-//  private static final int PORT = 8008;
+//  private static final int PORT = 2342;
+//  private static final int PORT = 80;
   /**
    * Path to demo application
    */
@@ -33,9 +33,10 @@ public class Server {
 
   /**
    * Creates the base URI.
+   *
    * @return Base URI
    */
-  private static URI getBaseURI() {
+  private static URI getBaseURI(int PORT) {
     return UriBuilder.fromUri("http://0.0.0.0/").port(PORT).build();
   }
 
@@ -45,15 +46,16 @@ public class Server {
    * @return the running server
    * @throws IOException if server creation fails
    */
-  private static HttpServer startServer() throws IOException {
+  private static HttpServer startServer(int PORT, String type) throws IOException {
     System.out.println("Starting grizzly...");
     ResourceConfig rc = new PackagesResourceConfig("server");
     rc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
-    HttpServer server = GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
-    String path =  Server.class.getResource("/web").getPath();
-//    path = path.substring(path.indexOf(":")+1,path.lastIndexOf("target/")+6) + "/classes/web";
+    HttpServer server = GrizzlyServerFactory.createHttpServer(getBaseURI(PORT), rc);
+    path = Server.class.getResource("/web").getPath();
+    if(type.equals("online"))
+        path = path.substring(path.indexOf(":")+1,path.lastIndexOf("target/")+6) + "/classes/web";
     HttpHandler staticHandler = new StaticHttpHandler(path);
-    server.getServerConfiguration().addHttpHandler( staticHandler, "/server" );
+    server.getServerConfiguration().addHttpHandler(staticHandler, "/server");
 
     return server;
   }
@@ -65,10 +67,22 @@ public class Server {
    * @throws IOException if server creation fails
    */
   public static void main(String[] args) throws IOException {
-    HttpServer httpServer = startServer();
+      int PORT = Integer.parseInt(args[0]);
+      String type = args[1];
+    HttpServer httpServer = startServer(PORT,type);
     System.out.printf("server started at %s%s%n" +
-      "Press any key to stop it.%n", getBaseURI(), APPLICATION_PATH);
+            "Press any key to stop it.%n", getBaseURI(PORT), APPLICATION_PATH);
     System.in.read();
     httpServer.stop();
+  }
+
+  private static String path = "";
+
+  public static String getPathOfWebResources() {
+    return path;
+  }
+
+  public static String getPathOfResource() {
+     return path.substring(0, path.lastIndexOf("/"));
   }
 }

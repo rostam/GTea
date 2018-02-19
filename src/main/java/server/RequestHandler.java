@@ -671,7 +671,9 @@ public class RequestHandler {
     @Produces("application/json;charset=utf-8")
     public Response getMats() {
         JSONArray jsonArray = new JSONArray();
-        File matsFolder = new File(RequestHandler.class.getResource("/mats/").getFile());
+        System.out.println(Server.getPathOfResource() + "/mats/");
+        File matsFolder = new File(Server.getPathOfResource() + "/mats/");
+        System.out.println(matsFolder.getAbsolutePath());
         String[] mats = matsFolder.list((current,name) -> !(new File(current,name).isDirectory()));
         Arrays.sort(mats);
         for(String m : mats) jsonArray.put(m);
