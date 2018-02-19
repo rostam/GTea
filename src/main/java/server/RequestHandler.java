@@ -1,14 +1,10 @@
 package server;
 
-import Jama.Matrix;
 import graphtea.extensions.Centrality;
 import graphtea.extensions.G6Format;
 import graphtea.extensions.RandomTree;
 import graphtea.extensions.io.LatexWriter;
-import graphtea.extensions.io.LoadMtx;
-import graphtea.extensions.io.LoadSpecialGML;
 import graphtea.extensions.io.SaveGraph;
-import graphtea.extensions.reports.coloring.ColumnIntersectionGraph;
 import graphtea.graph.graph.*;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 import graphtea.plugins.main.extension.GraphActionExtension;
@@ -17,8 +13,6 @@ import graphtea.plugins.reports.extension.GraphReportExtension;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.reflections.Reflections;
-import graphtea.platform.extension.Extension;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -29,28 +23,21 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Vector;
 
 /**
  * Handles REST requests to the server.
  */
 @Path("")
 public class RequestHandler {
-    private static HashMap<String,Class> extensionNameToClass = new HashMap<>();
-    private static HashMap<String, GraphModel> sessionToGraph = new HashMap<>();
-
     public GraphModel generateGraph(String[] props, String graph) {
-        try {
-            GraphGeneratorExtension gge =
-                    ((GraphGeneratorExtension) extensionNameToClass.get(graph).newInstance());
-            String[] propsNameSplitted = props[0].split(",");
-            String[] propsValueSplitted = props[1].split(",");
-            PropsTypeValueFill.fill(gge,propsNameSplitted,propsValueSplitted);
-            return gge.generateGraph();
-        } catch (IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        }
-        return new GraphModel();
+        GraphGeneratorExtension gge = Helpers.getInstanceOfExtension(graph);
+        String[] propsNameSplitted = props[0].split(",");
+        String[] propsValueSplitted = props[1].split(",");
+        PropsTypeValueFill.fill(gge, propsNameSplitted, propsValueSplitted);
+        return gge.generateGraph();
     }
 
     /**
@@ -69,11 +56,11 @@ public class RequestHandler {
         String sessionID = infos[1];
         handleSession(sessionID);
         try {
-            if ((type.equals("directed")) != sessionToGraph.get(sessionID).isDirected()) {
+            if ((type.equals("directed")) != Helpers.sessionToGraph.get(sessionID).isDirected()) {
                 if (type.equals("directed")) {
-                    sessionToGraph.get(sessionID).setDirected(true);
+                    Helpers.sessionToGraph.get(sessionID).setDirected(true);
                 } else if (type.equals("undirected")) {
-                    sessionToGraph.get(sessionID).setDirected(false);
+                    Helpers.sessionToGraph.get(sessionID).setDirected(false);
                 }
 
             } else {
@@ -81,7 +68,7 @@ public class RequestHandler {
                 return Response.noContent().header("Access-Control-Allow-Origin", "*").build();
 
             }
-            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            String json = CytoJSONBuilder.getJSON(Helpers.sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -112,14 +99,14 @@ public class RequestHandler {
                 int _source = Integer.parseInt(sId[0]);
                 int _target = Integer.parseInt(sId[1]);
 
-                Vertex vertex = sessionToGraph.get(sessionID).getVertex(_source);
-                Vertex opposingVertex = sessionToGraph.get(sessionID).getVertex(_target);
+                Vertex vertex = Helpers.sessionToGraph.get(sessionID).getVertex(_source);
+                Vertex opposingVertex = Helpers.sessionToGraph.get(sessionID).getVertex(_target);
 
-                Edge parallelEdge = sessionToGraph.get(sessionID).getEdge(vertex, opposingVertex);
-                sessionToGraph.get(sessionID).removeEdge(parallelEdge);
+                Edge parallelEdge = Helpers.sessionToGraph.get(sessionID).getEdge(vertex, opposingVertex);
+                Helpers.sessionToGraph.get(sessionID).removeEdge(parallelEdge);
             }
 
-            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            String json = CytoJSONBuilder.getJSON(Helpers.sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -146,13 +133,13 @@ public class RequestHandler {
         String sessionID = infos[3];
         handleSession(sessionID);
 
-        Vertex _source = sessionToGraph.get(sessionID).getVertex(sourceID);
-        Vertex _target = sessionToGraph.get(sessionID).getVertex(targetID);
+        Vertex _source = Helpers.sessionToGraph.get(sessionID).getVertex(sourceID);
+        Vertex _target = Helpers.sessionToGraph.get(sessionID).getVertex(targetID);
 
         try {
-            Edge _edge = sessionToGraph.get(sessionID).getEdge(_source, _target);
-            sessionToGraph.get(sessionID).removeEdge(_edge);
-            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            Edge _edge = Helpers.sessionToGraph.get(sessionID).getEdge(_source, _target);
+            Helpers.sessionToGraph.get(sessionID).removeEdge(_edge);
+            String json = CytoJSONBuilder.getJSON(Helpers.sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -182,9 +169,9 @@ public class RequestHandler {
         if(handleSession(sessionID)) {
             // New session was created
             if(type.equals("directed")){
-                sessionToGraph.get(sessionID).setDirected(true);
+                Helpers.sessionToGraph.get(sessionID).setDirected(true);
             } else if (type.equals("undirected")){
-                sessionToGraph.get(sessionID).setDirected(false);
+                Helpers.sessionToGraph.get(sessionID).setDirected(false);
             }
         }
 
@@ -192,8 +179,8 @@ public class RequestHandler {
         vertex.setLabel(vertexId);
         vertex.setLocation(new GPoint(xPos, yPos));
         try {
-            sessionToGraph.get(sessionID).insertVertex(vertex);
-            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            Helpers.sessionToGraph.get(sessionID).insertVertex(vertex);
+            String json = CytoJSONBuilder.getJSON(Helpers.sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -216,12 +203,10 @@ public class RequestHandler {
         String sessionID = infos[1];
         handleSession(sessionID);
         try {
-            Vertex v = sessionToGraph.get(sessionID).getVertex(Integer.parseInt(vertexId));
-            sessionToGraph.get(sessionID).deleteVertex(v);
-
-            Iterable<Vertex> vi = sessionToGraph.get(sessionID).vertices();
-
-            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            Vertex v = Helpers.sessionToGraph.get(sessionID).getVertex(Integer.parseInt(vertexId));
+            Helpers.sessionToGraph.get(sessionID).deleteVertex(v);
+            Iterable<Vertex> vi = Helpers.sessionToGraph.get(sessionID).vertices();
+            String json = CytoJSONBuilder.getJSON(Helpers.sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -244,8 +229,8 @@ public class RequestHandler {
         String[] infos = info.split("--");
         String sessionID = infos[0];
         try {
-            sessionToGraph.get(sessionID).clear();
-            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            Helpers.sessionToGraph.get(sessionID).clear();
+            String json = CytoJSONBuilder.getJSON(Helpers.sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -258,7 +243,7 @@ public class RequestHandler {
     public Response saveTea(@PathParam("info") String info) {
         String[] infos = info.split("--");
         String name = infos[0];String sessionID = infos[1];
-        GraphModel g = sessionToGraph.get(sessionID);
+        GraphModel g = Helpers.sessionToGraph.get(sessionID);
         try {
             new SaveGraph().write(new File(name+".tea"),g);
         } catch (GraphIOException e) {
@@ -288,7 +273,7 @@ public class RequestHandler {
     public Response saveTex(@PathParam("info") String info) {
         String[] infos = info.split("--");
         String name = infos[0];String sessionID = infos[1];
-        GraphModel g = sessionToGraph.get(sessionID);
+        GraphModel g = Helpers.sessionToGraph.get(sessionID);
         try {
             new LatexWriter().write(new File(name+".tex"),g);
         } catch (GraphIOException e) {
@@ -329,11 +314,11 @@ public class RequestHandler {
         handleSession(sessionID);
 
         try {
-            Vertex source = sessionToGraph.get(sessionID).getVertex(Integer.parseInt(sourceID));
-            Vertex target = sessionToGraph.get(sessionID).getVertex(Integer.parseInt(targetID));
+            Vertex source = Helpers.sessionToGraph.get(sessionID).getVertex(Integer.parseInt(sourceID));
+            Vertex target = Helpers.sessionToGraph.get(sessionID).getVertex(Integer.parseInt(targetID));
             Edge edge = new Edge(source, target);
-            sessionToGraph.get(sessionID).insertEdge(edge);
-            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            Helpers.sessionToGraph.get(sessionID).insertEdge(edge);
+            String json = CytoJSONBuilder.getJSON(Helpers.sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -354,15 +339,15 @@ public class RequestHandler {
         handleSession(sessionID);
 
         try {
-            if(sessionToGraph.get(sessionID).getVerticesCount() == 0)
-                sessionToGraph.put(sessionID, generateGraph(props, graph));
+            if(Helpers.sessionToGraph.get(sessionID).getVerticesCount() == 0)
+                Helpers.sessionToGraph.put(sessionID, generateGraph(props, graph));
 
             if(!report.contains("No ")) {
-                GraphReportExtension gre = ((GraphReportExtension) extensionNameToClass.get(report).newInstance());
+                GraphReportExtension gre = (GraphReportExtension) Helpers.getInstanceOfExtension(report);
                 String[] propsNameSplitted = reportProps[0].split(",");
                 String[] propsValueSplitted = reportProps[1].split(",");
                 PropsTypeValueFill.fill(gre,propsNameSplitted,propsValueSplitted);
-                Object o = gre.calculate(sessionToGraph.get(sessionID));
+                Object o = gre.calculate(Helpers.sessionToGraph.get(sessionID));
                 if(o instanceof JSONObject) {
                     return Response.ok(o.toString()).header("Access-Control-Allow-Origin", "*").build();
                 }
@@ -395,12 +380,10 @@ public class RequestHandler {
         handleSession(sessionID);
 
         try {
-            if (sessionToGraph.get(sessionID).getVerticesCount() == 0)
-                sessionToGraph.put(sessionID, generateGraph(props, graph));
+            if (Helpers.sessionToGraph.get(sessionID).getVerticesCount() == 0)
+                Helpers.sessionToGraph.put(sessionID, generateGraph(props, graph));
 
-            System.out.println(graph);
-            System.out.println(extensionNameToClass.get(graph));
-            GraphActionExtension gre = ((GraphActionExtension) extensionNameToClass.get(graph).newInstance());
+            GraphActionExtension gre = Helpers.getInstanceOfExtension(graph);
             String[] propsNameSplitted = props[0].split(",");
             String[] propsValueSplitted = props[1].split(",");
             for(Field f : gre.getClass().getFields())
@@ -436,96 +419,15 @@ public class RequestHandler {
         String sessionID = data[3];
         handleSession(sessionID);
         GraphModel g = new GraphModel();
-        switch (loadType) {
-            case "el":
-                g = getGraphFromEdgeList(graph);
-                break;
-            case "g6":
-                graph = graph.replaceAll("qqq", "?");
-                g = G6Format.stringToGraphModel(graph);
-                break;
-            case "adjadj":
-                if(graph.contains(".mtx")) {
-                    File mat = new File(Server.getPathOfMats()+graph);
-                    try {
-                        g = new LoadMtx().read(mat);
-                    } catch (GraphIOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    String[] rows = graph.split("-");
-                    for (String row : rows) g.addVertex(new Vertex());
-                    for (int i = 0; i < rows.length; i++) {
-                        String tmp[] = rows[i].split(",");
-                        for (int j = 0; j < tmp.length; j++) {
-                            if (tmp[j].equals("1")) {
-                                g.addEdge(new Edge(g.getVertex(i), g.getVertex(j)));
-                            }
-                        }
-                    }
-                }
-                break;
-            case "adjcig":
-                if(graph.contains(".mtx")) {
-                    File mat = new File(Server.getPathOfMats()+graph);
-                    GraphModel g1 = null;
-                    try {
-                        g1 = new LoadMtx().read(mat);
-                    } catch (GraphIOException e) {
-                        e.printStackTrace();
-                    }
-                    g = ColumnIntersectionGraph.from(g1);
-                } else {
-                    String[] rows2 = graph.split("-");
-                    Matrix m = new Matrix(rows2.length, rows2.length);
-                    for (int i = 0; i < rows2.length; i++) {
-                        String tmp[] = rows2[i].split(",");
-                        for (int j = 0; j < tmp.length; j++) {
-                            m.set(j, i, Double.parseDouble(tmp[j]));
-                        }
-                    }
-                    g = ColumnIntersectionGraph.from(m);
-                }
-                break;
-            case "adjrcig":
-                String[] rows3 = graph.split("-");
-                Matrix m3 = new Matrix(rows3.length, rows3.length);
-                for (int i = 0; i < rows3.length; i++) {
-                    String tmp[] = rows3[i].split(",");
-                    for (int j = 0; j < tmp.length; j++) {
-                        m3.set(j, i, Double.parseDouble(tmp[j]));
-                    }
-                }
-                for (String row : rows3) g.addVertex(new Vertex());
-                for (int i = 0; i < m3.getColumnDimension(); i++) {
-                    for (int j = 0; j < m3.getColumnDimension(); j++) {
-                        for (int k = 0; k < m3.getRowDimension(); k++) {
-                            if (m3.get(i, k) != 0 && m3.get(j, k) != 0) {
-                                if (m3.get(i, k) == 2 || m3.get(j, k) == 2) {
-                                    g.addEdge(new Edge(g.getVertex(i), g.getVertex(j)));
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                break;
-            case "adjspecial":
-                try {
-                    g = new LoadSpecialGML().read(new File("/home/rostam/kara/GD2018/got-graph.graphml"));
-                } catch (GraphIOException e) {
-                    e.printStackTrace();
-                }
-                break;
-        }
-        sessionToGraph.put(sessionID, g);
+        g = MatrixHandler.getGraphFromMatrix(loadType, graph, g);
+        Helpers.sessionToGraph.put(sessionID, g);
         if(type.equals("directed")){
-            sessionToGraph.get(sessionID).setDirected(true);
+            Helpers.sessionToGraph.get(sessionID).setDirected(true);
         } else if (type.equals("undirected")){
-            sessionToGraph.get(sessionID).setDirected(false);
+            Helpers.sessionToGraph.get(sessionID).setDirected(false);
         }
         try {
-            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            String json = CytoJSONBuilder.getJSON(Helpers.sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -533,33 +435,6 @@ public class RequestHandler {
         return Response.ok("").header("Access-Control-Allow-Origin", "*").build();
     }
 
-    private GraphModel getGraphFromEdgeList(String info) {
-        String[] rows = info.split("-");
-        Vector<String> vs = new Vector<>();
-        for(String row : rows) {
-            String tmp[] = row.split(",");
-            String v1 = tmp[0].trim();
-            String v2 = tmp[1].trim();
-            if(!vs.contains(v1)) vs.add(v1);
-            if(!vs.contains(v2)) vs.add(v2);
-        }
-        HashMap<String,Vertex> labelVertex = new HashMap<>();
-        GraphModel currentGraph = new GraphModel();
-        for(String v : vs) {
-            Vertex vertex = new Vertex();
-            vertex.setLabel(v);
-            labelVertex.put(v,vertex);
-            currentGraph.addVertex(vertex);
-        }
-        for(String row : rows) {
-            String tmp[] = row.split(",");
-            String v1 = tmp[0].trim();
-            String v2 = tmp[1].trim();
-            Edge e = new Edge(labelVertex.get(v1),labelVertex.get(v2));
-            currentGraph.addEdge(e);
-        }
-        return currentGraph;
-    }
 
     @GET
     @Path("/save/{info}")
@@ -570,7 +445,7 @@ public class RequestHandler {
         handleSession(sessionID);
         String output = infos[0];
         String result = "";
-        GraphModel g = sessionToGraph.get(sessionID);
+        GraphModel g = Helpers.sessionToGraph.get(sessionID);
         if(g.getVerticesCount() != 0) {
             if (output.equals("g6")) {
                 result=G6Format.graphToG6(g);
@@ -597,60 +472,20 @@ public class RequestHandler {
         String sessionID = infos[4];
         handleSession(sessionID);
         try {
-            sessionToGraph.put(sessionID, generateGraph(props, graph));
+            Helpers.sessionToGraph.put(sessionID, generateGraph(props, graph));
 
             if(type.equals("directed")){
-                sessionToGraph.get(sessionID).setDirected(true);
+                Helpers.sessionToGraph.get(sessionID).setDirected(true);
             } else if (type.equals("undirected")){
-                sessionToGraph.get(sessionID).setDirected(false);
+                Helpers.sessionToGraph.get(sessionID).setDirected(false);
             }
-            String json = CytoJSONBuilder.getJSON(sessionToGraph.get(sessionID));
+            String json = CytoJSONBuilder.getJSON(Helpers.sessionToGraph.get(sessionID));
             return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
-    }
-
-
-
-    private JSONArray getExtensions(String extensionPackage, Class extensionClass) {
-        Reflections reflectionsReports = new Reflections(extensionPackage);
-        Set<Class> subTypesReport = reflectionsReports.getSubTypesOf(extensionClass);
-        Vector<String> reports = new Vector<>();
-        JSONArray jsonArray2 = new JSONArray();
-        for(Class<? extends Extension> c : subTypesReport) {
-            JSONObject jo = new JSONObject();
-            String classSimpleName = c.getSimpleName();
-            try {
-                jo.put("name",classSimpleName);
-                jo.put("desc",c.newInstance().getDescription());
-            } catch (JSONException | IllegalAccessException | InstantiationException e) {
-                e.printStackTrace();
-            }
-            Field[] fs = c.getFields();
-            JSONArray properties = new JSONArray();
-            for(Field f : fs)
-                if(f.getAnnotations().length!=0) {
-                    try {
-                        properties.put(f.getName()+":"+f.getType().getSimpleName()+":"+f.get(c.newInstance()));
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    }
-                }
-            try {
-                jo.put("properties",properties);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            jsonArray2.put(jo);
-            reports.add(classSimpleName);
-            extensionNameToClass.put(classSimpleName,c);
-        }
-        return jsonArray2;
     }
 
     /**
@@ -664,9 +499,9 @@ public class RequestHandler {
     public Response getGraphs() {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("graphs", getExtensions("graphtea.extensions.generators", GraphGeneratorExtension.class));
-            jsonObject.put("reports",getExtensions("graphtea.extensions.reports", GraphReportExtension.class));
-            jsonObject.put("actions",getExtensions("graphtea.extensions.actions", GraphActionExtension.class));
+            jsonObject.put("graphs", Helpers.getExtensions("graphtea.extensions.generators", GraphGeneratorExtension.class));
+            jsonObject.put("reports",Helpers.getExtensions("graphtea.extensions.reports", GraphReportExtension.class));
+            jsonObject.put("actions",Helpers.getExtensions("graphtea.extensions.actions", GraphActionExtension.class));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -679,7 +514,6 @@ public class RequestHandler {
     public Response getMats() {
         JSONArray jsonArray = new JSONArray();
         File matsFolder = new File(Server.getPathOfMats());
-        System.out.println(matsFolder.getAbsolutePath());
         String[] mats = matsFolder.list((current,name) -> !(new File(current,name).isDirectory()));
         Arrays.sort(mats);
         for(String m : mats) jsonArray.put(m);
@@ -763,8 +597,8 @@ public class RequestHandler {
     }
 
     private boolean handleSession(String sessionID) {
-        if(!sessionToGraph.containsKey(sessionID)){
-            sessionToGraph.put(sessionID, new GraphModel());
+        if(!Helpers.sessionToGraph.containsKey(sessionID)){
+            Helpers.sessionToGraph.put(sessionID, new GraphModel());
             return true; // Session created
         }
         return false; // Session exists
