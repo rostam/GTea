@@ -446,7 +446,7 @@ public class RequestHandler {
                 break;
             case "adjadj":
                 if(graph.contains(".mtx")) {
-                    File mat = new File(RequestHandler.class.getResource("/mats/").getFile()+"/"+graph);
+                    File mat = new File(Server.getPathOfMats()+graph);
                     try {
                         g = new LoadMtx().read(mat);
                     } catch (GraphIOException e) {
@@ -467,7 +467,7 @@ public class RequestHandler {
                 break;
             case "adjcig":
                 if(graph.contains(".mtx")) {
-                    File mat = new File(RequestHandler.class.getResource("/mats/").getFile()+"/"+graph);
+                    File mat = new File(Server.getPathOfMats()+graph);
                     GraphModel g1 = null;
                     try {
                         g1 = new LoadMtx().read(mat);
@@ -671,8 +671,7 @@ public class RequestHandler {
     @Produces("application/json;charset=utf-8")
     public Response getMats() {
         JSONArray jsonArray = new JSONArray();
-        System.out.println(Server.getPathOfResource() + "/mats/");
-        File matsFolder = new File(Server.getPathOfResource() + "/mats/");
+        File matsFolder = new File(Server.getPathOfMats());
         System.out.println(matsFolder.getAbsolutePath());
         String[] mats = matsFolder.list((current,name) -> !(new File(current,name).isDirectory()));
         Arrays.sort(mats);
