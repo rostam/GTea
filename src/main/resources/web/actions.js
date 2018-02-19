@@ -29,6 +29,10 @@ function do_actions() {
         if (act_name == 'gen') load_generator(true, true, endLoaderIcon);
         else load_graph(act_name, true, true, endLoaderIcon);
     }
+
+    // trigger the graph creation event on the document node
+    var event = new CustomEvent('newGraph', { detail: action });
+    document.dispatchEvent(event);
 }
 
 function do_saves() {

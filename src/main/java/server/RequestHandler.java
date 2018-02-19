@@ -11,12 +11,14 @@ import graphtea.extensions.io.SaveGraph;
 import graphtea.extensions.reports.coloring.ColumnIntersectionGraph;
 import graphtea.graph.graph.*;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
+import graphtea.plugins.main.extension.GraphActionExtension;
 import graphtea.plugins.main.saveload.core.GraphIOException;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.reflections.Reflections;
+import graphtea.platform.extension.Extension;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -381,6 +383,48 @@ public class RequestHandler {
     }
 
     @GET
+    @Path("/action/{info}")
+    @Produces("application/json;charset=utf-8")
+    public Response action(@PathParam("info") String info) {
+        String[] infos = info.split("--");
+        String graph = infos[0];
+        String action = infos[1];
+        String[] props = infos[2].replaceAll(" ", "").split(":");
+//        String[] reportProps = infos[3].replaceAll(" ", "").split(":");
+        String sessionID = infos[3];
+        handleSession(sessionID);
+
+        try {
+            if (sessionToGraph.get(sessionID).getVerticesCount() == 0)
+                sessionToGraph.put(sessionID, generateGraph(props, graph));
+
+            System.out.println(graph);
+            System.out.println(extensionNameToClass.get(graph));
+            GraphActionExtension gre = ((GraphActionExtension) extensionNameToClass.get(graph).newInstance());
+            String[] propsNameSplitted = props[0].split(",");
+            String[] propsValueSplitted = props[1].split(",");
+            for(Field f : gre.getClass().getFields())
+                System.out.println(f.getType());
+//            PropsTypeValueFill.fill(gre, propsNameSplitted, propsValueSplitted);
+//            Object o = gre.calculate(sessionToGraph.get(sessionID));
+//            if (o instanceof JSONObject) {
+//                return Response.ok(o.toString()).header("Access-Control-Allow-Origin", "*").build();
+//            }
+            JSONObject jsonObject = new JSONObject();
+//            if (o instanceof RenderTable) {
+//                jsonObject.put("titles", ((RenderTable) o).getTitles().toString());
+//            }
+//            jsonObject.put("results", o.toString());
+            return Response.ok(jsonObject.toString()).header("Access-Control-Allow-Origin", "*").build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
     @Path("/loadGraph/{info}")
     @Produces("application/json;charset=utf-8")
     public Response edgeList(@PathParam("info") String info) {
@@ -569,53 +613,14 @@ public class RequestHandler {
         return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
     }
 
-    /**
-     * Creates a list of all available databases from the file structure under the /data/ folder.
-     *
-     * @return List of folders (datbases) under the /data/ folder.
-     */
-    @GET
-    @Path("/graphs")
-    @Produces("application/json;charset=utf-8")
-    public Response getGraphs() {
-        JSONObject jsonObject = new JSONObject();
-        Reflections reflectionsGenerators = new Reflections("graphtea.extensions.generators");
-        Set<Class<? extends GraphGeneratorExtension>> subTypes = reflectionsGenerators.getSubTypesOf(GraphGeneratorExtension.class);
-        Vector<String> graphs = new Vector<>();
-        JSONArray jsonArray = new JSONArray();
-        for(Class<? extends GraphGeneratorExtension> c : subTypes) {
-            JSONObject jo = new JSONObject();
-            String classSimpleName = c.getSimpleName();
-            try {
-                jo.put("name",classSimpleName);
-                jo.put("desc", c.newInstance().getDescription());
-            } catch (JSONException | IllegalAccessException | InstantiationException e) {
-                e.printStackTrace();
-            }
-            graphs.add(classSimpleName);
-            extensionNameToClass.put(classSimpleName,c);
-            Field[] fs = c.getFields();
-            JSONArray properties = new JSONArray();
-            for(Field f : fs)
-                properties.put(f.getName()+":"+f.getType().getSimpleName());
-            try {
-                jo.put("properties",properties);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            jsonArray.put(jo);
-        }
-        try {
-            jsonObject.put("graphs",jsonArray);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
-        Reflections reflectionsReports = new Reflections("graphtea.extensions.reports");
-        Set<Class<? extends GraphReportExtension>> subTypesReport = reflectionsReports.getSubTypesOf(GraphReportExtension.class);
+
+    private JSONArray getExtensions(String extensionPackage, Class extensionClass) {
+        Reflections reflectionsReports = new Reflections(extensionPackage);
+        Set<Class> subTypesReport = reflectionsReports.getSubTypesOf(extensionClass);
         Vector<String> reports = new Vector<>();
         JSONArray jsonArray2 = new JSONArray();
-        for(Class<? extends GraphReportExtension> c : subTypesReport) {
+        for(Class<? extends Extension> c : subTypesReport) {
             JSONObject jo = new JSONObject();
             String classSimpleName = c.getSimpleName();
             try {
@@ -638,16 +643,26 @@ public class RequestHandler {
             reports.add(classSimpleName);
             extensionNameToClass.put(classSimpleName,c);
         }
-//        Collections.sort(reports);
-//        for (String s : reports) {
-//            jsonArray2.put(s);
-//        }
+        return jsonArray2;
+    }
+
+    /**
+     * Creates a list of all available databases from the file structure under the /data/ folder.
+     *
+     * @return List of folders (datbases) under the /data/ folder.
+     */
+    @GET
+    @Path("/graphs")
+    @Produces("application/json;charset=utf-8")
+    public Response getGraphs() {
+        JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("reports",jsonArray2);
+            jsonObject.put("graphs", getExtensions("graphtea.extensions.generators", GraphGeneratorExtension.class));
+            jsonObject.put("reports",getExtensions("graphtea.extensions.reports", GraphReportExtension.class));
+            jsonObject.put("actions",getExtensions("graphtea.extensions.actions", GraphActionExtension.class));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         return Response.ok(jsonObject.toString()).header("Access-Control-Allow-Origin", "*").build();
     }
 

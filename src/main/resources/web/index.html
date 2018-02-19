@@ -14,6 +14,7 @@
     <script src="js/jquery.qtip.min.js"></script>
     <script src="paper-full.min.js"></script>
     <script src="drawBotanical.js"></script>
+    <script src="js/panda.js"></script>
     <title>GraphTea</title>
 </head>
 <body>
@@ -146,6 +147,19 @@
             <button onclick="do_saves()">Go</button>
             <textarea name="Text2" cols="35" rows="4" id="outputResults"></textarea>
         </div>
+        <hr>
+
+        <p id="strings-graph-actions"></p>
+        <select id="graphActions"></select>
+        <div id="graphActionsProps"></div>
+        <button onclick="graphAction()">Go</button>
+        <div class="tooltip"><i class="fa fa-info-circle" aria-hidden="true"></i>
+            <span id="tooltiptextGraphAction" class="tooltiptext">A brief description</span>
+        </div>
+
+        <p><em>Graph ID:<span id="RUID"></span></em></p>
+
+
         <!--<button onclick="clearCanvas()">Clear</button>-->
 
         <!--<div id="reportResults"></div>-->

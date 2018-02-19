@@ -15,7 +15,8 @@ var full_strings = {
     "        The elements in a row are separated with a comma." +
     "        Each row comes in a new line. ",
     save: "Here, you can save the current graph to different format. The outputs" +
-    " that are textual are shown on the text area."
+    " that are textual are shown on the text area.",
+    graphActions: "Here, you can apply a graph operator to the graph. The results will be shown as a new graph"
 };
 var strings = {
     intro : "Select how to load a graph:",
@@ -25,6 +26,7 @@ var strings = {
     report: "Compute a report on graph:",
     adjMat: "The adjacency matrix:",
     save: "Save the graph:",
+    graphActions: "Apply an operator on the graph:",
     freehand: "Freehand graph drawing by mouse."
 };
 
@@ -36,6 +38,7 @@ $("#strings-layout").html(strings.layout);
 $("#strings-report").html(strings.report);
 $("#strings-adjMatformat").html(strings.adjMat);
 $("#strings-save").html(strings.save);
+$("#strings-graph-actions").html(strings.graphActions);
 $("#strings-elformat").html(strings.elist);
 //
 // strings.intro+= "<div class=\"tooltip\"><i class=\"fa fa-info-circle\" aria-hidden=\"true\"></i>\n" +
@@ -112,3 +115,13 @@ $('#strings-save').qtip({
         classes: 'qtip-light'
     }
 });
+
+$('#strings-graph-actions').qtip({
+       content: {
+           text: full_strings.graphActions,
+           title: "Apply an operator on the graph"
+       },
+       style: {
+           classes: 'qtip-light'
+       }
+   });

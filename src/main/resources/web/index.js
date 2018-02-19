@@ -63,6 +63,29 @@ $.get(serverAddr + 'graphs/')
             var desc = original_data[report].desc;
             $('#tooltiptextReport').html(desc);
         });
+        var actionsSelect = $('#graphActions');
+        data.actions.forEach(function (d) {
+            actionsSelect.append('<option>' + d.name + '</option>');
+            original_data[d.name] = {desc: d.desc, props: d.properties};
+        });
+        actionsSelect.on('change', function () {
+            var action = getSelectedGraphAction();
+            var props = $('#graphActionsProps');
+            props.empty();
+            var keys="",vals="";
+            original_data[action].props.forEach(function (d) {
+                var propNamesTypes = d.split(":");
+                keys+=propNamesTypes[0]+", ";vals+=propNamesTypes[1]+", ";
+            });
+            keys=keys.substr(0,keys.length-2);
+            vals=vals.substr(0,vals.length-2);
+            if(keys=="") props.append("No parameters<br/>");
+            else props.append('<span id="graphActionPropsKeys">' +keys + '</span>: ' +
+                '<input id="graphActionPropsVals"' + 'name="' + keys + '"' + ' value="' + vals + '">');
+
+            var desc = original_data[action].desc;
+            $('#tooltiptextGraphAction').html(desc);
+        });
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
         alert(errorThrown);
@@ -74,6 +97,27 @@ $.get(serverAddr + 'mats/')
             $('#existing_mat').append("<option>" + d + "</option>");
         });
     });
+
+function graphAction(){
+    var actionProps = "";
+    $('#graphActionsProps').children('input').each(function (i, item) {
+        actionProps += item.name + ":" + item.value + "-"
+    });
+    if (actionProps == "") {
+        actionProps = "no";
+    }
+    $.get(serverAddr + 'action/'
+        + $('#graphActions').find('option:selected').text() + "--"
+        + ($('#props_keys').html() + ":" + $('#props_vals').val()) + "--"
+        + ($('#reportPropsKeys').html() + ":" + $('#reportPropsVals').val())
+        + "--" + uuid)
+        .done(function (data) {
+
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        });
+}
 
 function Report() {
     $('#reportResults').html('computing...');
@@ -171,6 +215,10 @@ function getSelectedCategory() {
 
 function getSelectedReport() {
     return $('#reports').find('option:selected').text();
+}
+
+function getSelectedGraphAction() {
+    return $('#graphActions').find('option:selected').text();
 }
 
 /**
