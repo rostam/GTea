@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Conjecture Checking</title>
+    <script src="js/jquery-3.1.1.min.js"></script>
+    <style>
+        html {
+            font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+    </style>
+</head>
+<body style="margin: 10px;line-height: 2em;">
+<h3>GraphTea (Conjecture Checking)</h3>
+Here, a conjecture can be checked on a set of graphs.
+This set of graphs can be computed in two ways:
+<form name="myform">
+    <input type="radio" name="ways" value="all" onclick="selRadio('all')"> All graphs on a given number of vertices<br>
+    <input type="radio" name="ways" value="list" onclick="selRadio('list')"> Graphs from a list (G6 format)<br>
+    <input type="radio" name="ways" value="gen" onclick="selRadio('gen')"> Custom graph generators<br>
+</form>
+<hr/>
+<div id="allDiv" class="divs">
+    Enter the number of vertices:<input type="text" name="NumOfVs" value="5"><br/>
+    <button>Compute</button>
+</div>
+<div id="listDiv" class="divs">
+    Select the file containing a list of graphs:<select id="listOfGraphs"></select>
+    <button>Compute</button>
+</div>
+<div id="genDiv" class="divs">
+    Select a graph generator: <select id="generators"></select><br/>
+    Select the bounds for the properties of this graph generator:<br/>
+    <div id="props">From <span id="props_keys">n</span> = <input type="text" id="props_vals" placeholder="Integer">
+        to
+    <span id="props_keys2">n</span> = <input type="text" id="props_vals2" placeholder="Integer"></div>
+    <button>Compute</button>
+</div>
+
+<script>
+    var allDiv = $('#allDiv');
+    var listDiv = $('#listDiv');
+    var genDiv = $('#genDiv');
+    // allDiv.hide();
+    // listDiv.hide();
+    // genDiv.hide();
+    $('.divs').hide();
+    function selRadio(type) {
+        $('.divs').hide();
+        if(type == 'all') {
+            allDiv.show();
+        } else if(type == 'list') {
+            listDiv.show();
+        } else {
+            genDiv.show();
+        }
+    }
+    var serverAddr = "http://127.0.0.1:2342/"; //"http://0.0.0.0:2342/";
+    var original_data;
+    $.get(serverAddr + 'graphs/')
+        .done(function (data) {
+            original_data = data;
+            var categoriesSelect = $('#generators');
+            data.graphs.forEach(function (d) {
+                categoriesSelect.append('<option>' + d.name + '</option>');
+                original_data[d.name] = {desc: d.desc, props: d.properties};
+            });
+            categoriesSelect.on('change', function () {
+                var category = getSelectedCategory();
+                var keys = "", vals = "";
+                original_data[category].props.forEach(function (d) {
+                    var propNamesTypes = d.split(":");
+                    keys += propNamesTypes[0] + ", ";
+                    vals += propNamesTypes[1] + ", ";
+                });
+                keys = keys.substr(0, keys.length - 2);
+                vals = vals.substr(0, vals.length - 2);
+                $('#props_keys').html(keys);
+                $('#props_vals').val(vals);
+                $('#props_keys2').html(keys);
+                $('#props_vals2').val(vals);
+
+                var desc = original_data[category].desc;
+                $('#tooltiptext').html(desc);
+                var linkName = category;
+                var ind = category.indexOf("Generator");
+                if(ind != -1) linkName = category.substr(0,ind);
+                ind = category.indexOf("Graph");
+                if(ind == -1) linkName += "Graph";
+                linkName += ".html";
+                $('#gen_link').attr('href','http://mathworld.wolfram.com/'+linkName);
+            });
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        });
+
+
+    function getSelectedCategory() {
+        return $('#generators').find('option:selected').text();
+    }
+</script>
+</body>
+</html>
