@@ -6,20 +6,28 @@ import graphtea.extensions.RandomTree;
 import graphtea.extensions.io.LatexWriter;
 import graphtea.extensions.io.SaveGraph;
 import graphtea.graph.graph.*;
+import graphtea.platform.extension.Extension;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 import graphtea.plugins.main.extension.GraphActionExtension;
 import graphtea.plugins.main.saveload.core.GraphIOException;
 import graphtea.plugins.reports.extension.GraphReportExtension;
+import graphtea.plugins.reports.ui.ReportsUI;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import javax.print.attribute.standard.Media;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -32,6 +40,7 @@ import java.util.Vector;
  */
 @Path("")
 public class RequestHandler {
+
     public GraphModel generateGraph(String[] props, String graph) {
         GraphGeneratorExtension gge = Helpers.getInstanceOfExtension(graph);
         String[] propsNameSplitted = props[0].split(",");
@@ -327,47 +336,6 @@ public class RequestHandler {
     }
 
     @GET
-    @Path("/report/{info}")
-    @Produces("application/json;charset=utf-8")
-    public Response report(@PathParam("info") String info) {
-        String[] infos = info.split("--");
-        String graph = infos[0];
-        String report = infos[1];
-        String[] props = infos[2].replaceAll(" ","").split(":");
-        String[] reportProps = infos[3].replaceAll(" ","").split(":");
-        String sessionID = infos[4];
-        handleSession(sessionID);
-
-        try {
-            if(Helpers.sessionToGraph.get(sessionID).getVerticesCount() == 0)
-                Helpers.sessionToGraph.put(sessionID, generateGraph(props, graph));
-
-            if(!report.contains("No ")) {
-                GraphReportExtension gre = (GraphReportExtension) Helpers.getInstanceOfExtension(report);
-                String[] propsNameSplitted = reportProps[0].split(",");
-                String[] propsValueSplitted = reportProps[1].split(",");
-                PropsTypeValueFill.fill(gre,propsNameSplitted,propsValueSplitted);
-                Object o = gre.calculate(Helpers.sessionToGraph.get(sessionID));
-                if(o instanceof JSONObject) {
-                    return Response.ok(o.toString()).header("Access-Control-Allow-Origin", "*").build();
-                }
-                JSONObject jsonObject = new JSONObject();
-                if(o instanceof RenderTable) {
-                    jsonObject.put("titles",((RenderTable)o).getTitles().toString());
-                }
-                jsonObject.put("results",o.toString());
-                return Response.ok(jsonObject.toString()).header("Access-Control-Allow-Origin", "*").build();
-            } else {
-                return Response.ok("").header("Access-Control-Allow-Origin", "*").build();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
-    }
-
-    @GET
     @Path("/action/{info}")
     @Produces("application/json;charset=utf-8")
     public Response action(@PathParam("info") String info) {
@@ -460,31 +428,53 @@ public class RequestHandler {
         return Response.ok(jsonObject.toString()).header("Access-Control-Allow-Origin", "*").build();
     }
 
-    @GET
-    @Path("/draw/{info}")
-    @Produces("application/json;charset=utf-8")
-    public Response draw(@PathParam("info") String info) {
-        String[] infos = info.split("--");
-        String graph = infos[0];
-        String report = infos[1];
-        String[] props = infos[2].replaceAll(" ","").split(":");
-        String type = infos[3];
-        String sessionID = infos[4];
+
+    @POST
+    @Path("/add")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response extensionHandler(JSONExtensionHandler customer){
+        System.out.println(customer);
+        String sessionID = customer.getuuid();
+        String[] props = {customer.getpropsKeys(), customer.getpropsVals()};
+        String type = customer.getDirected();
         handleSession(sessionID);
-        try {
-            Helpers.sessionToGraph.put(sessionID, generateGraph(props, graph));
-
-            if(type.equals("directed")){
-                Helpers.sessionToGraph.get(sessionID).setDirected(true);
-            } else if (type.equals("undirected")){
-                Helpers.sessionToGraph.get(sessionID).setDirected(false);
-            }
-            String json = CytoJSONBuilder.getJSON(Helpers.sessionToGraph.get(sessionID));
-            return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
-        } catch (JSONException e) {
-            e.printStackTrace();
+        switch (customer.gettype()) {
+            case "gen":
+                Helpers.sessionToGraph.put(sessionID, generateGraph(props,customer.getgraph()));
+                if(type.equals("directed")){
+                    Helpers.sessionToGraph.get(sessionID).setDirected(true);
+                } else if (type.equals("undirected")){
+                    Helpers.sessionToGraph.get(sessionID).setDirected(false);
+                }
+                try {
+                    String json = CytoJSONBuilder.getJSON(Helpers.sessionToGraph.get(sessionID));
+                    return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "report":
+                if(Helpers.sessionToGraph.containsKey(sessionID)) {
+                    GraphReportExtension gre = Helpers.getInstanceOfExtension(customer.getname());
+                    String[] propsNameSplitted = props[0].split(",");
+                    String[] propsValueSplitted = props[1].split(",");
+                    PropsTypeValueFill.fill(gre, propsNameSplitted, propsValueSplitted);
+                    Object o = gre.calculate(Helpers.sessionToGraph.get(sessionID));
+                    if (o instanceof JSONObject) {
+                        return Response.ok(o.toString()).header("Access-Control-Allow-Origin", "*").build();
+                    }
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        if (o instanceof RenderTable) {
+                            jsonObject.put("titles", ((RenderTable) o).getTitles().toString());
+                        }
+                        jsonObject.put("results", o.toString());
+                    } catch (Exception e) {}
+                    return Response.ok(jsonObject.toString()).header("Access-Control-Allow-Origin", "*").build();
+                }
+                break;
         }
-
         return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
     }
 

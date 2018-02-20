@@ -14,6 +14,9 @@ public class PropsTypeValueFill {
 
     public static void fill(Extension gre, String name, String val) {
         Field f = null;
+        name = name.trim();
+        val = val.trim();
+        System.out.println(name);
         try {
             f = gre.getClass().getField(name);
             String nameOfType = f.getType().getSimpleName();

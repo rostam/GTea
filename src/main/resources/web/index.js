@@ -121,6 +121,7 @@ function graphAction(){
 }
 
 function Report() {
+    var type = $('#graphType').find('option:selected').text();
     $('#reportResults').html('computing...');
     var reportProps = "";
     $('#reportProps').children('input').each(function (i, item) {
@@ -129,12 +130,26 @@ function Report() {
     if (reportProps == "") {
         reportProps = "no";
     }
-    $.get(serverAddr + 'report/'
-        + $('#categories').find('option:selected').text() + "--"
-        + $('#reports').find('option:selected').text() + "--"
-        + ($('#props_keys').html() + ":" + $('#props_vals').val()) + "--"
-        + ($('#reportPropsKeys').html() + ":" + $('#reportPropsVals').val())
-        + "--" + uuid)
+    jQuery.ajax({
+        url: 'http://0.0.0.0:2342/add', type: 'POST', contentType: 'application/json',
+        data: JSON.stringify({
+            "type": "report",
+            "name": $('#reports').find('option:selected').text(),
+            "graph": $('#categories').find('option:selected').text(),
+            "uuid": uuid,
+            "propsKeys": $('#reportPropsKeys').html(),
+            "propsVals": $('#reportPropsVals').val(),
+            "directed": type
+        }),
+        dataType: 'json'
+    })
+    //
+    // $.get(serverAddr + 'report/'
+    //     + $('#categories').find('option:selected').text() + "--"
+    //     + $('#reports').find('option:selected').text() + "--"
+    //     + ($('#props_keys').html() + ":" + $('#props_vals').val()) + "--"
+    //     + ($('#reportPropsKeys').html() + ":" + $('#reportPropsVals').val())
+    //     + "--" + uuid)
         .done(function (data) {
             report_results = data;
             if (data.titles != undefined) {
@@ -179,34 +194,51 @@ function load_generator(isDraw,webgl,ended) {
         drawBotanical();
         return;
     }
-
-    server(serverAddr + 'draw/'
-        + $('#categories').find('option:selected').text() + "--"
-        + $('#reports').find('option:selected').text() + "--" +
-        ($('#props_keys').html() + ":" + $('#props_vals').val())
-        + "--" + type
-        + "--" + uuid, function (data) {
-        if (isDraw) {
-            if (!webgl) {
-                $('#parent_canvas').empty();
-                $('#parent_canvas').append("<div id='canvas' class='main'>")
-                initCytoscape(undirected, serverAddr, uuid);
-                nodeId = 0; //resets counter for freehand vertices
-                var nodes = data.nodes;
-                var edges = data.edges;
-                cy.elements().remove();
-                cy.add(nodes);
-                cy.add(edges);
-                nodeId += nodes.length; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
-                setVertexIds();
-                applyLayout();
-                ended();
-            } else {
-                viva_action(data);
-                ended();
-            }
-        }
+    jQuery.ajax({
+        url: 'http://0.0.0.0:2342/add', type: 'POST', contentType: 'application/json',
+        data: JSON.stringify({
+            "type": "gen",
+            "name": $('#categories').find('option:selected').text(),
+            "graph": $('#categories').find('option:selected').text(),
+            "uuid": uuid,
+            "propsKeys": $('#props_keys').html(),
+            "propsVals": $('#props_vals').val(),
+            "directed": type
+        }),
+        dataType: 'json'
     })
+        .done(function (data) {
+            if (isDraw) {
+                if (!webgl) {
+                    $('#parent_canvas').empty();
+                    $('#parent_canvas').append("<div id='canvas' class='main'>")
+                    initCytoscape(undirected, serverAddr, uuid);
+                    nodeId = 0; //resets counter for freehand vertices
+                    var nodes = data.nodes;
+                    var edges = data.edges;
+                    cy.elements().remove();
+                    cy.add(nodes);
+                    cy.add(edges);
+                    nodeId += nodes.length; //adds the current amount of nodes, so the next freehand item will be max(ids)+1
+                    setVertexIds();
+                    applyLayout();
+                    ended();
+                } else {
+                    viva_action(data);
+                    ended();
+                }
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+        alert(errorThrown);
+    });
+
+    // server(serverAddr + 'draw/'
+    //   + $('#categories').find('option:selected').text() + "--"
+    //   + $('#reports').find('option:selected').text() + "--" +
+    //   ($('#props_keys').html() + ":" + $('#props_vals').val())
+    //   + "--" + type
+    //   + "--" + uuid, function (data) {
+    // })
 }
 
 
