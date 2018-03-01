@@ -15,7 +15,8 @@ public class PropsTypeValueFill {
         Field f = null;
         name = name.trim();
         val = val.trim();
-        System.out.println(name);
+        System.err.println(name);
+        System.err.println(gre.getName());
         try {
             f = gre.getClass().getField(name);
             String nameOfType = f.getType().getSimpleName();

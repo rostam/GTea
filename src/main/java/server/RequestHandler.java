@@ -451,7 +451,8 @@ public class RequestHandler {
                     GraphReportExtension gre = Helpers.getInstanceOfExtension(customer.getname());
                     String[] propsNameSplitted = props[0].split(",");
                     String[] propsValueSplitted = props[1].split(",");
-                    PropsTypeValueFill.fill(gre, propsNameSplitted, propsValueSplitted);
+                    if(propsNameSplitted.equals(""))
+                        PropsTypeValueFill.fill(gre, propsNameSplitted, propsValueSplitted);
                     Object o = gre.calculate(Helpers.sessionToGraph.get(sessionID));
                     if (o instanceof JSONObject) {
                         return Response.ok(o.toString()).header("Access-Control-Allow-Origin", "*").build();
