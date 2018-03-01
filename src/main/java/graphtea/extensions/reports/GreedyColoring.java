@@ -6,7 +6,6 @@
 package graphtea.extensions.reports;
 
 import graphtea.graph.graph.GraphModel;
-import graphtea.graph.graph.RenderTable;
 import graphtea.graph.graph.Vertex;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 import org.codehaus.jettison.json.JSONArray;
@@ -14,7 +13,6 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.Iterator;
-import java.util.Vector;
 
 /**
  * @author Azin Azadi

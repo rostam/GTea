@@ -1,15 +1,16 @@
 package graphtea.extensions.reports.numberings;
 
-import graphtea.extensions.algs4.Graph;
 import graphtea.extensions.generators.*;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class StNumberingTest {
     @Test

@@ -5,10 +5,7 @@
 
 package graphtea.extensions.reports;
 
-import Jama.Matrix;
 import graphtea.extensions.reports.coloring.ColumnIntersectionGraph;
-import graphtea.extensions.reports.coloring.SpMat;
-import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.plugins.reports.extension.GraphReportExtension;
@@ -16,7 +13,6 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.Iterator;
 import java.util.Vector;
 
 /**

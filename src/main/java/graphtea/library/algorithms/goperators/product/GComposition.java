@@ -5,8 +5,8 @@
 
 package graphtea.library.algorithms.goperators.product;
 
-import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.GPoint;
+import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.library.BaseVertex;
 import graphtea.plugins.graphgenerator.core.PositionGenerators;

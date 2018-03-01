@@ -1,9 +1,9 @@
 package graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes;
 
-import java.util.*;
-
 import graphtea.extensions.reports.planarity.planaritypq.pqtree.exceptions.IllegalNodeTypeException;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.util.*;
 
 /**
  * This class holds the required functions and variables for a PQNode which are used

@@ -1,7 +1,6 @@
 package server;
 
 import graphtea.platform.extension.Extension;
-import graphtea.plugins.reports.extension.GraphReportExtension;
 
 import java.lang.reflect.Field;
 

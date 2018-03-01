@@ -1,7 +1,5 @@
 package server;
 
-import graphtea.graph.graph.GraphModel;
-
 import java.util.concurrent.atomic.AtomicLong;
 
 public class JSONExtensionHandler {

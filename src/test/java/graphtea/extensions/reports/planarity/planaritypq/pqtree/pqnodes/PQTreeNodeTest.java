@@ -1,16 +1,11 @@
 package graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes;
 
-import static graphtea.extensions.reports.planarity.planaritypq.pqtree.helpers.PQHelpers.setCircularLinks;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
-
-import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.LeafNode;
-import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.PNode;
-import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.PQNode;
-import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.QNode;
 import org.junit.Test;
 
 import java.util.*;
+
+import static graphtea.extensions.reports.planarity.planaritypq.pqtree.helpers.PQHelpers.setCircularLinks;
+import static junit.framework.TestCase.assertTrue;
 
 
 public class PQTreeNodeTest {

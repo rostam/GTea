@@ -2,7 +2,7 @@ package graphtea.extensions.reports.planarity.planaritypq;
 
 import graphtea.extensions.reports.numberings.NotBiconnectedException;
 import graphtea.extensions.reports.numberings.StNumbering;
-import graphtea.extensions.reports.planarity.planaritypq.pqtree.*;
+import graphtea.extensions.reports.planarity.planaritypq.pqtree.PQTree;
 import graphtea.extensions.reports.planarity.planaritypq.pqtree.exceptions.NodeNotFoundException;
 import graphtea.extensions.reports.planarity.planaritypq.pqtree.helpers.PQHelpers;
 import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.LeafNode;
@@ -14,7 +14,10 @@ import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.library.util.Pair;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * This class takes a biconnected graph, applies an st-numbering, and then runs the edges

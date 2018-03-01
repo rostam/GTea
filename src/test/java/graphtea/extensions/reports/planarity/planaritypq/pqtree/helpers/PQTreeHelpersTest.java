@@ -1,6 +1,5 @@
 package graphtea.extensions.reports.planarity.planaritypq.pqtree.helpers;
 
-import graphtea.extensions.reports.planarity.planaritypq.pqtree.helpers.PQHelpers;
 import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.LeafNode;
 import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.PNode;
 import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.PQNode;
@@ -14,7 +13,8 @@ import java.util.List;
 
 import static graphtea.extensions.reports.planarity.planaritypq.pqtree.helpers.PQHelpers.reverseCircularLinks;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public class PQTreeHelpersTest {
 

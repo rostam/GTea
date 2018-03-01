@@ -9,7 +9,6 @@
 
 package graphtea.extensions.io;
 
-import graphtea.extensions.G6Format;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.plugins.main.saveload.core.GraphIOException;

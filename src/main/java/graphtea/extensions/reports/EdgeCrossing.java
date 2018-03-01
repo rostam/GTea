@@ -8,7 +8,6 @@ import graphtea.graph.graph.GraphModel;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 
 import java.util.ArrayList;
-import java.util.Vector;
 
 /**
  * Created by rostami on 26.04.17.

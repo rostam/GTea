@@ -1,6 +1,6 @@
 package graphtea.extensions;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 /**
  * Written by Farshad Toosi (farshad.toosi@lero.ie)

@@ -6,8 +6,6 @@ import graphtea.graph.graph.GraphModel;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import java.util.List;
-import java.util.Vector;
 
 /**
  * Converts a logical graph or a read JSON into a cytoscape-conform JSON.

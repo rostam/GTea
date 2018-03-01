@@ -1,14 +1,15 @@
 package graphtea.extensions.reports.numberings;
 
-import graphtea.extensions.reports.connectivity.KConnected;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.library.algorithms.Algorithm;
 import graphtea.plugins.reports.extension.GraphReportExtension;
-import java.lang.Math;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Stack;
 
 /**
  * This class takes a graph and applies an st-numbering to its vertices.

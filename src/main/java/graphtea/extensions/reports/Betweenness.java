@@ -2,15 +2,10 @@ package graphtea.extensions.reports;
 
 import graphtea.extensions.Centrality;
 import graphtea.extensions.RandomTree;
-import graphtea.extensions.reports.basicreports.Diameter;
-import graphtea.extensions.reports.zagreb.WienerIndex;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
-import graphtea.graph.graph.RenderTable;
-import graphtea.graph.graph.Vertex;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 
-import java.util.Collections;
 import java.util.Vector;
 
 /**

@@ -5,7 +5,6 @@
 
 package graphtea.extensions.reports.basicreports;
 
-import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
@@ -13,7 +12,6 @@ import graphtea.platform.lang.CommandAttitude;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * @author Mohammad Ali Rostami

@@ -4,8 +4,10 @@ import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.PNode;
 import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.PQNode;
 import graphtea.extensions.reports.planarity.planaritypq.pqtree.pqnodes.QNode;
 
-import java.lang.Math;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * This class holds various functions that are applied in the PQTree data-structure

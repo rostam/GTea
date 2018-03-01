@@ -1,11 +1,9 @@
 package graphtea.extensions.reports.planarity;
 
-import graphtea.extensions.algs4.Bipartite;
 import graphtea.extensions.reports.basicreports.NumOfTriangles;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
-import graphtea.library.algorithms.util.BipartiteChecker;
 
 import java.util.ArrayList;
 

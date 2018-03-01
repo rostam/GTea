@@ -48,9 +48,7 @@ public class Helpers {
                 if(f.getAnnotations().length!=0) {
                     try {
                         properties.put(f.getName()+":"+f.getType().getSimpleName()+":"+f.get(c.newInstance()));
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InstantiationException e) {
+                    } catch (IllegalAccessException | InstantiationException e) {
                         e.printStackTrace();
                     }
                 }
