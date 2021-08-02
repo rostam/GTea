@@ -24,10 +24,10 @@ import java.util.prefs.InvalidPreferencesFormatException;
  */
 public class Settings implements AttributeListener {
     private HashSet<Object> registeredObjects = new HashSet<>();
-    private java.util.prefs.Preferences builtInPrefs = java.util.prefs.Preferences.userRoot();
-    private java.util.prefs.Preferences graphPrefs = builtInPrefs.node("graph");
+    private final java.util.prefs.Preferences builtInPrefs = java.util.prefs.Preferences.userRoot();
+    private final java.util.prefs.Preferences graphPrefs = builtInPrefs.node("graph");
     private HashSet<Class> registeredClasses = new HashSet<>();
-    private File file = new File("prefs");
+    private final File file = new File("prefs");
 
     {
         file.mkdir();
@@ -40,7 +40,7 @@ public class Settings implements AttributeListener {
                 saveSettings();
             }
             FileInputStream is = new FileInputStream(file);
-            graphPrefs.importPreferences(is);
+            java.util.prefs.Preferences.importPreferences(is);
             is.close();
 
         } catch (IOException | InvalidPreferencesFormatException e) {
@@ -99,10 +99,10 @@ public class Settings implements AttributeListener {
 
         Object obj = null;
         try {
-            if (m.length() > 6 && m.substring(6, m.length()).equalsIgnoreCase("java.lang.String")) {
+            if (m.length() > 6 && m.substring(6).equalsIgnoreCase("java.lang.String")) {
                 obj = value;
             } else if (m.length() > 6) {
-                obj = StaticUtils.fromString(m.substring(6, m.length()), value.toString());
+                obj = StaticUtils.fromString(m.substring(6), value.toString());
 
             }
         } catch (Exception e) {
@@ -142,7 +142,7 @@ public class Settings implements AttributeListener {
         NotifiableAttributeSetImpl y = new NotifiableAttributeSetImpl();
         Map<String, Object> map = x.getAttrs();
         Iterator<String> iterator = map.keySet().iterator();
-        for (; iterator.hasNext();) {
+        while (iterator.hasNext()) {
             String key = iterator.next();
             Object value = map.get(key);
             if (value instanceof Serializable) {
@@ -178,7 +178,7 @@ public class Settings implements AttributeListener {
         try {
             java.util.prefs.Preferences.userRoot().flush();
             graphPrefs.exportSubtree(new FileOutputStream(new File(file, "graph.xml")));
-            graphPrefs.exportNode(new FileOutputStream(new File("sgraph.xml")));
+            graphPrefs.exportNode(new FileOutputStream("sgraph.xml"));
         } catch (IOException | BackingStoreException e) {
             ExceptionHandler.catchException(e);
         }

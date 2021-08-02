@@ -69,7 +69,7 @@ public class HierarchicalTreeVisualization implements VisualizationExtension {
     private Vertex findAppropriateRoot(GraphModel g) {
         Vertex root = g.getAVertex();
         Iterator<Vertex> ei = g.iterator();
-        for (; ei.hasNext();) {
+        while (ei.hasNext()) {
             Vertex e = ei.next();
             root = findHigherVertex(e, root);
         }
@@ -81,7 +81,7 @@ public class HierarchicalTreeVisualization implements VisualizationExtension {
         for (Vertex v : currentLevel) {
             v.setMark(true);
             Iterator<Edge> em = g.edgeIterator(v);
-            for (; em.hasNext();) {
+            while (em.hasNext()) {
                 Edge e = em.next();
                 Vertex v2 = e.source;
                 if (!v2.getMark()) {
@@ -103,7 +103,7 @@ public class HierarchicalTreeVisualization implements VisualizationExtension {
         if (currentLevelVertices.size() != 0) {
             for (Vertex v : currentLevelVertices) {
                 Iterator<Edge> e = g.edgeIterator(v);
-                for (; e.hasNext();) {
+                while (e.hasNext()) {
                     Edge ed = e.next();
                     Vertex dest = ed.source;
                     if (!visitedVertices.contains(dest)) {
@@ -147,13 +147,13 @@ public class HierarchicalTreeVisualization implements VisualizationExtension {
     */
 
     public void setWorkingGraph(GraphModel g) {
-        this.g = g;
+        HierarchicalTreeVisualization.g = g;
     }
 
-    @UserModifiableProperty(displayName = "Hierachical Tree Visualization Width", obeysAncestorCategory = false
+    @UserModifiableProperty(displayName = "Hierarchical Tree Visualization Width", obeysAncestorCategory = false
             , category = "Visualization Options")
     public static Integer width = 600;
-    @UserModifiableProperty(displayName = "Hierachical Tree Visualization : Each Level's height", obeysAncestorCategory = false
+    @UserModifiableProperty(displayName = "Hierarchical Tree Visualization : Each Level's height", obeysAncestorCategory = false
             , category = "Visualization Options")
     public static Integer eachLevelHeigh = 50;
 

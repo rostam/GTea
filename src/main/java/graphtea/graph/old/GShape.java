@@ -46,15 +46,15 @@ public class GShape implements Serializable, FromStringProvider<GShape> {
     }
 
     public void draw(Graphics g, int x, int y, int shapeWidth, int shapeHeight) {
-        ((Graphics2D) g).translate(x, y);
+        g.translate(x, y);
         drawShape(this.name, g, shapeWidth, shapeHeight);
-        ((Graphics2D) g).translate(-x, -y);
+        g.translate(-x, -y);
     }
 
     public void fill(Graphics g, int x, int y, int shapeWidth, int shapeHeight) {
-        ((Graphics2D) g).translate(x, y);
+        g.translate(x, y);
         fillShape(this.name, g, shapeWidth, shapeHeight);
-        ((Graphics2D) g).translate(-x, -y);
+        g.translate(-x, -y);
     }
 
     public String name;
@@ -343,38 +343,32 @@ public class GShape implements Serializable, FromStringProvider<GShape> {
 
     private static int[][] provideTrapezoidPoints(int h, int w, boolean t) {
 //        h = h < w ? h : w;
+        int[] xPoints = new int[]{(w - 1) * 2 / 3, (w - 1) / 3, 0, (w - 1)};
+        int[] yPoints;
         if (t) {
-            int[] xPoints = new int[]{(w - 1) * 2 / 3, (w - 1) / 3, 0, (w - 1)};
-            int[] yPoints = new int[]{h - 1, h - 1, 0, 0};
-            int[][] points = new int[][]{xPoints, yPoints};
-            return points;
+            yPoints = new int[]{h - 1, h - 1, 0, 0};
         } else {
-            int[] xPoints = new int[]{(w - 1) * 2 / 3, (w - 1) / 3, 0, (w - 1)};
-            int[] yPoints = new int[]{0, 0, h - 1, h - 1};
-            int[][] points = new int[][]{xPoints, yPoints};
-            return points;
+            yPoints = new int[]{0, 0, h - 1, h - 1};
         }
+        return new int[][]{xPoints, yPoints};
     }
 
     private static int[][] provideParallelogramPoints(int h, int w, boolean t) {
 //        h = h < w ? h : w;
+        int[] xPoints = new int[]{(w - 1), (w - 1) / 2, 0, (w - 1) / 2};
+        int[] yPoints;
         if (t) {
-            int[] xPoints = new int[]{(w - 1), (w - 1) / 2, 0, (w - 1) / 2};
-            int[] yPoints = new int[]{(h - 1) * 3 / 4, (h - 1) * 3 / 4, (h - 1) / 4, (h - 1) / 4};
-            int[][] points = new int[][]{xPoints, yPoints};
-            return points;
+            yPoints = new int[]{(h - 1) * 3 / 4, (h - 1) * 3 / 4, (h - 1) / 4, (h - 1) / 4};
         } else {
-            int[] xPoints = new int[]{(w - 1), (w - 1) / 2, 0, (w - 1) / 2};
-            int[] yPoints = new int[]{(h - 1) / 4, (h - 1) / 4, (h - 1) * 3 / 4, (h - 1) * 3 / 4};
-            int[][] points = new int[][]{xPoints, yPoints};
-            return points;
+            yPoints = new int[]{(h - 1) / 4, (h - 1) / 4, (h - 1) * 3 / 4, (h - 1) * 3 / 4};
         }
+        return new int[][]{xPoints, yPoints};
     }
 
     private static int[][] provideRegularPolygonPoints(int h, int w, int n) {
         int[] xPoints = new int[n];
         int[] yPoints = new int[n];
-        h = h < w ? h : w;
+        h = Math.min(h, w);
         for (int i = 0; i != n; i++) {
             if (n % 2 == 0) {
 
@@ -456,17 +450,14 @@ public class GShape implements Serializable, FromStringProvider<GShape> {
 
     private static int[][] provideTrianglePoints(int h, int w, boolean t) {
         // h = h < w ? h : w;
+        int[] xPoints;
+        int[] yPoints = new int[]{(h - 1) / 2, 0, h - 1};
         if (t) {
-            int[] xPoints = new int[]{0, w - 1, w - 1};
-            int[] yPoints = new int[]{(h - 1) / 2, 0, h - 1};
-            int[][] points = new int[][]{xPoints, yPoints};
-            return points;
+            xPoints = new int[]{0, w - 1, w - 1};
         } else {
-            int[] xPoints = new int[]{w - 1, 0, 0};
-            int[] yPoints = new int[]{(h - 1) / 2, 0, h - 1};
-            int[][] points = new int[][]{xPoints, yPoints};
-            return points;
+            xPoints = new int[]{w - 1, 0, 0};
         }
+        return new int[][]{xPoints, yPoints};
 
     }
 }

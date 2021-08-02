@@ -6,6 +6,7 @@ package graphtea.platform;
 
 import graphtea.platform.core.BlackBoard;
 import graphtea.platform.core.exception.ExceptionOccuredData;
+import graphtea.platform.extension.Extension;
 import graphtea.platform.extension.ExtensionLoader;
 import graphtea.platform.lang.ArrayX;
 import graphtea.platform.lang.FromStringProvider;
@@ -47,17 +48,17 @@ public class StaticUtils {
         return result;
     }
 
-    public static void putInJar(File directory, JarOutputStream jos, String prefix) throws IOException, FileNotFoundException, Exception {
+    public static void putInJar(File directory, JarOutputStream jos, String prefix) throws Exception {
         FileInputStream fis;
         File[] files = directory.listFiles();
 
-        for (int n = 0; n < files.length; n++) {
+        for (File file : files) {
 
-            if (files[n].isDirectory()) {
-                putInJar(files[n], jos, prefix + files[n].getName() + "/");
+            if (file.isDirectory()) {
+                putInJar(file, jos, prefix + file.getName() + "/");
             } else {
-                jos.putNextEntry(new JarEntry(prefix + files[n].getName()));
-                fis = new FileInputStream(files[n]);
+                jos.putNextEntry(new JarEntry(prefix + file.getName()));
+                fis = new FileInputStream(file);
 
                 copyStream(fis, jos);
 
@@ -99,7 +100,7 @@ public class StaticUtils {
 
         if (String.class.getName().equals(classname)) return data;
 
-        if (Integer.class.getName().equals(classname)) return new Integer(data);
+        if (Integer.class.getName().equals(classname)) return Integer.valueOf(data);
 
         if (BigInteger.class.getName().equals(classname)) return new BigInteger(data);
 
@@ -226,8 +227,8 @@ public class StaticUtils {
      *
      * @param s The class to be loaded
      */
-    public static void loadSingleExtension(Class s) {
-        Object extension = ExtensionLoader.loadExtension(s);
+    public static void loadSingleExtension(Class<Extension> s) {
+        Extension extension = ExtensionLoader.loadExtension(s);
         if (extension != null) {
             StorableOnExit.SETTINGS.registerSetting(extension, "Extention Options");
             ExtensionLoader.handleExtension(Application.blackboard, extension);
@@ -300,7 +301,7 @@ class BareBonesBrowserLaunch {
                     if (browser == null)
                         throw new Exception(Arrays.toString(browsers));
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
     }

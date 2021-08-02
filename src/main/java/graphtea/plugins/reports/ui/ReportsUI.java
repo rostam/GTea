@@ -4,10 +4,11 @@
 // Distributed under the terms of the GNU General Public License (GPL): http://www.gnu.org/licenses/
 package graphtea.plugins.reports.ui;
 
-//import de.neuland.jade4j.Jade4J;
-
+import de.neuland.jade4j.Jade4J;
 import graphtea.graph.ui.GHTMLPageComponent;
+import graphtea.platform.StaticUtils;
 import graphtea.platform.core.BlackBoard;
+import graphtea.platform.extension.Extension;
 import graphtea.platform.extension.ExtensionLoader;
 import graphtea.plugins.main.GraphData;
 import graphtea.plugins.reports.extension.GraphReportExtension;
@@ -15,6 +16,7 @@ import graphtea.plugins.reports.extension.GraphReportExtensionHandler;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
@@ -25,7 +27,6 @@ import java.util.Vector;
  */
 public class ReportsUI {
     GraphData graphData;
-    public HashMap<String, GraphReportExtension> reportByName = new HashMap<>();
 
     public static ReportsUI self = null;
     public GHTMLPageComponent html;
@@ -51,10 +52,11 @@ public class ReportsUI {
     public void initTable() {
         String h = "";
         HashMap<String, Object> model = new HashMap<>();
-        Vector<GraphReportExtension> reports = ExtensionLoader.extensionsList.get(GraphReportExtensionHandler.class);
+        Vector<Extension> reports = ExtensionLoader.extensionsList.get(GraphReportExtensionHandler.class);
         HashSet<String> categories = new HashSet<>();
         HashMap<String, Vector<GraphReportExtension>> categoryLists = new HashMap<>();
-        for (GraphReportExtension report : reports) {
+        for (Extension r : reports) {
+            GraphReportExtension report = (GraphReportExtension) r;
             String category = report.getCategory();
             categories.add(category);
             if (!categoryLists.containsKey(category)){
@@ -63,15 +65,14 @@ public class ReportsUI {
             categoryLists.get(category).add(report);
         }
 
-
         model.put("reports", reports);
         model.put("categories", categories);
         model.put("categoryLists", categoryLists);
-//        try {
-//            h = Jade4J.render(getClass().getResource("sidebar.jade"), model);
-//        } catch (IOException e) {
-//            StaticUtils.addExceptionLog(e);
-//        }
+        try {
+            h = Jade4J.render(getClass().getResource("sidebar.jade"), model);
+        } catch (IOException e) {
+            StaticUtils.addExceptionLog(e);
+        }
 //        System.out.println(h);
         html.setHTML(h);
     }

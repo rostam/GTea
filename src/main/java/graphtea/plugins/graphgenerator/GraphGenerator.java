@@ -44,14 +44,12 @@ public class GraphGenerator implements PluginMethods {
 
             public void onDrop(GraphEvent data) {
 //                final blackboard blackboard = blackboard;
-                new Thread() {
-                    public void run() {
-                        synchronized (gv) {
-                            generateGraph(gen, blackboard, rect);
-                            GTabbedGraphPane.hideNotificationMessage(blackboard);
-                        }
+                new Thread(() -> {
+                    synchronized (gv) {
+                        generateGraph(gen, blackboard, rect);
+                        GTabbedGraphPane.hideNotificationMessage(blackboard);
                     }
-                }.start();
+                }).start();
             }
         }.startSelectingRegion();
     }
@@ -70,15 +68,10 @@ public class GraphGenerator implements PluginMethods {
             rect.width = 550;
         if (rect.height < 5)
             rect.height = 550;
-        new Thread() {
-            public void run() {
-                ren.ignoreRepaints(() -> {
-                    generateGraphInRect(blackboard, gen, rect);
-                    blackboard.setData(AddVertex.DISABLE, false);
-                });
-
-            }
-        }.start();
+        new Thread(() -> ren.ignoreRepaints(() -> {
+            generateGraphInRect(blackboard, gen, rect);
+            blackboard.setData(AddVertex.DISABLE, false);
+        })).start();
     }
 
     public static GraphModel generateGraphInRect(BlackBoard blackboard, GraphGeneratorInterface gen, Rectangle rect) {
@@ -97,9 +90,8 @@ public class GraphGenerator implements PluginMethods {
      */
     public static GraphModel getGraph(boolean isDirected, SimpleGeneratorInterface gi) {
         GraphModel ret = new GraphModel(isDirected);
-        gi.setWorkingGraph(ret);
         Vertex[] vertices = gi.getVertices();
-        Point[] pos = gi.getVertexPositions();
+        GPoint[] pos = gi.getVertexPositions();
         Edge[] edges = gi.getEdges();
         for (Vertex v : vertices)
             ret.insertVertex(v);
@@ -145,10 +137,10 @@ public class GraphGenerator implements PluginMethods {
     }
 
     /**
-     * @see graphtea.extensions.generators.KenserGraphGenerator#generateKenserGraph(int,int)
+     * @see KndKneserGraphGenerator#generateKenserGraph(int,int)
      */
     public static GraphModel generateKenserGraph(int n, int d) {
-        return KenserGraphGenerator.generateKenserGraph(n, d);
+        return KndKneserGraphGenerator.generateKenserGraph(n, d);
     }
 
 
@@ -188,10 +180,10 @@ public class GraphGenerator implements PluginMethods {
     }
 
     /**
-     * @see graphtea.extensions.generators.CircularTreeGenerator#generateTree(int,int)
+     * @see graphtea.extensions.generators.TreeGenerator#generateTree(int,int)
      */
     public static GraphModel generateTree(int depth, int degree) {
-        return CircularTreeGenerator.generateTree(depth, degree);
+        return TreeGenerator.generateTree(depth, degree);
     }
 
     /**

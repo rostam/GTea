@@ -8,7 +8,6 @@ package graphtea.extensions.reports.basicreports;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.platform.lang.CommandAttitude;
-import graphtea.plugins.main.core.AlgorithmUtils;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 
 /**
@@ -16,8 +15,8 @@ import graphtea.plugins.reports.extension.GraphReportExtension;
  */
 
 @CommandAttitude(name = "num_of_triangles", abbreviation = "_notri")
-public class NumOfTriangles implements GraphReportExtension {
-    public Object calculate(GraphModel g) {
+public class NumOfTriangles implements GraphReportExtension<Integer> {
+    public Integer calculate(GraphModel g) {
         return getNumOfTriangles(g);
     }
 
@@ -27,8 +26,8 @@ public class NumOfTriangles implements GraphReportExtension {
     public static int getNumOfTriangles(GraphModel graph) {
         int cc = 0;
         for (Vertex i : graph) {
-            for (Vertex j : AlgorithmUtils.getNeighbors(graph, i))
-                for (Vertex k : AlgorithmUtils.getNeighbors(graph, j)) {
+            for (Vertex j : graph.directNeighbors(i))
+                for (Vertex k : graph.directNeighbors(j)) {
                     if (k.getId() != i.getId() && graph.isEdge(k, i))
                         cc++;
                 }
@@ -47,7 +46,6 @@ public class NumOfTriangles implements GraphReportExtension {
 
 	@Override
 	public String getCategory() {
-		// TODO Auto-generated method stub
 		return "General";
 	}
 }

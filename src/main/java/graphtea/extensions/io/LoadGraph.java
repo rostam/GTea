@@ -7,7 +7,6 @@ package graphtea.extensions.io;
 
 import graphtea.graph.graph.GraphModel;
 import graphtea.plugins.main.saveload.SaveLoadPluginMethods;
-import graphtea.plugins.main.saveload.core.GraphIOException;
 import graphtea.plugins.main.saveload.core.extension.GraphReaderExtension;
 
 import java.io.File;
@@ -32,7 +31,7 @@ public class LoadGraph implements GraphReaderExtension {
         return "tea";
     }
 
-    public GraphModel read(File file) throws GraphIOException {
+    public GraphModel read(File file) {
         try {
             ObjectInputStream in = new ObjectInputStream(
                     new FileInputStream(file));

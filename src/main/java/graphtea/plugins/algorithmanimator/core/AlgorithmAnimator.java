@@ -27,7 +27,7 @@ import java.util.Vector;
  * @author Azin Azadi
  */
 public class AlgorithmAnimator implements EventDispatcher, ActionListener {
-    static Vector<AtomAnimator> animators = new Vector<>();
+    static Vector<AtomAnimator<Event>> animators = new Vector<>();
     BlackBoard blackboard;
     private boolean paused = true;
     /**
@@ -55,7 +55,7 @@ public class AlgorithmAnimator implements EventDispatcher, ActionListener {
     }
 
     public Event animateEvent(Event ae) {
-        for (AtomAnimator animator : animators)
+        for (AtomAnimator<Event> animator : animators)
             if (animator.isAnimatable(ae)) {
                 return animator.animate(ae, blackboard);
             }
@@ -68,16 +68,14 @@ public class AlgorithmAnimator implements EventDispatcher, ActionListener {
      * @param aa The automated algorithm
      */
     public void animateAlgorithm(final AutomatedAlgorithm aa) {
-        new Thread() {
-            public void run() {
-                GraphModel g = blackboard.getData(GraphAttrSet.name);
-                boolean b = g.isShowChangesOnView();
-                g.setShowChangesOnView(true);
-                aa.acceptEventDispatcher(AlgorithmAnimator.this);
-                aa.doAlgorithm();
-                g.setShowChangesOnView(b);
-            }
-        }.start();
+        new Thread(() -> {
+            GraphModel g = blackboard.getData(GraphAttrSet.name);
+            boolean b = g.isShowChangesOnView();
+            g.setShowChangesOnView(true);
+            aa.acceptEventDispatcher(AlgorithmAnimator.this);
+            aa.doAlgorithm();
+            g.setShowChangesOnView(b);
+        }).start();
 
     }
 

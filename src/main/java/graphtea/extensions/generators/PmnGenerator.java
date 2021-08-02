@@ -5,6 +5,7 @@
 package graphtea.extensions.generators;
 
 import graphtea.graph.graph.Edge;
+import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.platform.lang.CommandAttitude;
@@ -15,8 +16,6 @@ import graphtea.plugins.graphgenerator.core.PositionGenerators;
 import graphtea.plugins.graphgenerator.core.SimpleGeneratorInterface;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 
-import java.awt.*;
-
 /**
  * User: Houshmand
  */
@@ -26,11 +25,6 @@ public class PmnGenerator implements GraphGeneratorExtension, Parametrizable, Si
     public static Integer m = 10;
     @Parameter(name = "N")
     public static Integer n = 4;
-    GraphModel g;
-
-    public void setWorkingGraph(GraphModel g) {
-        this.g = g;
-    }
 
     public String getName() {
         return "Pm * Pn";
@@ -67,12 +61,12 @@ public class PmnGenerator implements GraphGeneratorExtension, Parametrizable, Si
         return ret;
     }
 
-    public Point[] getVertexPositions() {
+    public GPoint[] getVertexPositions() {
         int w = 20000;
         int h = 20000;
-        Point ret[] = new Point[m * n];
+        GPoint[] ret = new GPoint[m * n];
         for (int i = 0; i < n; i++) {
-            Point p[] = PositionGenerators.line(5, h * (i + 1) / (n + 1), w, 0, m);
+            GPoint[] p = PositionGenerators.line(5, h * (i + 1) / (n + 1), w, 0, m);
             System.arraycopy(p, 0, ret, i * m, m);
 
         }

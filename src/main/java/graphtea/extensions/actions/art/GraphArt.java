@@ -1,17 +1,14 @@
 package graphtea.extensions.actions.art;
 
-import graphtea.extensions.Centrality;
+import graphtea.extensions.AlgorithmUtils;
 import graphtea.graph.graph.*;
 import graphtea.graph.old.GStroke;
 import graphtea.plugins.main.GraphData;
-import graphtea.plugins.main.core.AlgorithmUtils;
 import graphtea.plugins.main.extension.GraphActionExtension;
 
 import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.QuadCurve2D;
-import java.util.Collections;
-import java.util.Vector;
 
 /**
  * @author M. Ali Rostami
@@ -33,40 +30,6 @@ public class GraphArt implements GraphActionExtension {
         Vertex.addGlobalUserDefinedAttribute(CURVE_WIDTH,1);
 
         GraphModel g1 = graphData.getGraph();
-        GraphModel g = g1;
-        int[][] links = new int[2][g.getEdgesCount()];
-        int cnt = 0;
-        for(Edge e : g.edges()) {
-            links[0][cnt] = e.source.getId();
-            links[1][cnt] = e.target.getId();
-            cnt++;
-        }
-
-//        int[][] edges = g.getEdgeArray();
-//        int[][] links = new int[2][edges.length];
-//        System.out.println(edges.length + " " + edges[0].length);
-//        for(int i=0;i<edges.length;i++) {
-//            for(int j=0;j<edges[i].length;j++) {
-//                System.out.println(j + " " + i);
-//                links[j][i] = edges[i][j];
-//            }
-//        }
-//
-//
-        Centrality between = new Centrality(links);
-////        \\ int[2][L] edge_list = new int [2][L] : L => number of links
-        double [] Deg_bet = between.Betweenness_Centrality(g.numOfVertices());
-        Vector<Double> vv = new Vector<>();
-        for(double d : Deg_bet) {
-            vv.add(d);
-        }
-        System.out.println(Collections.max(vv));
-        int highBCVertex = vv.indexOf(Collections.max(vv));
-        Vertex newV = new Vertex();
-        newV.setLocation(g.getVertex(highBCVertex).getLocation().add(1,1));
-        g.addVertex(newV);
-        g.addEdge(new Edge(newV,g.getVertex(highBCVertex)));
-
         GraphModel g2 = g1.getCopy();
         g2.setFont(new Font(g2.getFont().getName(),g2.getFont().getStyle(), 0));
         g2.setLabel("TreeG0");
@@ -75,12 +38,12 @@ public class GraphArt implements GraphActionExtension {
             v.setSize(new GPoint(15,15));
         for(Edge e : g2.getEdges()) {
             e.setStroke(GStroke.dashed_dotted);
-            ;
             e.setColor(8);
         }
 
-        graphData.core.showGraph(g2);AbstractGraphRenderer gr = AbstractGraphRenderer.getCurrentGraphRenderer(graphData.getBlackboard());
-        gr.addPostPaintHandler(new Painter(graphData,g2.getVertex(newV.getId())));
+        graphData.core.showGraph(g2);
+        AbstractGraphRenderer gr = AbstractGraphRenderer.getCurrentGraphRenderer(graphData.getBlackboard());
+        gr.addPostPaintHandler(new Painter(graphData));
         gr.repaint();
     }
 
@@ -94,11 +57,9 @@ public class GraphArt implements GraphActionExtension {
 class Painter implements PaintHandler {
     GraphData gd;
     GraphModel G;
-    Vertex src;
-    public Painter(GraphData gd, Vertex src) {
+    public Painter(GraphData gd) {
         this.gd = gd;
         this.G  = gd.getGraph();
-        this.src=src;
     }
 
     public void paint(Graphics gr1d, Object destinationComponent, Boolean b) {
@@ -110,14 +71,11 @@ class Painter implements PaintHandler {
         if (n == 0) return;
 
         AbstractGraphRenderer.getCurrentGraphRenderer(gd.getBlackboard()).ignoreRepaints(() -> {
-            Vertex V[] = G.getVertexArray();
-            final Vertex parent[] = new Vertex[n];
+            Vertex[] V = G.getVertexArray();
+            final Vertex[] parent = new Vertex[n];
             //consider the hole structure as a tree
-            AlgorithmUtils.BFSrun(G, src, (v, p) -> parent[v.getId()] = p);
-            final int numChild[] = new int[n];
-            for(int nc = 0;nc < numChild.length;nc++) numChild[nc]=0;
-
-
+            AlgorithmUtils.BFSrun(G, V[0], (v, p) -> parent[v.getId()] = p);
+            final int[] numChild = new int[n];
             for(Vertex v:G) {
                 if(G.getDegree(v) != 1) continue;
                 Vertex par = v;
@@ -147,7 +105,6 @@ class Painter implements PaintHandler {
 
                     GPoint m1 = AlgorithmUtils.getMiddlePoint(p1, p2);
                     GPoint m2 = AlgorithmUtils.getMiddlePoint(p2, p3);
-                    GPoint cp = p2;
 
 //                        Integer w1 = numChild[v.getId()]/2;
                     Integer w1 = v.getUserDefinedAttribute(GraphArt.CURVE_WIDTH);
@@ -167,12 +124,12 @@ class Painter implements PaintHandler {
                     //generate boundary curves
                     QuadCurve2D c1 = new QuadCurve2D.Double(
                             m1.x - startWidth * Math.sin(teta1), m1.y + startWidth * Math.cos(teta1),
-                            cp.x - middleWidth * Math.sin(teta2), cp.y + middleWidth * Math.cos(teta2),
+                            p2.x - middleWidth * Math.sin(teta2), p2.y + middleWidth * Math.cos(teta2),
                             m2.x - endWidth * Math.sin(teta3), m2.y + endWidth * Math.cos(teta3));
 
                     QuadCurve2D c2 = new QuadCurve2D.Double(
                             m2.x + endWidth * Math.sin(teta3), m2.y - endWidth * Math.cos(teta3),
-                            cp.x + middleWidth * Math.sin(teta2), cp.y - middleWidth * Math.cos(teta2),
+                            p2.x + middleWidth * Math.sin(teta2), p2.y - middleWidth * Math.cos(teta2),
                             m1.x + startWidth * Math.sin(teta1), m1.y - startWidth * Math.cos(teta1));
 
                     //mix them

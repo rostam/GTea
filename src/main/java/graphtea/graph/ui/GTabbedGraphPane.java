@@ -15,8 +15,6 @@ import graphtea.platform.attribute.AttributeListener;
 import graphtea.platform.core.BlackBoard;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.util.HashMap;
 
@@ -34,19 +32,13 @@ public class GTabbedGraphPane extends GTabbedPane {
         return b.getData(GTabbedGraphPane.NAME);
     }
 
-    private HashMap<String, GraphModel> graphs = new HashMap<>();
+    private final HashMap<String, GraphModel> graphs = new HashMap<>();
 
     public GTabbedGraphPane(BlackBoard b) {
         super(b);
-        jtp.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                reTab();
-            }
-        });
+        jtp.addChangeListener(e -> reTab());
         b.setData(GTabbedGraphPane.NAME, this);
     }
-
-    public static Boolean defaultDirectedChoice = false;
 
     protected void reTab() {
         super.reTab();
@@ -80,14 +72,14 @@ public class GTabbedGraphPane extends GTabbedPane {
         final JGraph c = new JGraph(g, v);// JGraph.getNewComponent(blackboard);
 
         if (g.getLabel() == null)
-            g.setLabel("G" + String.valueOf(lastGraphIndex++));
+            g.setLabel("G" + lastGraphIndex++);
 
         final JComponent gsp = addComponent(g.getLabel(), c, true);
 
         graphs.put(g.getLabel(),g);
 
         new GraphNotifiableAttrSet(g).addAttributeListener(new AttributeListener() {
-            JComponent cc = gsp;
+            final JComponent cc = gsp;
 
             public void attributeUpdated(String name, Object oldVal, Object newVal) {
                 if (name.equals(GraphAttrSet.LABEL))
@@ -171,16 +163,14 @@ public class GTabbedGraphPane extends GTabbedPane {
      */
     public static void showTimeNotificationMessage(String message, final BlackBoard b, final long timeMillis, boolean formatIt) {
         showNotificationMessage(message, b, formatIt);
-        new Thread() {
-            public void run() {
-                try {
-                    Thread.sleep(timeMillis + 10000);
-                    hideNotificationMessage(b);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        new Thread(() -> {
+            try {
+                Thread.sleep(timeMillis + 10000);
+                hideNotificationMessage(b);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        }.start();
+        }).start();
 
     }
 

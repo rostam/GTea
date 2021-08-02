@@ -5,9 +5,9 @@
 
 package graphtea.extensions.reports.basicreports;
 
+import graphtea.extensions.AlgorithmUtils;
 import graphtea.graph.graph.GraphModel;
 import graphtea.platform.lang.CommandAttitude;
-import graphtea.plugins.main.core.AlgorithmUtils;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 
 import java.util.ArrayList;
@@ -17,9 +17,8 @@ import java.util.ArrayList;
  */
 
 @CommandAttitude(name = "num_of_connected_components", abbreviation = "_nocc")
-public class NumOfConnectedComponents implements GraphReportExtension {
-
-    public Object calculate(GraphModel g) {
+public class NumOfConnectedComponents implements GraphReportExtension<Integer> {
+    public Integer calculate(GraphModel g) {
         return getConnectedComponents(g).size();
     }
 
@@ -35,7 +34,7 @@ public class NumOfConnectedComponents implements GraphReportExtension {
             untraversed.add(i);
 
         ArrayList<ArrayList<Integer>> comps = new ArrayList<>();
-        int parent[] = new int[size];
+        int[] parent = new int[size];
         for (int i = 0; i < size; i++)
             parent[i] = -1;
 

@@ -12,9 +12,9 @@ import java.util.Vector;
 
 /**
  * <b>BlackBoard is just like a blackboard. Anyone can write on anywhere of it, Any one can read anywhere of it,
- * and anyone can look for changes in anewhere of it. It's the environment of anyone, just like the air.</b>
+ * and anyone can look for changes in anywhere of it. It's the environment of anyone, just like the air.</b>
  * <br/><br/>
- * Structurally BlackBoard is a listanable hashmap. So it makes a usefull environment in plugable applications.
+ * Structurally BlackBoard is a listenable hashmap. So it makes a useful environment in pluggable applications.
  * here you don't have extension points. all you have is some data which stores in BlackBoard as a hash map,
  * and some events which occurs on changing of data. (normally most places in BlackBoard are event place holders)
  * <br/><br/>
@@ -50,10 +50,10 @@ import java.util.Vector;
  *
  */
 public class BlackBoard {
-    private HashMap<String, Object> data = new HashMap<>();
-    private HashMap<String, HashSet<Listener>> listeners = new HashMap<>();
-    private HashMap<String, Vector<Couple<Boolean, Listener>>> addRemoveAfterFiring = new HashMap<>();
-    private HashMap<String, Integer> firingNames = new HashMap<>();
+    private final HashMap<String, Object> data = new HashMap<>();
+    private final HashMap<String, HashSet<Listener>> listeners = new HashMap<>();
+    private final HashMap<String, Vector<Couple<Boolean, Listener>>> addRemoveAfterFiring = new HashMap<>();
+    private final HashMap<String, Integer> firingNames = new HashMap<>();
 
     /**
      * @param key The key

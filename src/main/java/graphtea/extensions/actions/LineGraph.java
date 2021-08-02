@@ -3,7 +3,7 @@
 // Copyright (C) 2008 Mathematical Science Department of Sharif University of Technology
 // Distributed under the terms of the GNU Lesser General Public License (LGPL): http://www.gnu.org/licenses/
 package graphtea.extensions.actions;
-import graphtea.extensions.reports.Utils;
+import graphtea.extensions.AlgorithmUtils;
 import graphtea.plugins.main.GraphData;
 import graphtea.plugins.main.extension.GraphActionExtension;
 
@@ -14,9 +14,8 @@ import graphtea.plugins.main.extension.GraphActionExtension;
  * @author Azin Azadi
  */
 public class LineGraph implements GraphActionExtension {
-
     public void action(GraphData graphData) {
-        graphData.core.showGraph(Utils.createLineGraph(graphData.getGraph()));
+        graphData.core.showGraph(AlgorithmUtils.createLineGraph(graphData.getGraph()));
     }
 
     public String getName() {

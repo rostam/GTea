@@ -13,7 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * this is the same as JMenuItem with the diffrece that it sends its events to the blackboard automatically.
+ * this is the same as JMenuItem with the difference that it sends its events to the blackboard automatically.
  * see GButton for more details.
  *
  * @author Azin Azadi
@@ -78,6 +78,6 @@ public class GMenuItem extends JMenuItem implements ActionListener {
         blackboard.setData(UIEventData.name(""), t);
     }
 
-    private BlackBoard blackboard;
-    private UIEventData t;
+    private final BlackBoard blackboard;
+    private final UIEventData t;
 }

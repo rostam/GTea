@@ -5,7 +5,7 @@
 package graphtea.extensions.reports.spanningtree;
 
 
-import graphtea.extensions.reports.Utils;
+import graphtea.extensions.AlgorithmUtils;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.SubGraph;
 import graphtea.platform.lang.CommandAttitude;
@@ -16,7 +16,7 @@ import graphtea.plugins.reports.extension.GraphReportExtension;
  */
 
 @CommandAttitude(name = "mst_prim", abbreviation = "_mst_p")
-public class MSTPrimExtension implements GraphReportExtension {
+public class MSTPrimExtension implements GraphReportExtension<SubGraph> {
     public String getName() {
         return "Prim";
     }
@@ -25,11 +25,11 @@ public class MSTPrimExtension implements GraphReportExtension {
         return "Prim";
     }
 
-    public Object calculate(GraphModel g) {
+    public SubGraph calculate(GraphModel g) {
         SubGraph sg = new SubGraph();
         MSTPrim mp = new MSTPrim();
         double[][] adj = g.getAdjacencyMatrix().getArray();
-        int[][] adjMatrix = Utils.getBinaryPattern(adj,g.getVerticesCount());
+        int[][] adjMatrix = AlgorithmUtils.getBinaryPattern(adj,g.getVerticesCount());
         int[] parent = mp.prim(adjMatrix);
         for(int i=0;i<g.getVerticesCount();i++) {
             if(parent[i] != -1) {

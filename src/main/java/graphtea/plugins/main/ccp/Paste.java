@@ -109,10 +109,8 @@ public class Paste extends AbstractAction {
                 } catch (Exception e) {
                     if (e.getClass().equals(SAXParseException.class)) {
                         tk.beep();
-                        ExceptionHandler.catchException(e);
-                    } else {
-                        ExceptionHandler.catchException(e);
                     }
+                    ExceptionHandler.catchException(e);
                 }
             } else if (stream != null) {
                 //                  data was an input stream, read that directly
@@ -120,8 +118,7 @@ public class Paste extends AbstractAction {
                     GraphmlHandlerImpl phi = new GraphmlHandlerImpl(gg);
                     GraphmlParser.parse(new InputSource(stream), phi);
                     stream.close();
-                } catch (Exception e) {
-
+                } catch (Exception ignored) {
                 }
             }
 

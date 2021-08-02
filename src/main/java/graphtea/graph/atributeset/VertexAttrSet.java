@@ -18,8 +18,8 @@ import java.util.Map;
  * @author Azin Azadi
  * @see graphtea.graph.atributeset.GraphAttrSet
  */
-public class VertexAttrSet implements AttributeSet {
-    private Vertex v;
+public class VertexAttrSet implements AttributeSet<Object> {
+    private final Vertex v;
     public static final String LABEL = "Label";
     public static final String COLOR = "Color";
     public static final String SHAPE = "Shape";

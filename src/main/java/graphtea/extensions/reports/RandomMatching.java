@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  */
 
 @CommandAttitude(name = "maxium_matching", abbreviation = "_max_match")
-public class RandomMatching implements GraphReportExtension {
+public class RandomMatching implements GraphReportExtension<Vector<Object>> {
     public String getName() {
         return "Random Matching";
     }
@@ -30,9 +30,9 @@ public class RandomMatching implements GraphReportExtension {
         return "Random Matching";
     }
 
-    private Random r = new Random();
-    private Random r2 = new Random(10);
-    public Object calculate(GraphModel g) {
+    private final Random r = new Random();
+    private final Random r2 = new Random(10);
+    public Vector<Object> calculate(GraphModel g) {
         SubGraph sg = new SubGraph();
         int limit=r2.nextInt(g.getEdgesCount());
 
@@ -52,8 +52,8 @@ public class RandomMatching implements GraphReportExtension {
                 if(vi.contains(v1.getId()) && vi.contains(v2.getId())) {
                     vv.put(v1,v2);
 
-                    vi.remove(vi.indexOf(v1.getId()));
-                    vi.remove(vi.indexOf(v2.getId()));
+                    vi.remove((Integer) v1.getId());
+                    vi.remove((Integer) v2.getId());
                     break;
                 }
             }
@@ -64,8 +64,8 @@ public class RandomMatching implements GraphReportExtension {
             sg.vertices.add(vv.get(v));
         }
 
-        sg.edges.addAll(vv.keySet().stream()
-                .map(v -> g.getEdge(v, vv.get(v))).collect(Collectors.toList()));
+        sg.edges.addAll(vv.keySet().stream().map(v -> g.getEdge(v, vv.get(v))).collect(Collectors.toList()));
+
         Vector<Object> ret = new Vector<>();
         ret.add("Number of Matching:" + sg.edges.size());
         ret.add(sg);
@@ -85,5 +85,11 @@ public class RandomMatching implements GraphReportExtension {
             rotated[(i + orderToRotate) % length] = unOrderedArr[i];
         }
         return rotated;
+    }
+
+    public double calculateMaxMatching(GraphModel g) {
+        Vector<Object> result = calculate(g);
+        SubGraph maxMatching = (SubGraph)result.elementAt(1);
+        return maxMatching.edges.size();
     }
 }

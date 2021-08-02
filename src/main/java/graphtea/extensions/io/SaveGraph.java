@@ -6,7 +6,6 @@
 package graphtea.extensions.io;
 
 import graphtea.graph.graph.GraphModel;
-import graphtea.plugins.main.saveload.core.GraphIOException;
 import graphtea.plugins.main.saveload.core.extension.GraphWriterExtension;
 
 import java.io.File;
@@ -25,7 +24,7 @@ public class SaveGraph implements GraphWriterExtension {
     }
 
     @Override
-    public void write(File file, GraphModel graph) throws GraphIOException {
+    public void write(File file, GraphModel graph) {
         try {
             ObjectOutputStream out = new ObjectOutputStream(
                     new FileOutputStream(file));

@@ -110,10 +110,10 @@ abstract public class BaseGraph<VertexType extends BaseVertex, EdgeType extends 
 
     /**
      * Returns true if there is an edge between specified vertices (direction considered for directed graphs).
-     * * @param Source of the edge for existance check.
+     * * @param Source of the edge for existence check.
      *
      * @param source of the desired edges.
-     * @param target of the edge for existance check.
+     * @param target of the edge for existence check.
      * @return true if there is an edge between specified vertices (direction considered for directed graphs).
      * @throws InvalidVertexException if supplied source or target are invalid.
      */
@@ -260,7 +260,7 @@ abstract public class BaseGraph<VertexType extends BaseVertex, EdgeType extends 
     /**
      * This method returns true if the graph contains the specified vertex, false otherwise.
      *
-     * @param v Vertex to check existance.
+     * @param v Vertex to check existence.
      * @return True if the graph contains the specified vertex, false otherwise.
      */
     public abstract boolean containsVertex(VertexType v);
@@ -413,11 +413,7 @@ abstract public class BaseGraph<VertexType extends BaseVertex, EdgeType extends 
      * @see BaseGraph#lightEdgeIterator()
      */
     public Iterable<EdgeType> edges() {
-        return new Iterable<EdgeType>() {
-            public Iterator<EdgeType> iterator() {
-                return lightEdgeIterator();
-            }
-        };
+        return this::lightEdgeIterator;
     }
 
     /**
@@ -426,12 +422,7 @@ abstract public class BaseGraph<VertexType extends BaseVertex, EdgeType extends 
      * yeah
      */
     public Iterable<EdgeType> edges(final VertexType v){
-        return new Iterable<EdgeType>(){
-            @Override
-            public Iterator<EdgeType> iterator() {
-                return lightEdgeIterator(v);
-            }
-        };
+        return () -> lightEdgeIterator(v);
     }
     /**
      * Returns degree of vertex, the number of edges which their target or source is the specified vertex.
@@ -448,28 +439,25 @@ abstract public class BaseGraph<VertexType extends BaseVertex, EdgeType extends 
      * @see graphtea.library.BaseGraph#lightEdgeIterator(BaseVertex)
      */
     public Iterable<VertexType> getNeighbors(final VertexType vertex) {
-        return new Iterable<VertexType>() {
+        return () -> {
+            final Iterator<EdgeType> ei = lightEdgeIterator(vertex);
+            return new Iterator<VertexType>() {
+                public boolean hasNext() {
+                    return ei.hasNext();
+                }
 
-            public Iterator<VertexType> iterator() {
-                final Iterator<EdgeType> ei = lightEdgeIterator(vertex);
-                return new Iterator<VertexType>() {
-                    public boolean hasNext() {
-                        return ei.hasNext();
-                    }
+                public VertexType next() {
+                    EdgeType edg = ei.next();
+                    if (edg.source == vertex)
+                        return edg.target;
+                    else
+                        return edg.source;
+                }
 
-                    public VertexType next() {
-                        EdgeType edg = ei.next();
-                        if (edg.source == vertex)
-                            return edg.target;
-                        else
-                            return edg.source;
-                    }
-
-                    public void remove() {
-                        ei.remove();
-                    }
-                };
-            }
+                public void remove() {
+                    ei.remove();
+                }
+            };
         };
     }
 
@@ -489,34 +477,32 @@ abstract public class BaseGraph<VertexType extends BaseVertex, EdgeType extends 
     }
 
     /**
-     * this method is usefull in directed graphs which you want to know which vertices are sources of v(as target)
+     * this method is useful in directed graphs which you want to know which vertices are sources of v(as target)
      *
      * @param vertex The given vertex
      * @return an Iterable object which can be iterated trough all neighbours of the given vertex using lightEdgeIterator(vertex, false)
      * @see ListGraph#lightBackEdgeIterator(graphtea.library.BaseVertex)
      */
     public Iterable<VertexType> getBackNeighbours(final VertexType vertex) {
-        return new Iterable<VertexType>() {
-            public Iterator<VertexType> iterator() {
-                final Iterator<EdgeType> ei = lightBackEdgeIterator(vertex);
-                return new Iterator<VertexType>() {
-                    public boolean hasNext() {
-                        return ei.hasNext();
-                    }
+        return () -> {
+            final Iterator<EdgeType> ei = lightBackEdgeIterator(vertex);
+            return new Iterator<VertexType>() {
+                public boolean hasNext() {
+                    return ei.hasNext();
+                }
 
-                    public VertexType next() {
-                        EdgeType edg = ei.next();
-                        if (edg.source == vertex)
-                            return edg.target;
-                        else
-                            return edg.source;
-                    }
+                public VertexType next() {
+                    EdgeType edg = ei.next();
+                    if (edg.source == vertex)
+                        return edg.target;
+                    else
+                        return edg.source;
+                }
 
-                    public void remove() {
-                        ei.remove();
-                    }
-                };
-            }
+                public void remove() {
+                    ei.remove();
+                }
+            };
         };
     }
     

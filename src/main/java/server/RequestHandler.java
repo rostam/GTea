@@ -245,11 +245,7 @@ public class RequestHandler {
         String[] infos = info.split("--");
         String name = infos[0];String sessionID = infos[1];
         GraphModel g = Helpers.sessionToGraph.get(sessionID);
-        try {
-            new SaveGraph().write(new File(name+".tea"),g);
-        } catch (GraphIOException e) {
-            e.printStackTrace();
-        }
+        new SaveGraph().write(new File(name+".tea"),g);
         StreamingOutput fileStream = new StreamingOutput() {
             @Override
             public void write(java.io.OutputStream output) throws IOException, WebApplicationException {

@@ -5,9 +5,9 @@
 
 package graphtea.extensions.reports.basicreports;
 
+import graphtea.extensions.AlgorithmUtils;
 import graphtea.graph.graph.GraphModel;
 import graphtea.platform.lang.CommandAttitude;
-import graphtea.plugins.main.core.AlgorithmUtils;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 
 import java.util.ArrayList;
@@ -15,14 +15,16 @@ import java.util.List;
 
 /**
  * @author Mohammad Ali Rostami
+ *
+ * In graph theory, the girth of an undirected graph is the length of a shortest cycle contained in the graph.
  */
 
 @CommandAttitude(name = "girth_size", abbreviation = "_gs")
-public class GirthSize implements GraphReportExtension {
+public class GirthSize implements GraphReportExtension<Integer> {
 
-    private static int bfs(int start, double mat[][], int cc, int girth) {
-        int baba[] = new int[cc];
-        int dist[] = new int[cc];
+    private static int bfs(int start, double[][] mat, int cc, int girth) {
+        int[] baba = new int[cc];
+        int[] dist = new int[cc];
         for (int i = 0; i < cc; i++) {
             baba[i] = AlgorithmUtils.Max_Int;
             dist[i] = AlgorithmUtils.Max_Int;
@@ -49,7 +51,7 @@ public class GirthSize implements GraphReportExtension {
     }
 
 
-    public Object calculate(GraphModel g) {
+    public Integer calculate(GraphModel g) {
         return getGirthSize(g);
     }
 
@@ -58,7 +60,7 @@ public class GirthSize implements GraphReportExtension {
      */
     private static int getGirthSize(GraphModel graph) {
         int size = graph.getVertexArray().length;
-        double mat[][] = graph.getAdjacencyMatrix().getArray();
+        double[][] mat = graph.getAdjacencyMatrix().getArray();
         int girth = AlgorithmUtils.Max_Int;
         for (int i = 0; i < size; i++) {
             int sizeofsmallestcycle = bfs(i, mat, size, girth);
@@ -77,10 +79,8 @@ public class GirthSize implements GraphReportExtension {
         return "Graph Girth Size";
     }
 
-
 	@Override
 	public String getCategory() {
-		// TODO Auto-generated method stub
 		return "General";
 	}
 }

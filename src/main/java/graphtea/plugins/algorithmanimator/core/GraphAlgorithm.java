@@ -1,5 +1,6 @@
 package graphtea.plugins.algorithmanimator.core;
 
+import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.library.algorithms.Algorithm;
@@ -12,7 +13,7 @@ import graphtea.plugins.main.GraphData;
  */
 public class GraphAlgorithm extends Algorithm {
 
-    private BlackBoard blackBoard;
+    protected BlackBoard blackBoard;
     protected GraphData graphData;
 
     public GraphAlgorithm(BlackBoard blackBoard){
@@ -21,9 +22,9 @@ public class GraphAlgorithm extends Algorithm {
     }
     
     public Vertex requestVertex(GraphModel g,String msg){
-        VertexRequest vr = new VertexRequest(g, msg);
+        VertexRequest<Vertex, Edge> vr = new VertexRequest<>(g, msg);
         dispatchEvent(vr);
-        return (Vertex) vr.getVertex();
+        return vr.getVertex();
     }
     
     public String getMatrixHTML(GraphModel g){

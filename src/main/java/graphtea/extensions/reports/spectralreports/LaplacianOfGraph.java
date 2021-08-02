@@ -2,6 +2,7 @@ package graphtea.extensions.reports.spectralreports;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
+import graphtea.extensions.AlgorithmUtils;
 import graphtea.graph.graph.GraphModel;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 
@@ -16,23 +17,10 @@ import java.util.Arrays;
  *
  * @author Hooman Mohajeri Moghaddam
  */
-public class LaplacianOfGraph implements GraphReportExtension  {
+public class LaplacianOfGraph implements GraphReportExtension<ArrayList<String>>  {
 
 
 	boolean inDegree;
-	/**
-	 * Round func
-	 * @param value The value
-	 * @param decimalPlace The decimal place
-	 * @return rounded value of the input to the number of decimalPlace
-	 */
-	private double round(double value, int decimalPlace) {
-		double power_of_ten = 1;
-		while (decimalPlace-- > 0)
-			power_of_ten *= 10.0;
-		return Math.round(value * power_of_ten)
-		/ power_of_ten;
-	}
 
 	/**
 	 * Undirected Laplacian.
@@ -41,7 +29,7 @@ public class LaplacianOfGraph implements GraphReportExtension  {
 	 */
 	private Matrix getLaplacian(Matrix A)
 	{
-		//double[][] res=new double[g.n()][g.n()];
+		//double[][] res=new double[g.numOfVertices()][g.numOfVertices()];
 
 
 		int n=A.getArray().length;
@@ -104,28 +92,19 @@ public class LaplacianOfGraph implements GraphReportExtension  {
 		ArrayList<String> result = new ArrayList<>();
 		result.add("Eigen Value Decomposition:");
 		EigenvalueDecomposition ed = getLaplacian(matrix).eig();
-		double rv[] = ed.getRealEigenvalues();
-		double iv[] = ed.getImagEigenvalues();
+		double[] rv = ed.getRealEigenvalues();
+		double[] iv = ed.getImagEigenvalues();
 		for (int i = 0; i < rv.length; i++)
 			if (iv[i] != 0)
-				result.add("" + round(rv[i], 3) + " + " + round(iv[i], 3) + "i");
+				result.add("" + AlgorithmUtils.round(rv[i], 10) + " + " + AlgorithmUtils.round(iv[i], 10) + "i");
 			else
-				result.add("" + round(rv[i], 3));
+				result.add("" + AlgorithmUtils.round(rv[i], 10));
 		result.add("Eigen Vectors:\n");
 		double[][] eigenVectors = ed.getV().getArray();
-		for (int k = 0; k < eigenVectors.length; k++)
-			result.add(Arrays.toString(round(eigenVectors[k], 3)));
+        for (double[] eigenVector : eigenVectors) result.add(Arrays.toString(AlgorithmUtils.round(eigenVector, 10)));
 		return result;
 	}
 
-	private double[] round (double[] array, int prec)
-	{
-		double[] res=array;
-		for(int i=0;i<array.length;i++)
-			res[i]=round(res[i],prec);
-		return res;
-
-	}
 	public String getName() {
 		return "Spectrum of Laplacian";
 	}
@@ -134,7 +113,7 @@ public class LaplacianOfGraph implements GraphReportExtension  {
 		return "The Laplacian matrix associated with the graph";
 	}
 
-	public Object calculate(GraphModel g) {
+	public ArrayList<String> calculate(GraphModel g) {
 
 		try {
 			if(g.isDirected())
@@ -143,18 +122,14 @@ public class LaplacianOfGraph implements GraphReportExtension  {
 
 				if (a== -1)
 					return null;
-				else if(a==0)
-					inDegree = true;
-				else
-					inDegree = false;
+				else inDegree = a == 0;
 			}
 			Matrix A = g.getWeightedAdjacencyMatrix();
 			ArrayList<String> calc = new ArrayList<>(ShowLaplacian(A));
 			calc.addAll(getEigenValuesAndVectors(A));
 			return(calc);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-
+			e.printStackTrace();
 		}
 		return null;
 

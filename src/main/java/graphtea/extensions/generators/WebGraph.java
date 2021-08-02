@@ -6,6 +6,7 @@
 package graphtea.extensions.generators;
 
 import graphtea.graph.graph.Edge;
+import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.platform.lang.CommandAttitude;
@@ -16,26 +17,17 @@ import graphtea.plugins.graphgenerator.core.PositionGenerators;
 import graphtea.plugins.graphgenerator.core.SimpleGeneratorInterface;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 
-import java.awt.*;
-
 /**
  * Author: M. Ali Rostami
- * 
+ *
+ * https://mathworld.wolfram.com/WebGraph.html
  */
 @CommandAttitude(name = "generate_webgraph", abbreviation = "_g_webg", description = "generates a Web graph of order n")
 public class WebGraph implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
 
 	@Parameter(name = "n")
 	public static int n = 4;
-    @Parameter(name = "t")
-    public static int t = 2;
-
-	GraphModel g;
-
-	public void setWorkingGraph(GraphModel g)
-	{
-		this.g = g;
-	}
+	private final int t = 2;
 
 	public String getName()
 	{
@@ -51,16 +43,15 @@ public class WebGraph implements GraphGeneratorExtension, Parametrizable, Simple
 
 	public Vertex[] getVertices()
 	{
-		Vertex[] result = new Vertex[((t+1)*n)+1];
-		for (int i = 0; i < (t+1)*n+1; i++)
+		Vertex[] result = new Vertex[(t+1)*n];
+		for (int i = 0; i < (t+1)*n; i++)
 			result[i] = new Vertex();
 		v = result;
 		return result;
 	}
 
-    public Edge[] getEdges()
-    {
-        Edge[] result = new Edge[(2*t*n)+n];
+    public Edge[] getEdges() {
+        Edge[] result = new Edge[4*n];
         int ecnt = 0;
 
         for(int j=1;j < t+1;j++) {
@@ -79,22 +70,22 @@ public class WebGraph implements GraphGeneratorExtension, Parametrizable, Simple
             }
         }
 
-        for(int i=0;i < n;i++) {
-            result[ecnt]=new Edge(v[t*n + i],v[(t+1)*n]);
-            ecnt++;
-        }
+//        for(int i=0;i < n;i++) {
+//            result[ecnt]=new Edge(v[t*n + i],v[(t+1)*n]);
+//            ecnt++;
+//        }
 
         return result;
     }
 
-    public Point[] getVertexPositions() {
-        Point[] r = new Point[((t+1)*n)+1];
+    public GPoint[] getVertexPositions() {
+		GPoint[] r = new GPoint[((t+1)*n)+1];
 
         for(int i=t; i >=0 ;i--) {
-            Point p[] = PositionGenerators.circle((t-(i-1))*10000, 10000, 10000, n);
+			GPoint[] p = PositionGenerators.circle((t-(i-1))*10000, 10000, 10000, n);
             System.arraycopy(p, 0, r, (i * n), n);
         }
-        r[(t+1)*n] = new Point(10000,10000);
+        r[(t+1)*n] = new GPoint(10000,10000);
 
         return r;
     }

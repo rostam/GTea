@@ -8,6 +8,7 @@ import graphtea.platform.StaticUtils;
 import graphtea.platform.core.AbstractAction;
 import graphtea.platform.core.BlackBoard;
 import graphtea.platform.core.exception.ExceptionHandler;
+import graphtea.platform.extension.Extension;
 import graphtea.platform.extension.ExtensionLoader;
 import graphtea.platform.lang.Pair;
 import graphtea.platform.preferences.lastsettings.StorableOnExit;
@@ -22,7 +23,6 @@ import graphtea.ui.components.gsidebar.GSidebar;
 import graphtea.ui.extension.AbstractExtensionAction;
 import graphtea.ui.extension.UIActionExtensionAction;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,7 +40,7 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
     public GToolbar toolbar;
     public BlackBoard blackboard;
     Class resourceClass;
-    HashMap<String, graphtea.platform.core.AbstractAction> actions = null;
+    HashMap<String, graphtea.platform.core.AbstractAction> actions;
     /**
      * determines the character which if put before a character in the string of the label, that character will be set to it's mnemonics
      */
@@ -64,7 +64,7 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
     private JToolBar lastToolbar = new JToolBar();
     private int lastToolbarPlace;
 
-    public void start_toolbar(final Attributes meta) throws SAXException {
+    public void start_toolbar(final Attributes meta) {
 //        lastToolbar = new JToolBar();
 //        lastToolbar.setFloatable(false);
         lastToolbar = toolbar.createToolBar();
@@ -72,7 +72,7 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
         if (DEBUG) System.err.println("start_toolbar: " + meta);
     }
 
-    public void handle_tool(final Attributes meta) throws SAXException {
+    public void handle_tool(final Attributes meta) {
         String label = meta.getValue("label");
         String icon = meta.getValue("image");
         String action = meta.getValue("action");
@@ -97,24 +97,24 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
         if (DEBUG) System.err.println("handle_tool: " + meta);
     }
 
-    public void end_toolbar() throws SAXException {
+    public void end_toolbar()  {
         lastToolbar.add(new JSeparator(JSeparator.VERTICAL));
         toolbar.addIndexed(lastToolbar, lastToolbarPlace);
 //        toolbar.add(lastToolbar);
         if (DEBUG) System.err.println("end_toolbar()");
     }
 
-    public void start_toolbars(Attributes meta) throws SAXException {
+    public void start_toolbars(Attributes meta) {
 //        lastToolbar = toolbar.getLastToolBar();
     }
 
-    public void end_toolbars() throws SAXException {
+    public void end_toolbars() {
     }
 
     //***************** status handling --------------------
     public GStatusBar statusbar;
 
-    public void handle_bar(Attributes meta) throws SAXException {
+    public void handle_bar(Attributes meta) {
         String clazz = meta.getValue("class");
         String id = meta.getValue("id");
         System.out.println("Adding the Bar with id:" + id + " ,class:" + clazz);
@@ -126,13 +126,11 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
 
     //*****************menu handling------------------------
     public GMenuBar menubar;
-    private GFrame frame;
+    private final GFrame frame;
     private JMenu currentMenu;
 
-    public void start_menues(Attributes meta) throws SAXException {
+    public void start_menues(Attributes meta) {
     }
-
-    static HashMap<JMenuItem, Integer> places = new HashMap<>();
 
     private Pair<Integer, String> extractLabelInfo(String label) {
         int index = Math.max(label.indexOf(menueIndexChar), 0);
@@ -142,7 +140,7 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
 
     int lastMenuPlace;
 
-    public void start_submenu(final Attributes meta) throws SAXException {
+    public void start_submenu(final Attributes meta)  {
         String label = meta.getValue("label");
         String accel = meta.getValue("accelerator");
         Pair<Integer, String> lInfo = extractLabelInfo(label);
@@ -162,20 +160,20 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
         if (DEBUG) System.err.println("start_submenu: " + meta);
     }
 
-    public void handle_menu(final Attributes meta) throws SAXException {
+    public void handle_menu(final Attributes meta) {
         String label = meta.getValue("label");
         String action = meta.getValue("action");
         String accel = meta.getValue("accelerator");
         int place = extractPlace(meta);
         if (label.equals("seperator_menu")) {
             JSeparator js = new JSeparator(JSeparator.HORIZONTAL);
-            menubar.insert(currentMenu, js, place);
+            GMenuBar.insert(currentMenu, js, place);
             return;
         }
+        
         Pair<Integer, String> lInfo = extractLabelInfo(label);
         int index = lInfo.first;
         label = lInfo.second;
-
 
         GMenuItem item;
         /*
@@ -183,7 +181,9 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
          * if the menu action was an extension removes the menu
          * that the extension created in UI and set it to this menu.
          */
+        
         graphtea.platform.core.AbstractAction targetAction = actions.get(action);
+        
         if (targetAction instanceof AbstractExtensionAction) {
             AbstractExtensionAction targetExt = (AbstractExtensionAction) targetAction;
             item = targetExt.menuItem;
@@ -192,10 +192,9 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
              */
             item.setText(label);
             //todo: BUG the mnemotic doesn't set
-            System.out.println(item + " " + index);
             KeyBoardShortCut shortcut = null;
             String desc =targetExt.getTarget().getDescription();
-            if(desc.contains("HotKey:(")) {
+            if(desc != null && desc.contains("HotKey:(")) {
                 String tmp = desc.substring(desc.indexOf("HotKey:(") + 1);
                 tmp = tmp.substring(0,tmp.indexOf(")"));
                 shortcut = KeyBoardShortCutProvider.registerKeyBoardShortcut(tmp, label, index);
@@ -211,7 +210,7 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
             item = new GMenuItem(label, action, blackboard, accel, index);
         }
 
-        menubar.insert(currentMenu, item, place);
+        GMenuBar.insert(currentMenu, item, place);
         if (DEBUG) System.err.println("handle_menu: " + meta);
     }
 
@@ -228,14 +227,14 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
         return place;
     }
 
-    public void end_submenu() throws SAXException {
+    public void end_submenu()  {
 //        currentMenu.add(new JSeparator(JSeparator.VERTICAL));
 //        GMenuBar.insert(currentMenu, new JSeparator(JSeparator.VERTICAL), -1);
         //todo: add ability of adding JSeperator to UI
         if (DEBUG) System.err.println("end_submenu()");
     }
 
-    public void end_menues() throws SAXException {
+    public void end_menues()  {
         //pak kardan e menu e action e ezafe
         GMenuBar menu = frame.getMenu();
         for (int i = 0; i < menu.getMenuCount(); i++) {
@@ -251,22 +250,21 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
 // If action has a group, then its default value for enable will be true,
 // else it will true if enable property equals to true.
 
-    public void handle_action(Attributes meta) throws SAXException {
+    public void handle_action(Attributes meta) {
         String clazz = meta.getValue("class");
         String id = meta.getValue("id");
         String group = meta.getValue("group");
 //todo: is it good to remove the action wich loaded twice, (2 of same action are working together)
         System.err.println("  Adding action " + clazz + " (" + id + "," + group + ") ...");
 
-        Class<?> clazzz = null;
+        Class<Extension> clazzz;
         try {
-            clazzz = Class.forName(clazz);
+            clazzz = (Class<Extension>) Class.forName(clazz);
         } catch (ClassNotFoundException e) {
             System.err.println("the given class name can't be loaded: " + clazz);
             ExceptionHandler.catchException(e);
             return;
         }
-        boolean b = false;
         graphtea.platform.core.AbstractAction x = loadAbstractAction(clazz);
 
 /*
@@ -280,7 +278,7 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
 
 //        for (ExtensionHandler s : ExtensionLoader.getRegisteredExtensionHandlers()) {
         if (x == null) {
-            Object e = ExtensionLoader.loadExtension(clazzz);
+            Extension e = ExtensionLoader.loadExtension(clazzz);
 //            SETTINGS.registerSetting(e,"Extention Options");     //Moved to Extension Loader
             if (e != null)
                 x = ExtensionLoader.handleExtension(blackboard, e);
@@ -324,10 +322,7 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
     //****************** side bar handling -------------------------
     public GSidebar sidebar;
 
-    public void start_sidebar(Attributes meta) throws SAXException {
-    }
-
-    public void handle_sidebar(Attributes meta) throws SAXException {
+    public void handle_sidebar(Attributes meta) {
         String image = meta.getValue("image") + "";//to getting it not null
         String clazz = meta.getValue("class");
         String id = meta.getValue("id");
@@ -341,12 +336,8 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
             sidebar.addButton(resourceClass.getResource(image), component, label);
     }
 
-    public void end_sidebar() throws SAXException {
-    }
-
 //************* body handling ------------------------------------
-
-    public void handle_body(Attributes meta) throws SAXException {
+    public void handle_body(Attributes meta) {
         String clazz = meta.getValue("class");
         String id = meta.getValue("id");
         Component gci = getComponent(clazz);
@@ -357,9 +348,8 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
 //************** utilities +++++++++++++++++++++
 
     AbstractAction loadAbstractAction(String abstractActionclazz) {
-        String clazz = abstractActionclazz;
-        if (!(clazz == null) && !(clazz.equals(""))) {
-            Class t = clazz2Class(clazz);
+        if (!(abstractActionclazz == null) && !(abstractActionclazz.equals(""))) {
+            Class t = clazz2Class(abstractActionclazz);
             if (graphtea.platform.core.AbstractAction.class.isAssignableFrom(t)) {
                 Object[] o = {blackboard};
                 try {
@@ -379,19 +369,18 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
 
     //todo: it is possible to also get a component from xml by it's direct class name, like javax.swing.JLabel . but i decided not to do it for cleaner codes! i am not sure is it good or not?
     Component getComponent(String GComponentInterfaceClassName) {
-        String clazz = GComponentInterfaceClassName;
-        if (!(clazz == null) && !(clazz.equals(""))) {
-            Class t = clazz2Class(clazz);
+        if (!(GComponentInterfaceClassName == null) && !(GComponentInterfaceClassName.equals(""))) {
+            Class t = clazz2Class(GComponentInterfaceClassName);
             Constructor c = null;
             Object[] o = {blackboard};
             try {
                 c = t.getConstructor(BlackBoard.class);
             } catch (NoSuchMethodException e) {
                 try {
-                    c = t.getConstructor(new Class[]{});
+                    c = t.getConstructor();
                     o = new Object[]{};
                 } catch (NoSuchMethodException e1) {
-                    System.err.println("the clazz " + clazz + "does not have a constructor(blackboard) or constructor(), how can i load it?");
+                    System.err.println("the clazz " + GComponentInterfaceClassName + "does not have a constructor(blackboard) or constructor(), how can i load it?");
                     e1.printStackTrace();
                 }
 //                ExceptionHandler.catchException(e);
@@ -403,13 +392,13 @@ public class UIHandlerImpl implements UIHandler, StorableOnExit {
                     //load was successfull
                     return ((GComponentInterface) o1).getComponent(blackboard);
                 } else {
-                    System.err.println("the class " + clazz + " doesn't implement the interface GComponentInterface, so it can't be put on the UI.");
+                    System.err.println("the class " + GComponentInterfaceClassName + " doesn't implement the interface GComponentInterface, so it can't be put on the UI.");
                 }
             } catch (InstantiationException | IllegalAccessException e) {
-                System.err.println("There was an error while initializing the class" + clazz + "may be in it's constructor or in one of classes it instantiate in its constructor");
+                System.err.println("There was an error while initializing the class" + GComponentInterfaceClassName + "may be in it's constructor or in one of classes it instantiate in its constructor");
                 ExceptionHandler.catchException(e);
             } catch (InvocationTargetException e) {
-                System.err.println("There was an error while initializing the class" + clazz + "may be in it's constructor or in one of classes it instantiate in its constructor");
+                System.err.println("There was an error while initializing the class" + GComponentInterfaceClassName + "may be in it's constructor or in one of classes it instantiate in its constructor");
                 e.getTargetException().printStackTrace();
             }
         }

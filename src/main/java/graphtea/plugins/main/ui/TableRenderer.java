@@ -6,6 +6,7 @@
 package graphtea.plugins.main.ui;
 
 import graphtea.extensions.G6Format;
+import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.RenderTable;
 import graphtea.graph.graph.Vertex;
@@ -17,6 +18,7 @@ import graphtea.ui.components.gpropertyeditor.GBasicCellRenderer;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Vector;
 
 /**
@@ -41,7 +43,7 @@ public class TableRenderer implements GBasicCellRenderer<RenderTable> {
                 if(o instanceof Double && !o.toString().equals("NaN")) {
                     Double toBeTruncated = (Double) o;
                     o = new BigDecimal(toBeTruncated).
-                            setScale(5, BigDecimal.ROUND_HALF_UP).doubleValue();
+                            setScale(12, RoundingMode.HALF_UP).doubleValue();
                 }
 
                 data[i][j] = o;
@@ -57,7 +59,7 @@ public class TableRenderer implements GBasicCellRenderer<RenderTable> {
                 if (event.getValueIsAdjusting()) {
                     GraphModel g = G6Format.stringToGraphModel(table.getValueAt(table.getSelectedRow(),
                             sd.getTitles().size() - 1).toString());
-                    Point pp[] = PositionGenerators.circle(200, 400, 250, g.numOfVertices());
+                    GPoint[] pp = PositionGenerators.circle(200, 400, 250, g.numOfVertices());
 
                     int tmpcnt = 0;
                     for (Vertex v : g) {

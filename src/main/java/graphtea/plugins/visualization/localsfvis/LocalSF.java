@@ -36,7 +36,7 @@ public class LocalSF extends AbstractAction {
         stopbtn = (JButton) UIUtils.getComponent(bb, "stop");
         if (stopbtn != null)
             stopbtn.setVisible(false);
-        blackboard.addListener(stop, new Listener() {
+        blackboard.addListener(stop, new Listener<Object>() {
             public void performJob(String name) {
                 stopbtn = blackboard.getData(stop);
                 stopbtn.setVisible(false);
@@ -45,10 +45,6 @@ public class LocalSF extends AbstractAction {
             public void keyChanged(String name, Object value) {
                 stopbtn = blackboard.getData(stop);
                 stopbtn.setVisible(false);
-            }
-
-            public boolean isEnable() {
-                return true;
             }
         });
     }
@@ -107,7 +103,7 @@ public class LocalSF extends AbstractAction {
         return g2a.get(g);
     }
 
-    private HashMap<GraphModel, animatorLSF> g2a = new HashMap<>();
+    private final HashMap<GraphModel, animatorLSF> g2a = new HashMap<>();
     private GraphModel g;
 }
 

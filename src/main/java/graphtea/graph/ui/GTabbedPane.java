@@ -9,8 +9,6 @@ import graphtea.platform.core.BlackBoard;
 import graphtea.platform.core.exception.ExceptionHandler;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.util.HashMap;
 
 /**
@@ -32,11 +30,7 @@ public class GTabbedPane {
         jtp.setBorder(null);
         jtp.setOpaque(false);
 //        jtp.setBackground(Color.white);
-        jtp.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                reTab();
-            }
-        });
+        jtp.addChangeListener(e -> reTab());
 
         b.setData(GTabbedPane.NAME, this);
     }

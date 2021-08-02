@@ -12,8 +12,6 @@ import graphtea.platform.core.AbstractAction;
 import graphtea.platform.core.BlackBoard;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 
 /**
@@ -73,9 +71,9 @@ public class PopupMenuHandler extends AbstractAction {
         }
     }
 
-    private static JPopupMenu graphMnu = new JPopupMenu();
-    private static JPopupMenu vertexMnu = new JPopupMenu();
-    private static JPopupMenu edgeMnu = new JPopupMenu();
+    private static final JPopupMenu graphMnu = new JPopupMenu();
+    private static final JPopupMenu vertexMnu = new JPopupMenu();
+    private static final JPopupMenu edgeMnu = new JPopupMenu();
 
     /**
      * registers a popup menu that will be shown on each graph that assigned to Graph.name in blackboard (after the assignment)
@@ -101,17 +99,15 @@ public class PopupMenuHandler extends AbstractAction {
         JMenuItem item = new JMenuItem(id);
         mnu.add(item, index);
         mnu.validate();
-        item.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (forceEnable) {
+        item.addActionListener(e -> {
+            if (forceEnable) {
 //                    Configuration conf = n.getBlackBoard().getData(UIEventHandler.CONF);
 //                    conf.enableAction(n);
-                    if (n.isEnable()) {
-                        n.performAction("popup menu: " + id, null);
-                    }
-                } else {
+                if (n.isEnable()) {
                     n.performAction("popup menu: " + id, null);
                 }
+            } else {
+                n.performAction("popup menu: " + id, null);
             }
         });
     }

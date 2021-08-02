@@ -95,7 +95,7 @@ public class Plugger {
                     for (File ff : libf.listFiles()) {
                         if (ff.isFile() && "jar".equalsIgnoreCase(getExtension(ff))) {
                             try {
-                                libURLs.add(ff.toURL());
+                                libURLs.add(ff.toURI().toURL());
                                 System.out.println("Library file " + ff + " added.");
                             } catch (MalformedURLException e) {
                                 ExceptionHandler.catchException(e);
@@ -111,7 +111,7 @@ public class Plugger {
                 for (String name : files.keySet()) {
                     if (mark.get(name) == 0)
                         try {
-                            urls[i] = files.get(name).toURL();
+                            urls[i] = files.get(name).toURI().toURL();
                         } catch (MalformedURLException e) {
                             System.out.println(name + " [" + files.get(name).getPath() + "]");
                             ExceptionHandler.catchException(e);
@@ -119,7 +119,7 @@ public class Plugger {
                     i++;
                 }
                 try {
-                    urls[i] = new File(directory, "extensions").toURL();
+                    urls[i] = new File(directory, "extensions").toURI().toURL();
                 } catch (MalformedURLException e) {
                     ExceptionHandler.catchException(e);
                 }
@@ -165,7 +165,7 @@ public class Plugger {
                 while (st.hasMoreElements()) {
                     String depName = st.nextToken();
                     String depVerStr = st.nextToken();
-                    Long depVer = Long.parseLong(depVerStr);
+                    long depVer = Long.parseLong(depVerStr);
                     dependsArray.add(new Object[]{depName, depVer});
                 }
             }
@@ -207,7 +207,7 @@ public class Plugger {
                 if (mark.get(name) == -1) {
                     String depName = (String) dep[0];
                     Long depVer = (Long) dep[1];
-                    Long depPlugVer = (versions.get(depName) == null) ? null : (Long) versions.get(depName);
+                    Long depPlugVer = versions.get(depName);
                     if (depPlugVer == null || depPlugVer < depVer || mark.get(depName) == -2) {
                         remove(name);
                     } else {
@@ -273,7 +273,7 @@ public class Plugger {
                 String cName = initializer.get(name);
                 if (cName == null)
                     cName = prefix + name + postfix;
-                PluginInterface init = (PluginInterface) classLoader.loadClass(cName).newInstance();
+                PluginInterface init = (PluginInterface) classLoader.loadClass(cName).getDeclaredConstructor().newInstance();
                 init.init(blackboard);
             } catch (ClassNotFoundException cnfe) {
                 String confixml = configxml.get(name);
@@ -283,7 +283,9 @@ public class Plugger {
                 PluginHandlerInterface init = null;
                 while (init == null) {
                     try {
-                        init = (PluginHandlerInterface) classLoader.loadClass(prefix + it.next()[0].toString() + handler_postfix).newInstance();
+                        init = (PluginHandlerInterface) classLoader
+                                .loadClass(prefix + it.next()[0].toString() + handler_postfix)
+                                .getDeclaredConstructor().newInstance();
                         init.init(confixml, blackboard);
                     } catch (ClassNotFoundException cnfe2) {
                         StaticUtils.addExceptiontoLog(cnfe2, blackboard);

@@ -28,11 +28,7 @@ public class MatrixHandler {
             case "adjadj":
                 if(graph.contains(".mtx")) {
                     File mat = new File(Server.getPathOfMats()+graph);
-                    try {
-                        g = new LoadMtx().read(mat);
-                    } catch (GraphIOException e) {
-                        e.printStackTrace();
-                    }
+                    g = new LoadMtx().read(mat);
                 } else {
                     String[] rows = graph.split("-");
                     for (String row : rows) g.addVertex(new Vertex());
@@ -50,11 +46,7 @@ public class MatrixHandler {
                 if(graph.contains(".mtx")) {
                     File mat = new File(Server.getPathOfMats()+graph);
                     GraphModel g1 = null;
-                    try {
-                        g1 = new LoadMtx().read(mat);
-                    } catch (GraphIOException e) {
-                        e.printStackTrace();
-                    }
+                    g1 = new LoadMtx().read(mat);
                     g = ColumnIntersectionGraph.from(g1);
                 } else {
                     String[] rows2 = graph.split("-");

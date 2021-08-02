@@ -6,13 +6,13 @@ package graphtea.extensions.reports.energy;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
-import graphtea.extensions.reports.zagreb.ZagrebIndexFunctions;
+import graphtea.extensions.AlgorithmUtils;
+import graphtea.extensions.reports.topological.ZagrebIndexFunctions;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.RenderTable;
 import graphtea.graph.graph.Vertex;
 import graphtea.library.util.Complex;
 import graphtea.platform.lang.CommandAttitude;
-import graphtea.plugins.main.core.AlgorithmUtils;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Vector;
 
-import static graphtea.extensions.reports.Utils.getLaplacian;
+import static graphtea.extensions.AlgorithmUtils.getLaplacian;
 
 /**
  * @author Ali Rostami
@@ -28,7 +28,7 @@ import static graphtea.extensions.reports.Utils.getLaplacian;
  */
 
 @CommandAttitude(name = "newInvs", abbreviation = "_newInv")
-public class UpperBounds implements GraphReportExtension {
+public class UpperBounds implements GraphReportExtension<RenderTable> {
     public String getName() {
         return "Upper Bounds";
     }
@@ -37,7 +37,7 @@ public class UpperBounds implements GraphReportExtension {
         return "Upper Bounds";
     }
 
-    public Object calculate(GraphModel g) {
+    public RenderTable calculate(GraphModel g) {
         ZagrebIndexFunctions zif = new ZagrebIndexFunctions(g);
         RenderTable ret = new RenderTable();
         Vector<String> titles = new Vector<>();
@@ -48,13 +48,14 @@ public class UpperBounds implements GraphReportExtension {
 
         Matrix A = g.getWeightedAdjacencyMatrix();
         EigenvalueDecomposition ed = A.eig();
-        double rv[] = ed.getRealEigenvalues();
+        double[] rv = ed.getRealEigenvalues();
         double sum = 0;
 
         //positiv RV
         Double[] prv = new Double[rv.length];
         for (int i = 0; i < rv.length; i++) {
             prv[i] = Math.abs(rv[i]);
+            prv[i] = (double)Math.round(prv[i] * 10000000000d) / 10000000000d;
             sum += prv[i];
         }
 
@@ -130,18 +131,9 @@ public class UpperBounds implements GraphReportExtension {
         return ret;
     }
 
-    double round(double value, int decimalPlace) {
-        double power_of_ten = 1;
-        while (decimalPlace-- > 0)
-            power_of_ten *= 10.0;
-        return Math.round(value * power_of_ten)
-                / power_of_ten;
-    }
-
     @Override
     public String getCategory() {
-        // TODO Auto-generated method stub
-        return "OurWork-Graph Energy";
+       return "Verification- Energy";
     }
 
     public Object calc(GraphModel g) {
@@ -152,8 +144,8 @@ public class UpperBounds implements GraphReportExtension {
             Matrix A = g.getWeightedAdjacencyMatrix();
             A = getLaplacian(A);
             EigenvalueDecomposition ed = A.eig();
-            double rv[] = ed.getRealEigenvalues();
-            double iv[] = ed.getImagEigenvalues();
+            double[] rv = ed.getRealEigenvalues();
+            double[] iv = ed.getImagEigenvalues();
             double maxrv = 0;
             double minrv = 1000000;
             for (double value : rv) {
@@ -163,26 +155,25 @@ public class UpperBounds implements GraphReportExtension {
             }
             double sum = 0;
             double sum_i = 0;
-            for (int i = 0; i < rv.length; i++)
-                sum += Math.pow(Math.abs(rv[i] - (2*m/n)), power);
-            for (int i = 0; i < iv.length; i++)
-                sum_i += Math.abs(iv[i]);
+            for (double v : rv) sum += Math.pow(Math.abs(v - (2 * m / n)), power);
+            for (double v : iv) sum_i += Math.abs(v);
 
             if (sum_i != 0) {
                 sum_i = 0;
                 Complex num = new Complex(0, 0);
                 for (int i = 0; i < iv.length; i++) {
                     Complex tmp = new Complex(rv[i], iv[i]);
-                    tmp.pow(new Complex(power, 0));
+                    Complex.pow(new Complex(power, 0));
                     num.plus(tmp);
                 }
-                return "" + round(num.re(), 5) + " + "
-                        + round(num.im(), 5) + "i";
+                return "" + AlgorithmUtils.round(num.re(), 5) + " + "
+                        + AlgorithmUtils.round(num.im(), 5) + "i";
             } else {
-                return "" + round(sum, 5);
+                return "" + AlgorithmUtils.round(sum, 5);
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return null;
     }
+    
 }

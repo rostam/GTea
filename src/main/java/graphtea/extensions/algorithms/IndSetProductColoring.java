@@ -7,7 +7,6 @@ import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.IndSubGraphs;
 import graphtea.graph.graph.SubGraph;
 import graphtea.graph.graph.Vertex;
-import graphtea.library.BaseVertex;
 import graphtea.platform.core.BlackBoard;
 import graphtea.plugins.algorithmanimator.core.GraphAlgorithm;
 import graphtea.plugins.algorithmanimator.extension.AlgorithmExtension;
@@ -31,13 +30,11 @@ public class IndSetProductColoring extends GraphAlgorithm implements AlgorithmEx
         super(blackBoard);
     }
 
-    public static Vector<ArrayDeque<BaseVertex>> getAllIndependentSets(GraphModel graph) {
+    public static Vector<ArrayDeque<Vertex>> getAllIndependentSets(GraphModel graph) {
         Partitioner p = new Partitioner(graph);
         AllIndSetSubSetListener l = new AllIndSetSubSetListener();
         p.findAllSubsets(l);
-        Vector<ArrayDeque<BaseVertex>> ret = new Vector<>();
-        ret.addAll(l.maxsets);
-        return ret;
+        return new Vector<>(l.maxsets);
     }
 
     @Override
@@ -51,7 +48,7 @@ public class IndSetProductColoring extends GraphAlgorithm implements AlgorithmEx
             e.printStackTrace();
         }
 
-        gu.setMessage("<p><h1>The Zeta transformation of I is computed. <br/> " +
+        GraphUtils.setMessage("<p><h1>The Zeta transformation of I is computed. <br/> " +
                 "The example here is for three vertices.</h1></p><p>" +
                 "<table><tr><td><h1>I</h1></td><td>" +
                 "<img src=\"" + url.toString()+ "\"></img>" +
@@ -70,22 +67,20 @@ public class IndSetProductColoring extends GraphAlgorithm implements AlgorithmEx
         //       "</tr>");
 
         GraphModel g = graphData.getGraph();
-        Vector<ArrayDeque<BaseVertex>> maxsets = getAllIndependentSets(g);
+        Vector<ArrayDeque<Vertex>> maxsets = getAllIndependentSets(g);
         Vector<SubGraph> ret = new Vector<>();
-        for (ArrayDeque<BaseVertex> maxset : maxsets) {
+        for (ArrayDeque<Vertex> maxset : maxsets) {
             SubGraph sd = new SubGraph(g);
             sd.vertices = new HashSet<>();
-            for (BaseVertex v : maxset) {
-                sd.vertices.add((Vertex) v);
-            }
+            sd.vertices.addAll(maxset);
             ret.add(sd);
         }
 
         Vector<Vector<Integer>> ind_sets= new Vector<>();
-        for(int i=0;i<ret.size();i++) {
-            HashSet<Vertex> ind_set = ret.get(i).vertices;
+        for (SubGraph subGraph : ret) {
+            HashSet<Vertex> ind_set = subGraph.vertices;
             Vector<Integer> indset = new Vector<>();
-            for(Vertex vid:ind_set)
+            for (Vertex vid : ind_set)
                 indset.add(vid.getId());
             ind_sets.add(indset);
         }
@@ -101,14 +96,16 @@ public class IndSetProductColoring extends GraphAlgorithm implements AlgorithmEx
             IndSetsDialog isd = new IndSetsDialog(ind_sets2,"I^"+(i+2),"");
 
             boolean hasAllVSets = true;
-            for(int k=0;k<ind_sets2.size();k++) {
+            for (Vector<Integer> integers : ind_sets2) {
                 hasAllVSets = true;
-                Vector<Integer> v = ind_sets2.get(k);
-                for(int j=0;j<g.getVerticesCount();j++) {
-                    if(!v.contains(j)) {hasAllVSets = false;break;}
+                for (int j = 0; j < g.getVerticesCount(); j++) {
+                    if (!integers.contains(j)) {
+                        hasAllVSets = false;
+                        break;
+                    }
                 }
 
-                if(hasAllVSets) break;
+                if (hasAllVSets) break;
             }
             String out = "<BR> I^ " + (i+2) +" is computed.";
             if(hasAllVSets)
@@ -122,32 +119,28 @@ public class IndSetProductColoring extends GraphAlgorithm implements AlgorithmEx
 
     public Vector<Vector<Integer>> setproduct(Vector<Vector<Integer>> set1,Vector<Vector<Integer>> set2,int minuscount) {
         Vector<Vector<Integer>> ret = new Vector<>();
-        for(int i=0;i<set1.size();i++) {
-            Vector<Integer> tt  = set1.get(i);
-            for(int j=0;j<set2.size();j++) {
-                Vector<Integer> tmp = new Vector<>();
-                for(int k=0;k<set1.get(i).size();k++) {
-                    tmp.add(tt.get(k));
-                }
-                Vector<Integer> tt2 = set2.get(j);
+        for (Vector<Integer> tt : set1) {
+            for (Vector<Integer> integers : set2) {
+                Vector<Integer> tmp = new Vector<>(tt);
                 boolean sameItem = false;
 
-                for (Integer aTt2 : tt2) {
+                for (Integer aTt2 : integers) {
                     int tmpInt = aTt2;
                     if (tmpInt != -1 && tmp.contains(tmpInt)) {
                         sameItem = true;
+                        break;
                     }
                 }
-                if(!sameItem && tmp.size() != 0 && tt2.size() != 0) {
+                if (!sameItem && tmp.size() != 0 && integers.size() != 0) {
                     tmp.add(-1);
-                    tmp.addAll(tt2);
+                    tmp.addAll(integers);
                 }
 
                 int mcount = 0;
-                for(int cnt : tmp) {
-                    if(cnt == -1) mcount ++ ;
+                for (int cnt : tmp) {
+                    if (cnt == -1) mcount++;
                 }
-                if(mcount == minuscount) ret.add(tmp);
+                if (mcount == minuscount) ret.add(tmp);
             }
 
         }
@@ -167,8 +160,8 @@ public class IndSetProductColoring extends GraphAlgorithm implements AlgorithmEx
 }
 
 class AllIndSetSubSetListener implements SubSetListener {
-    Vector<ArrayDeque<BaseVertex>> maxsets = new Vector<>();
-    public boolean subsetFound(int t, ArrayDeque<BaseVertex> complement, ArrayDeque<BaseVertex> set) {
+    Vector<ArrayDeque<Vertex>> maxsets = new Vector<>();
+    public boolean subsetFound(int t, ArrayDeque<Vertex> complement, ArrayDeque<Vertex> set) {
         maxsets.add(new ArrayDeque<>(set));
         return false;
     }

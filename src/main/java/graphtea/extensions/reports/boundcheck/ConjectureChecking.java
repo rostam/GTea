@@ -34,23 +34,25 @@ public class ConjectureChecking implements GraphReportExtension, Parametrizable 
         PostP.addValidValue("Min Filter");
     }
 
-    @Parameter(name = "Bound Check", description = "")
+    @Parameter(name = "Bound Check", description = "Bound Check")
     public boolean conjCheck = false;
-    @Parameter(name = "Connected", description = "")
+    @Parameter(name = "Connected", description = "Connected")
     public boolean connected = true;
-    @Parameter(name = "Num Of Nodes", description = "")
+    @Parameter(name = "Num Of Nodes", description = "Num Of Nodes")
     public int numOfNodes = 9;
 //    @Parameter(name = "Up to", description = "")
 //    public boolean upto = false;
-    @Parameter(name = "Filter", description = "")
+    @Parameter(name = "Filter", description = "Filter")
     public ArrayX<String> gfilters;
-    @Parameter(name = "Graph Generators", description = "")
+    @Parameter(name = "Column ID for Filter")
+    public int columnIDForFilter = 1;
+    @Parameter(name = "Graph Generators", description = "Generators")
     public ArrayX<String> generators;
     @Parameter(name = "Bound Type", description = "The type of bound.")
     public ArrayX<String> boundType;
-    @Parameter(name="Iterative", description = "")
+    @Parameter(name="Iterative", description = "Is it iterative?")
     public boolean iterative = false;
-    @Parameter(name="Post Processing Type", description = "")
+    @Parameter(name="Post Processing Type", description = "The type of post processing")
     public static ArrayX<String> PostP;
     @Parameter(name="Post Processing Value",description = "This is the value" +
             "which the equality post-processing filter uses to compare.")
@@ -70,9 +72,11 @@ public class ConjectureChecking implements GraphReportExtension, Parametrizable 
     }
 
     public Object calculate(GraphModel g) {
-        if(PostP.getValue().equals("No postprocessing")) RenderTable.noFilter=true;
+        if(PostP.getValue().equals("No postprocessing")) {
+            RenderTable.noFilter=true;
+        }
         if(GraphType.getValue().equals("custom")) {
-            currentType=JOptionPane.showInputDialog("Please enter the cutom graph6 format file:");
+            currentType=JOptionPane.showInputDialog("Please enter the custom graph6 format file:");
             size= Integer.parseInt(JOptionPane.showInputDialog("Please enter the number of graphs in file:"));
         } else {
             currentType=GraphType.getValue();
@@ -84,7 +88,7 @@ public class ConjectureChecking implements GraphReportExtension, Parametrizable 
             GraphReportExtensionAction.ig=null;
             IterGraphs itg=new IterGraphs(conjCheck,iterative,currentType,
                     size,boundType.getValue(),generators.getValue(), PostP.getValue(),
-                    Filters.getCorrectFilter(gfilters));
+                    Filters.getCorrectFilter(gfilters), columnIDForFilter);
             Vector<GraphModel> gs = itg.wrapper_generate();
             String nameOfFile = JOptionPane.showInputDialog("Please enter the name of a file in which the " +
                     "graphs will be saved.:");
@@ -103,10 +107,10 @@ public class ConjectureChecking implements GraphReportExtension, Parametrizable 
 
         GraphReportExtensionAction.ig=new IterGraphs(conjCheck,iterative,currentType,
                 size,boundType.getValue(),generators.getValue(), PostP.getValue(),
-                Filters.getCorrectFilter(gfilters));
+                Filters.getCorrectFilter(gfilters), columnIDForFilter);
 
         if(conjCheck) return "Conjecture Checking is enabled.";
-        return "Conjecture Checkign is disabled.";
+        return "Conjecture Checking is disabled.";
     }
 
     @Override

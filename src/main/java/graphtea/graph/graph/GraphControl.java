@@ -23,8 +23,8 @@ import java.util.Iterator;
  *         Mohsen Mansouryar > Added edge control for loops
  */
 public class GraphControl implements MouseListener, MouseWheelListener, MouseMotionListener {
-    private GraphModel g;
-    private JPanel gv;
+    private final GraphModel g;
+    private final JPanel gv;
     BlackBoard blackboard;
     private GraphControlListener listener;
     private Vertex lastVertexPressed = null;
@@ -145,7 +145,7 @@ public class GraphControl implements MouseListener, MouseWheelListener, MouseMot
 
         gv.requestFocusInWindow();
         GPoint mousePos = mousePos(mouseEvent);
-        Pair p = mindistv(g, mousePos);
+        Pair<Vertex,Double> p = mindistv(g, mousePos);
         Vertex v = (Vertex) p.first;
         int mbuton = mouseEvent.getModifiersEx();
         if (v != null && isPointOnVertex(g, v, mousePos)) {
@@ -171,7 +171,7 @@ public class GraphControl implements MouseListener, MouseWheelListener, MouseMot
 
 
     public void mouseReleased(MouseEvent mouseEvent) {
-        Pair p = mindistv(g, mousePos(mouseEvent));
+        Pair<Vertex, Double> p = mindistv(g, mousePos(mouseEvent));
         Vertex v = (Vertex) p.first;
         int mouseButton = mouseEvent.getModifiersEx();
         if (v != null && isPointOnVertex(g, v, mousePos(mouseEvent)) && lastVertexPressed != null) {
@@ -222,7 +222,7 @@ public class GraphControl implements MouseListener, MouseWheelListener, MouseMot
     }
 
     /**
-     * @return the minimum distanse edge and its distance to the given GPoint,
+     * @return the minimum distance edge and its distance to the given GPoint,
      *         If edges are curved the distance will be calculated to Curve Control Points
      */
     public static Pair<Edge, Double> mindiste(GraphModel g, GPoint p) {
@@ -231,7 +231,7 @@ public class GraphControl implements MouseListener, MouseWheelListener, MouseMot
         Edge mine = null;
         Iterator<Edge> ei = g.lightEdgeIterator();
         if (g.isEdgesCurved()) {
-            for (; ei.hasNext();) {
+            while (ei.hasNext()) {
                 Edge e = ei.next();
                 GPoint cnp = e.getCurveControlPoint();
                 GPoint s = e.source.getLocation();
@@ -249,7 +249,7 @@ public class GraphControl implements MouseListener, MouseWheelListener, MouseMot
                 min = 0;
             }
         } else {
-            for (; ei.hasNext();) {
+            while (ei.hasNext()) {
                 Edge e = ei.next();
                 if (!isInBounds(e, p) && !e.isLoop())
                     continue;

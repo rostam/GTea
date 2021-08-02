@@ -1,5 +1,6 @@
 package graphtea.extensions.algorithms;
 
+import graphtea.extensions.AlgorithmUtils;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
@@ -7,7 +8,6 @@ import graphtea.library.Path;
 import graphtea.platform.core.BlackBoard;
 import graphtea.plugins.algorithmanimator.core.GraphAlgorithm;
 import graphtea.plugins.algorithmanimator.extension.AlgorithmExtension;
-import graphtea.plugins.main.core.AlgorithmUtils;
 
 import java.util.Vector;
 
@@ -59,7 +59,7 @@ public class SampleAlgorithm extends GraphAlgorithm implements AlgorithmExtensio
         step("the graph matrix<br>" + getMatrixHTML(g));
 
         step("That's it!");
-        step("Start making your algorithm by modifing this file, and running make.sh");
+        step("Start making your algorithm by modifying this file, and running make.sh");
         step("have fun :)");
     }
 

@@ -11,15 +11,12 @@ package graphtea.extensions.io.specialjson;
 
 import graphtea.graph.graph.*;
 import graphtea.plugins.main.saveload.SaveLoadPluginMethods;
-import graphtea.plugins.main.saveload.core.GraphIOException;
 import graphtea.plugins.main.saveload.core.extension.GraphReaderExtension;
 import graphtea.ui.UIUtils;
 import graphtea.ui.components.gpropertyeditor.GCellRenderer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -48,7 +45,7 @@ public class LoadSpecialjson implements GraphReaderExtension {
     }
 
     @Override
-    public GraphModel read(File file) throws GraphIOException {
+    public GraphModel read(File file) {
         GraphModel g = new GraphModel(false);
         //2793
         Vector<String> regions = new Vector<>();
@@ -58,7 +55,6 @@ public class LoadSpecialjson implements GraphReaderExtension {
         HashMap<Integer, String> verticesRegion = new HashMap<>();
         try {
             int i = 0;
-            final double QUARTERPI = Math.PI / 4.0;
             Scanner sc = new Scanner(file);
             FastRenderer.defaultVertexRadius = 12;
             RenderTable rt = new RenderTable();
@@ -97,12 +93,10 @@ public class LoadSpecialjson implements GraphReaderExtension {
                     v.setLabel(id);
                     v.setLocation(convertLatLonToXY(lat, lng));
                     g.addVertex(v);
-                    if (regionVertices.keySet().contains(region)) {
-                        regionVertices.get(region).add(i);
-                    } else {
+                    if (!regionVertices.containsKey(region)) {
                         regionVertices.put(region, new Vector<>());
-                        regionVertices.get(region).add(i);
                     }
+                    regionVertices.get(region).add(i);
                     verticesRegion.put(i, region);
                     if (!regions.contains(region)) regions.add(region);
                     g.getVertex(i).setColor(regions.indexOf(region) + 2);
@@ -139,19 +133,16 @@ public class LoadSpecialjson implements GraphReaderExtension {
             rendererComponent.setEnabled(true);
             jd.add(rendererComponent, BorderLayout.CENTER);
             Button bt = new Button("Show settlements without coordinates");
-            bt.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    int i = 0;
-                    for(Vertex v : g) {
-                        if(sttlWithoutCoordinates.contains(v.getLabel())) {
+            bt.addActionListener(actionEvent -> {
+                int i1 = 0;
+                for(Vertex v : g) {
+                    if(sttlWithoutCoordinates.contains(v.getLabel())) {
 //                            v.setColor(3);
-                            //v.setLocation(new GPoint(200,200 + i*20));
-                            i++;
-                        } else {
-                            v.setLocation(new GPoint(100,100));
-                            v.setColor(0);
-                        }
+                        //v.setLocation(new GPoint(200,200 + i*20));
+                        i1++;
+                    } else {
+                        v.setLocation(new GPoint(100,100));
+                        v.setColor(0);
                     }
                 }
             });
@@ -172,7 +163,6 @@ public class LoadSpecialjson implements GraphReaderExtension {
                 gp.add(g.getVertex(ver).getLocation());
             }
             gp.multiply(1.0 / num);
-//            System.out.println(s + "  " + gp);
             g.getVertex(labelVertex.get(s)).setLocation(gp);
 //            g.getVertex(labelVertex.get(s)).setColor(50);
         }

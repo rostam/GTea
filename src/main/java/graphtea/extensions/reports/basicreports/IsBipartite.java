@@ -7,11 +7,9 @@ import graphtea.plugins.reports.extension.GraphReportExtension;
 /**
  * Description here.
  *
- * @author Hooman Mohajeri Moghaddam
+ * @author Hooman Mohajeri Moghaddam, Ali Rostami
  */
-public class IsBipartite implements GraphReportExtension  {
-
-
+public class IsBipartite implements GraphReportExtension<Boolean>  {
 
 	public String getName() {
 		return "Is Bipartite";
@@ -21,16 +19,12 @@ public class IsBipartite implements GraphReportExtension  {
 		return "Is the graph Bipartite?";
 	}
 
-	public Object calculate(GraphModel g) {
-		if(g.numOfVertices()==0)
-			return "Graph empty";
-		return BipartiteChecker.isBipartite(g) + "";
-
+	public Boolean calculate(GraphModel g) {
+		return BipartiteChecker.isBipartite(g);
 	}
 
 	@Override
 	public String getCategory() {
-		// TODO Auto-generated method stub
 		return "General";
 	}
 

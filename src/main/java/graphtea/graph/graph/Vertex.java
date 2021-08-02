@@ -34,7 +34,7 @@ public class Vertex extends BaseVertex {
 
     public boolean isSelected = false;
     String label = null;
-    private Point center = new Point();
+    private final Point center = new Point();
     //    private static GPoint dp=new GPoint(100,100);
     //represents the location of the vertex on the graph, this location will not changed by zooming and similar operations, the location only change by moving the vertex
     private GPoint location = new GPoint(100, 100);
@@ -46,7 +46,7 @@ public class Vertex extends BaseVertex {
      * the location of the lable relative to the center of the edge
      */
 
-    private GPoint labelLocation = new GPoint(0, 4);
+    private GPoint labelLocation = new GPoint(0, 0);
 
     //________________________   Userdefined Attributes    _________________________________
     /**
@@ -150,12 +150,15 @@ public class Vertex extends BaseVertex {
         this.shapeStroke = v.shapeStroke;
         this.labelLocation = v.labelLocation;
         //copies all attributes from second edge to first edge
-        AttributeSet a = new VertexAttrSet(v);
-        AttributeSet b = new VertexAttrSet(this);
+        AttributeSet<Object> a = new VertexAttrSet(v);
+        AttributeSet<Object> b = new VertexAttrSet(this);
         Map<String, Object> map = a.getAttrs();
         for (String name : map.keySet()) {
             b.put(name, map.get(name));
         }
+        this.view = v.view;
+        this.isSelected = v.isSelected;
+        this.userDefinedAttributes = v.userDefinedAttributes;
     }
 
     public Vertex() {
@@ -167,8 +170,8 @@ public class Vertex extends BaseVertex {
     }
 
     public String toString() {
-        Integer i = getId();
-        return label + " (" + i + ")";
+        int i = getId();
+        return label + " (" + getId() + ")";
     }
 
     public void setMark(boolean mark) {

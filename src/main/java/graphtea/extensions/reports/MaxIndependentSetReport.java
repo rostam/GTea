@@ -8,7 +8,6 @@ package graphtea.extensions.reports;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.SubGraph;
 import graphtea.graph.graph.Vertex;
-import graphtea.library.BaseVertex;
 import graphtea.platform.lang.CommandAttitude;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
  */
 
 @CommandAttitude(name = "maximum_independent_set", abbreviation = "_mis")
-public class MaxIndependentSetReport implements GraphReportExtension {
+public class MaxIndependentSetReport implements GraphReportExtension<Vector<SubGraph>> {
 //    @Parameter(name = "Lower Bound", description = "Lower Bound for the number of independent set members, This will make the search Interval smaller")
 //    public Integer lowerBound = 1;
 //
@@ -39,21 +38,19 @@ public class MaxIndependentSetReport implements GraphReportExtension {
     }
 
 
-    public Object calculate(GraphModel g) {
-        Vector<ArrayDeque<BaseVertex>> maxsets = getMaxIndependentSet(g);
+    public Vector<SubGraph> calculate(GraphModel g) {
+        Vector<ArrayDeque<Vertex>> maxsets = getMaxIndependentSet(g);
         Vector<SubGraph> ret = new Vector<>();
-        for (ArrayDeque<BaseVertex> maxset : maxsets) {
+        for (ArrayDeque<Vertex> maxset : maxsets) {
             SubGraph sd = new SubGraph(g);
             sd.vertices = new HashSet<>();
-            for (BaseVertex v : maxset) {
-                sd.vertices.add((Vertex) v);
-            }
+            sd.vertices.addAll(maxset);
             ret.add(sd);
         }
         return ret;
     }
 
-    public static Vector<ArrayDeque<BaseVertex>> getMaxIndependentSet(GraphModel graph) {
+    public static Vector<ArrayDeque<Vertex>> getMaxIndependentSet(GraphModel graph) {
         Partitioner p = new Partitioner(graph);
         MaxIndSetSubSetListener l = new MaxIndSetSubSetListener();
         p.findAllSubsets(l);
@@ -67,18 +64,16 @@ public class MaxIndependentSetReport implements GraphReportExtension {
 
 	@Override
 	public String getCategory() {
-		// TODO Auto-generated method stub
 		return "General";
 	}
 
 }
 
 class MaxIndSetSubSetListener implements SubSetListener {
-    Vector<ArrayDeque<BaseVertex>> maxsets = new Vector<>();
-    //    ArrayDeque<BaseVertex> maxset = new ArrayDeque<BaseVertex>();
+    Vector<ArrayDeque<Vertex>> maxsets = new Vector<>();
     int max = -1;
 
-    public boolean subsetFound(int t, ArrayDeque<BaseVertex> complement, ArrayDeque<BaseVertex> set) {
+    public boolean subsetFound(int t, ArrayDeque<Vertex> complement, ArrayDeque<Vertex> set) {
         if (max <= set.size()) {
             max = set.size();
             maxsets.add(new ArrayDeque<>(set));
@@ -87,13 +82,3 @@ class MaxIndSetSubSetListener implements SubSetListener {
     }
 }
 
-class MaxIndSetSubSetSizeListener implements SubSetListener {
-    private int max = -1;
-
-    public boolean subsetFound(int t, ArrayDeque<BaseVertex> complement, ArrayDeque<BaseVertex> set) {
-        if (max < set.size()) {
-            max = set.size();
-        }
-        return false;
-    }
-}

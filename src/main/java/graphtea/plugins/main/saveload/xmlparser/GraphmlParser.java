@@ -18,13 +18,13 @@ import org.xml.sax.*;
  */
 public class GraphmlParser implements ContentHandler {
 
-    private java.lang.StringBuffer buffer;
+    private final java.lang.StringBuffer buffer;
 
-    private GraphmlHandler handler;
+    private final GraphmlHandler handler;
 
-    private java.util.Stack context;
+    private final java.util.Stack context;
 
-    private EntityResolver resolver;
+    private final EntityResolver resolver;
 
     /**
      * Creates a parser instance.
@@ -177,7 +177,7 @@ public class GraphmlParser implements ContentHandler {
      * @throws java.io.IOException on I/O error.
      * @throws SAXException        propagated exception thrown by a DocumentHandler.
      * @throws javax.xml.parsers.ParserConfigurationException
-     *                             a parser satisfining requested configuration can not be created.
+     *                             a parser satisfying requested configuration can not be created.
      * @throws javax.xml.parsers.FactoryConfigurationRrror
      *                             if the implementation can not be instantiated.
      */
@@ -193,7 +193,7 @@ public class GraphmlParser implements ContentHandler {
      * @throws java.io.IOException on I/O error.
      * @throws SAXException        propagated exception thrown by a DocumentHandler.
      * @throws javax.xml.parsers.ParserConfigurationException
-     *                             a parser satisfining requested configuration can not be created.
+     *                             a parser satisfying requested configuration can not be created.
      */
     public void parse(final java.net.URL url) throws SAXException, javax.xml.parsers.ParserConfigurationException, java.io.IOException {
 
@@ -207,7 +207,7 @@ public class GraphmlParser implements ContentHandler {
      * @throws java.io.IOException on I/O error.
      * @throws SAXException        propagated exception thrown by a DocumentHandler.
      * @throws javax.xml.parsers.ParserConfigurationException
-     *                             a parser satisfining requested configuration can not be created.
+     *                             a parser satisfying requested configuration can not be created.
      * @throws javax.xml.parsers.FactoryConfigurationRrror
      *                             if the implementation can not be instantiated.
      */
@@ -223,7 +223,7 @@ public class GraphmlParser implements ContentHandler {
      * @throws java.io.IOException on I/O error.
      * @throws SAXException        propagated exception thrown by a DocumentHandler.
      * @throws javax.xml.parsers.ParserConfigurationException
-     *                             a parser satisfining requested configuration can not be created.
+     *                             a parser satisfying requested configuration can not be created.
      * @throws javax.xml.parsers.FactoryConfigurationRrror
      *                             if the implementation can not be instantiated.
      */

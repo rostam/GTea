@@ -19,19 +19,12 @@ import java.util.StringTokenizer;
  * @author Mohammad Ali Rostami
  */
 public class NativeCommands {
-    private BlackBoard bb;
-    private GraphData datas;
+    private final BlackBoard bb;
+    private final GraphData datas;
 
     public NativeCommands(BlackBoard bb) {
         this.bb = bb;
         datas = new GraphData(bb);
-    }
-
-    static {
-        try {
-            //System.loadLibrary("graphtea_gui_plugins_commandline_commands_NativeCommands");
-        } catch (Exception e) {
-        }
     }
 
     private native String homomorph(String graph_format1, String graph_format2);

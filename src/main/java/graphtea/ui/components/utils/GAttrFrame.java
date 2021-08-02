@@ -18,7 +18,7 @@ public class GAttrFrame extends javax.swing.JDialog {
      *
      */
     private static final long serialVersionUID = 722213016758300314L;
-    private NotifiableAttributeSet atr;
+    private final NotifiableAttributeSet atr;
 
     /**
      * Creates new form GAttrFrame
@@ -111,7 +111,7 @@ public class GAttrFrame extends javax.swing.JDialog {
     }
 
     /**
-     * return the GProertyEditor which is the main editor of NotifiableAttributeSet
+     * return the GPropertyEditor which is the main editor of NotifiableAttributeSet
      */
     public GPropertyEditor getPropertyEditor() {
         return table;

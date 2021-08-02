@@ -14,7 +14,6 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 import java.awt.*;
 import java.io.IOException;
@@ -40,8 +39,8 @@ import java.util.HashMap;
  * @see graphtea.plugins.commandline.ShellHyperlinkHandler
  */
 public class GHTMLPageComponent extends JScrollPane implements HyperlinkListener {
-    private BlackBoard blackboard;
-    private static HashMap<String, HyperlinkHandler> handlers = new HashMap<>();
+    private final BlackBoard blackboard;
+    private static final HashMap<String, HyperlinkHandler> handlers = new HashMap<>();
     JEditorPane jta;
 
     static {
@@ -91,20 +90,16 @@ public class GHTMLPageComponent extends JScrollPane implements HyperlinkListener
     }
 
     public void appendHTML(String html) {
-
-
-        StringBuffer sb9 = new StringBuffer();
+        StringBuilder sb9 = new StringBuilder();
         String pointtext = jta.getText();
-
         sb9.append("<html><body>");
         sb9.append(html);
         sb9.append("</body></html>");
 
 
         try {
-            Document doc = (Document) jta.getDocument();
-
-            ((HTMLEditorKit) jta.getEditorKit()).read(
+            Document doc = jta.getDocument();
+            jta.getEditorKit().read(
                     new java.io.StringReader(sb9.toString())
                     , jta.getDocument()
                     , jta.getDocument().getLength());

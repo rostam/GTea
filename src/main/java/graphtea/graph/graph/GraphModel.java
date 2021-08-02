@@ -237,7 +237,7 @@ public class GraphModel extends ListGraph<Vertex, Edge> implements StorableOnExi
 	}
 
 	public Edge getEdge(Vertex src, Vertex trg) {
-		Object t[] = null;
+		Object[] t = null;
 		try {
 			t = super.getEdges(src, trg).toArray();
 		}
@@ -434,7 +434,7 @@ public class GraphModel extends ListGraph<Vertex, Edge> implements StorableOnExi
 			vm.setLocation(new GPoint(((p.x - bounds1.x) * kx + rect.x), (int) ((p.y - bounds1.y) * ky + rect.y)));
 		}
 		Iterator<Edge> eiter = graph.lightEdgeIterator();
-		for (; eiter.hasNext();) {
+		while (eiter.hasNext()) {
 			Edge edge = eiter.next();
 			insertEdge(edge);
 		}
@@ -601,24 +601,6 @@ public class GraphModel extends ListGraph<Vertex, Edge> implements StorableOnExi
 			} else if (e.target.getId() == v.getId()) {
 				if(!vs.contains(e.source)) {
 					vs.add(e.source);
-				}
-			}
-		}
-		return vs;
-	}
-
-	public Vector<Integer> directNeighborsInts(Vertex v) {
-		Iterator<Edge> eit = this.edgeIterator();
-		Vector<Integer> vs = new Vector<>();
-		while (eit.hasNext()) {
-			Edge e = eit.next();
-			if (e.source.getId() == v.getId()) {
-				if(!vs.contains(e.target.getId())) {
-					vs.add(e.target.getId());
-				}
-			} else if (e.target.getId() == v.getId()) {
-				if(!vs.contains(e.source.getId())) {
-					vs.add(e.source.getId());
 				}
 			}
 		}

@@ -5,7 +5,7 @@
 package graphtea.extensions.reports.hamilton;
 
 
-import graphtea.extensions.reports.Utils;
+import graphtea.extensions.AlgorithmUtils;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.SubGraph;
 import graphtea.platform.lang.CommandAttitude;
@@ -16,7 +16,7 @@ import graphtea.plugins.reports.extension.GraphReportExtension;
  */
 
 @CommandAttitude(name = "hamiltonian_path", abbreviation = "_hp")
-public class HamiltonianPathExtension implements GraphReportExtension {
+public class HamiltonianPathExtension implements GraphReportExtension<SubGraph> {
     public String getName() {
         return "Hamiltonian Path";
     }
@@ -25,12 +25,12 @@ public class HamiltonianPathExtension implements GraphReportExtension {
         return "Hamiltonian Path";
     }
 
-    public Object calculate(GraphModel g) {
+    public SubGraph calculate(GraphModel g) {
         SubGraph sg = new SubGraph();
 
         HamiltonianCycle hc = new HamiltonianCycle();
         double[][] adj = g.getAdjacencyMatrix().getArray();
-        int[][] adjMatrix = Utils.getBinaryPattern(adj,g.getVerticesCount());
+        int[][] adjMatrix = AlgorithmUtils.getBinaryPattern(adj,g.getVerticesCount());
         int[] path = hc.HamiltonCycle(adjMatrix);
 
         if(path == null) return sg;

@@ -22,12 +22,12 @@ public class PushRelabel extends MaxFlow{
 
 
 
-	private int height[];
-	private int excess[];
-	private Integer current[];
-	private HashMap <Integer, LinkedList<Integer>> neighborMap ;
-	private HashMap <Integer, Iterator<Integer>> iterMap ;
-	private boolean isDirecte;
+	private int[] height;
+	private int[] excess;
+	private Integer[] current;
+	private final HashMap <Integer, LinkedList<Integer>> neighborMap ;
+	private final HashMap <Integer, Iterator<Integer>> iterMap ;
+	private final boolean isDirecte;
 
 
 
@@ -121,7 +121,7 @@ public class PushRelabel extends MaxFlow{
 
 	private void push(int u , int v)
 	{
-		int deltaF = (excess[u] < Cf(u,v) ? excess[u] : Cf(u,v));
+		int deltaF = Math.min(excess[u], Cf(u, v));
 		if(C[u][v]>0)
 			F[u][v] += deltaF;
 		else
@@ -168,7 +168,7 @@ public class PushRelabel extends MaxFlow{
 		initializePreflow();
 		LinkedList<Integer> L = new LinkedList<>();
 
-		for(Integer i=0 ; i < n ; i++)
+		for(int i = 0; i < n ; i++)
 			if( i != s && i != t )
 				L.add(i);
 		Iterator<Integer> iter = L.iterator();

@@ -5,6 +5,7 @@
 package graphtea.extensions.generators;
 
 import graphtea.graph.graph.Edge;
+import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.platform.lang.CommandAttitude;
@@ -14,8 +15,6 @@ import graphtea.plugins.graphgenerator.GraphGenerator;
 import graphtea.plugins.graphgenerator.core.PositionGenerators;
 import graphtea.plugins.graphgenerator.core.SimpleGeneratorInterface;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
-
-import java.awt.*;
 
 /**
  * @author rostam
@@ -30,11 +29,6 @@ public class TadpoleGenerator implements GraphGeneratorExtension, Parametrizable
     public static Integer k = 10;
 
     Vertex[] v;
-    GraphModel g;
-
-    public void setWorkingGraph(GraphModel g) {
-        this.g = g;
-    }
 
     public String getName() {
         return "Tadpole Graph";
@@ -70,12 +64,12 @@ public class TadpoleGenerator implements GraphGeneratorExtension, Parametrizable
         return GraphGenerator.getGraph(false, this);
     }
 
-    public Point[] getVertexPositions() {
-        Point[] ret = new Point[n+k];
-        Point[] circ = PositionGenerators.circle(5, 5, 100, 100, n);
+    public GPoint[] getVertexPositions() {
+        GPoint[] ret = new GPoint[n+k];
+        GPoint[] circ = PositionGenerators.circle(5, 5, 100, 100, n);
         System.arraycopy(circ, 0, ret, 0, n);
         for(int i=n;i<n+k;i++) {
-            ret[i] = new Point(ret[n-1].x+(i-n+1)*60+100,ret[n-1].y);
+            ret[i] = new GPoint(ret[n-1].x+(i-n+1)*60+100,ret[n-1].y);
         }
 
         return ret;

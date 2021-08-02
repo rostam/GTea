@@ -4,8 +4,9 @@
 // Distributed under the terms of the GNU General Public License (GPL): http://www.gnu.org/licenses/
 package graphtea.extensions.generators;
 
-import graphtea.extensions.reports.Utils;
+import graphtea.extensions.AlgorithmUtils;
 import graphtea.graph.graph.Edge;
+import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.platform.lang.CommandAttitude;
@@ -15,24 +16,17 @@ import graphtea.plugins.graphgenerator.GraphGenerator;
 import graphtea.plugins.graphgenerator.core.SimpleGeneratorInterface;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 
-import java.awt.*;
-
 /**
  * User: root
  */
 @CommandAttitude(name = "generate_random_tree", abbreviation = "_g_rand_t")
 public class RandomTreeGenerator implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
-    GraphModel g;
     @Parameter(name = "Number of Vertices")
     public static Integer n = 50;
     @Parameter(name = "Height")
     public static Integer h = 5;
     @Parameter(name = "Maximum Degree")
     public static Integer d = 5;
-
-    public void setWorkingGraph(GraphModel g) {
-        this.g = g;
-    }
 
     Vertex[] v;
 
@@ -63,8 +57,8 @@ public class RandomTreeGenerator implements GraphGeneratorExtension, Parametriza
         return ret;
     }
 
-    public Point[] getVertexPositions() {
-        return Utils.computeRandomPositions(n);
+    public GPoint[] getVertexPositions() {
+        return AlgorithmUtils.computeRandomPositions(n);
     }
 
     public String getName() {

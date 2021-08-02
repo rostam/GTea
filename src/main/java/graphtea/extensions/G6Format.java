@@ -13,15 +13,15 @@ import java.util.Vector;
  * @author M. Ali Rostami
  */
 public class G6Format {
-    private static int BIAS6 = 63;
-    private static int SMALLN = 62;
-    private static int SMALLISHN = 258047;
-    private static int TOPBIT6 = 32;
-    private static int  WORDSIZE = 32;
+    private static final int BIAS6 = 63;
+    private static final int SMALLN = 62;
+    private static final int SMALLISHN = 258047;
+    private static final int TOPBIT6 = 32;
+    private static final int  WORDSIZE = 32;
     private static String g6_graph;
 
 
-    static int bit_[] = {020000000000, 010000000000, 04000000000, 02000000000,
+    static int[] bit_ = {020000000000, 010000000000, 04000000000, 02000000000,
             01000000000, 0400000000, 0200000000, 0100000000, 040000000,
             020000000, 010000000, 04000000, 02000000, 01000000, 0400000,
             0200000, 0100000, 040000, 020000, 010000, 04000, 02000, 01000,
@@ -50,9 +50,7 @@ public class G6Format {
 
         int m = (n + WORDSIZE - 1) / WORDSIZE;
         int x=0;
-        long[] g = new long[m * n];
-        for (int ii = m * n; --ii > 0; ) g[ii] = 0;
-        g[0] = 0;
+
         int k = 1;
         int it = 0;
         for (int j = 1; j < n; ++j) {
@@ -63,11 +61,10 @@ public class G6Format {
                     it++;
                 }
                 if ((x & TOPBIT6) != 0) {
-                    if (graph.containsKey(i)) graph.get(i).add(j);
-                    else {
+                    if (!graph.containsKey(i)) {
                         graph.put(i, new Vector<>());
-                        graph.get(i).add(j);
                     }
+                    graph.get(i).add(j);
                 }
                 x <<= 1;
             }
@@ -88,9 +85,7 @@ public class G6Format {
 
         int m = (n + WORDSIZE - 1) / WORDSIZE;
         int x=0;
-        long[] g = new long[m * n];
-        for (int ii = m * n; --ii > 0; ) g[ii] = 0;
-        g[0] = 0;
+
         int k = 1;
         int it = 0;
         for (int j = 1; j < n; ++j) {

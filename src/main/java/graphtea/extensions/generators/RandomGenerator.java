@@ -4,8 +4,9 @@
 // Distributed under the terms of the GNU General Public License (GPL): http://www.gnu.org/licenses/
 package graphtea.extensions.generators;
 
-import graphtea.extensions.reports.Utils;
+import graphtea.extensions.AlgorithmUtils;
 import graphtea.graph.graph.Edge;
+import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.platform.lang.CommandAttitude;
@@ -15,22 +16,15 @@ import graphtea.plugins.graphgenerator.GraphGenerator;
 import graphtea.plugins.graphgenerator.core.SimpleGeneratorInterface;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 
-import java.awt.*;
-
 /**
  * User: root
  */
 @CommandAttitude(name = "generate_random", abbreviation = "_g_rand")
 public class RandomGenerator implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
-    GraphModel g;
     @Parameter(name = "Vertices", description = "Num of Vertices")
     public static Integer n = 30;
     @Parameter(name = "Edges", description = "Num of Edges")
-    private static Integer e = 80;
-
-    public void setWorkingGraph(GraphModel g) {
-        this.g = g;
-    }
+    private static Integer numOfEdges = 80;
 
     public String getName() {
         return "Random Graph";
@@ -40,7 +34,7 @@ public class RandomGenerator implements GraphGeneratorExtension, Parametrizable,
         return "Generates a random graph with N Vertices and E Edges";
     }
 
-    Vertex v[];
+    Vertex[] v;
 
     public Vertex[] getVertices() {
         Vertex[] ret = new Vertex[n];
@@ -51,8 +45,8 @@ public class RandomGenerator implements GraphGeneratorExtension, Parametrizable,
     }
 
     public Edge[] getEdges() {
-        Edge[] ret = new Edge[e];
-        for (int i = 0; i < e; i++)
+        Edge[] ret = new Edge[numOfEdges];
+        for (int i = 0; i < numOfEdges; i++)
             ret[i] = randomEdge();
         return ret;
     }
@@ -70,12 +64,12 @@ public class RandomGenerator implements GraphGeneratorExtension, Parametrizable,
         return v[(int) (Math.random() * n)];
     }
 
-    public Point[] getVertexPositions() {
-        return Utils.computeRandomPositions(n);
+    public GPoint[] getVertexPositions() {
+        return AlgorithmUtils.computeRandomPositions(n);
     }
 
     public String checkParameters() {
-    	if( e <0 || n <0) return "Both Edges & Vertices must be positive!";
+    	if( numOfEdges<0 || n<0) return "Both Edges & Vertices must be positive!";
     	else
     		return null;
     }
@@ -89,7 +83,7 @@ public class RandomGenerator implements GraphGeneratorExtension, Parametrizable,
      */
     public static GraphModel generateRandomGraph(int numOfVertices, int numOfEdges) {
         RandomGenerator.n = numOfVertices;
-        RandomGenerator.e = numOfEdges;
+        RandomGenerator.numOfEdges = numOfEdges;
         return GraphGenerator.getGraph(false, new RandomGenerator());
     }
 

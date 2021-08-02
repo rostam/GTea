@@ -33,7 +33,7 @@ public class Edge extends BaseEdge<Vertex> {
     private Arrow arrow = ArrowHandler.defaultArrow;
 
     /**
-     * the location of the lable relative to the center of the edge
+     * the location of the label relative to the center of the edge
      */
     private GPoint labelLocation = new GPoint(0, 0);
 
@@ -350,7 +350,7 @@ public class Edge extends BaseEdge<Vertex> {
         else if (isShowWeight())
             _label = String.valueOf(super.getWeight());
         else
-            _label = label + "," + String.valueOf(super.getWeight());
+            _label = label + "," + super.getWeight();
         this.text = _label;
         repaintView();
     }

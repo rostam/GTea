@@ -35,21 +35,19 @@ public class MaximumFlow extends Algorithm implements GraphReportExtension{
 
 	@Override
 	public Object calculate(GraphModel g) {
-		g = g;
 		//AlgorithmAnimator algorithmAnimator = new AlgorithmAnimator( gd.getBlackboard());
 		//acceptEventDispatcher(algorithmAnimator);
-		//JOptionPane.showMessageDialog(null, "Maxmimum flow between source and sink:" + doAlgorithm());
+		//JOptionPane.showMessageDialog(null, "Maximum flow between source and sink:" + doAlgorithm());
 		return null;
 	}
 
 	public int doAlgorithm() {
-		// TODO Auto-generated method stub
 		resetGraphTeaels();
 		GraphRequest<BaseVertex, BaseEdge<BaseVertex>> gr = new GraphRequest<>();
 		try{
 			dispatchEvent(gr);	
 		}
-		catch(Exception e){}
+		catch(Exception ignored){}
 
 		Vertex source, sink;
 
@@ -59,7 +57,7 @@ public class MaximumFlow extends Algorithm implements GraphReportExtension{
 		try{
 			dispatchEvent(sourceReq);	
 		}
-		catch(Exception e){}
+		catch(Exception ignored){}
 		source = g.getVertex(sourceReq.getVertex().getId());
 		source.setColor(7);
 		source.setMark(true);
@@ -68,7 +66,7 @@ public class MaximumFlow extends Algorithm implements GraphReportExtension{
 		try{
 			dispatchEvent(sinkReq);	
 		}
-		catch(Exception e){}
+		catch(Exception ignored){}
 		sink = g.getVertex(sinkReq.getVertex().getId());
 		sink.setColor(3);
 		sink.setMark(true);

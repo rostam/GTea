@@ -2,7 +2,6 @@ package graphtea.extensions.actions;
 
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.ui.GTabbedGraphPane;
-import graphtea.library.algorithms.goperators.product.GDisjunction;
 import graphtea.platform.parameter.Parameter;
 import graphtea.platform.parameter.Parametrizable;
 import graphtea.plugins.main.GraphData;
@@ -32,8 +31,7 @@ public class Disjunction implements GraphActionExtension, Parametrizable {
     public void action(GraphData graphData) {
         GTabbedGraphPane gtp = graphData.getBlackboard().getData(GTabbedGraphPane.NAME);
         GDisjunction prod = new GDisjunction();
-        GraphModel g= (GraphModel) prod.multiply(gtp.getGraphs().get(g0),
-                gtp.getGraphs().get(g1));
+        GraphModel g= prod.multiply(gtp.getGraphs().get(g0), gtp.getGraphs().get(g1));
         prod.setPositions(g);
         graphData.core.showGraph(g);
     }

@@ -51,13 +51,13 @@ public class ShellConsole extends JScrollPane
     }
 
     private int cmdStart = 0;
-    private Vector history = new Vector();
+    private final Vector<String> history = new Vector<>();
     private String startedLine;
     private int histLine = 0;
 
-    private JPopupMenu menu;
-    private JTextPane text;
-    private DefaultStyledDocument doc;
+    private final JPopupMenu menu;
+    private final JTextPane text;
+    private final DefaultStyledDocument doc;
 
     NameCompletion nameCompletion;
     final int SHOW_AMBIG_MAX = 15;
@@ -213,7 +213,7 @@ public class ShellConsole extends JScrollPane
                 break;
 
             case(KeyEvent.VK_U):    // clear line
-                if ((e.getModifiers() & InputEvent.CTRL_MASK) > 0) {
+                if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) > 0) {
                     replaceRange("", cmdStart, textLength());
                     histLine = 0;
                     e.consume();
@@ -249,7 +249,7 @@ public class ShellConsole extends JScrollPane
                 // Control-C
             case(KeyEvent.VK_C):
                 if (text.getSelectedText() == null) {
-                    if (((e.getModifiers() & InputEvent.CTRL_MASK) > 0)
+                    if (((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) > 0)
                             && (e.getID() == KeyEvent.KEY_PRESSED)) {
                         append("^C");
                     }
@@ -267,9 +267,9 @@ public class ShellConsole extends JScrollPane
 
             default:
                 if (
-                        (e.getModifiers() &
-                                (InputEvent.CTRL_MASK
-                                        | InputEvent.ALT_MASK | InputEvent.META_MASK)) == 0) {
+                        (e.getModifiersEx() &
+                                (InputEvent.CTRL_DOWN_MASK
+                                        | InputEvent.ALT_DOWN_MASK | InputEvent.META_DOWN_MASK)) == 0) {
                     // plain character
                     forceCaretMoveToEnd();
                 }
@@ -320,7 +320,7 @@ public class ShellConsole extends JScrollPane
         if (index <= 0) index = 0;
         else index = Math.max(bk.lastIndexOf("bsh % ") + 6, bk.lastIndexOf(">>  ") + 4);
         String ret = bk.substring(index, i + 1);
-        ret.trim();
+        ret = ret.trim();
         // no completion
         String[] complete = nameCompletion.completeName(part);
         if (complete.length == 0) {
@@ -329,7 +329,7 @@ public class ShellConsole extends JScrollPane
         }
 
         // Found one completion (possibly what we already have)
-        if (complete.length == 1 && !complete.equals(part)) {
+        if (complete.length == 1 && !complete[0].equals(part)) {
             if (part.endsWith("(")) {
                 if (complete[0].equals(part + ");")) {
                     String append = complete[0].substring(part.length());
@@ -360,7 +360,7 @@ public class ShellConsole extends JScrollPane
         // Show ambiguous
         StringBuffer sb = new StringBuffer("\n");
         for (i = 0; i < complete.length && i < SHOW_AMBIG_MAX; i++)
-            sb.append(complete[i] + "\n");
+            sb.append(complete[i]).append("\n");
         if (i == SHOW_AMBIG_MAX)
             sb.append("...\n");
 
@@ -453,13 +453,13 @@ public class ShellConsole extends JScrollPane
     }
 
     private void showHistoryLine() {
-        String showline;
+        String showLine;
         if (histLine == 0)
-            showline = startedLine;
+            showLine = startedLine;
         else
-            showline = (String) history.elementAt(history.size() - histLine);
+            showLine = history.elementAt(history.size() - histLine);
 
-        replaceRange(showline, cmdStart, textLength());
+        replaceRange(showLine, cmdStart, textLength());
         text.setCaretPosition(textLength());
         text.repaint();
     }
@@ -491,12 +491,12 @@ public class ShellConsole extends JScrollPane
 
         // Patch to handle Unicode characters
         // Submitted by Daniel Leuck
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         int lineLength = line.length();
         for (int i = 0; i < lineLength; i++) {
             String val = Integer.toString(line.charAt(i), 16);
             val = ZEROS.substring(0, 4 - val.length()) + val;
-            buf.append("\\u" + val);
+            buf.append("\\u").append(val);
         }
         line = buf.toString();
         // End unicode patch
@@ -520,7 +520,7 @@ public class ShellConsole extends JScrollPane
             return;
         }
 
-        print(String.valueOf(o) + "\n");
+        print(o + "\n");
         text.repaint();
     }
 
@@ -529,25 +529,15 @@ public class ShellConsole extends JScrollPane
             console_interface.print(o);
             return;
         }
-        invokeAndWait(new Runnable() {
-            public void run() {
-                append(String.valueOf(o));
-                resetCommandStart();
-                text.setCaretPosition(cmdStart);
-            }
+        invokeAndWait(() -> {
+            append(String.valueOf(o));
+            resetCommandStart();
+            text.setCaretPosition(cmdStart);
         });
     }
 
     public Color getResultColor() {
         return Color.blue;
-    }
-
-    public void printResult(Object s) {
-        print(s, getResultColor());
-    }
-
-    public void printlnResult(Object s) {
-        println(s, getResultColor());
     }
 
     /**
@@ -578,12 +568,10 @@ public class ShellConsole extends JScrollPane
         if (icon == null)
             return;
 
-        invokeAndWait(new Runnable() {
-            public void run() {
-                text.insertIcon(icon);
-                resetCommandStart();
-                text.setCaretPosition(cmdStart);
-            }
+        invokeAndWait(() -> {
+            text.insertIcon(icon);
+            resetCommandStart();
+            text.setCaretPosition(cmdStart);
         });
     }
 
@@ -613,15 +601,13 @@ public class ShellConsole extends JScrollPane
     }
 
     public void print(final Object o, final Font font, final Color color) {
-        invokeAndWait(new Runnable() {
-            public void run() {
-                AttributeSet old = getStyle();
-                setStyle(font, color);
-                append(String.valueOf(o));
-                resetCommandStart();
-                text.setCaretPosition(cmdStart);
-                setStyle(old, true);
-            }
+        invokeAndWait(() -> {
+            AttributeSet old = getStyle();
+            setStyle(font, color);
+            append(String.valueOf(o));
+            resetCommandStart();
+            text.setCaretPosition(cmdStart);
+            setStyle(old, true);
         });
     }
 
@@ -644,15 +630,13 @@ public class ShellConsole extends JScrollPane
             final boolean italic,
             final boolean underline
     ) {
-        invokeAndWait(new Runnable() {
-            public void run() {
-                AttributeSet old = getStyle();
-                setStyle(fontFamilyName, size, color, bold, italic, underline);
-                append(String.valueOf(o));
-                resetCommandStart();
-                text.setCaretPosition(cmdStart);
-                setStyle(old, true);
-            }
+        invokeAndWait(() -> {
+            AttributeSet old = getStyle();
+            setStyle(fontFamilyName, size, color, bold, italic, underline);
+            append(String.valueOf(o));
+            resetCommandStart();
+            text.setCaretPosition(cmdStart);
+            setStyle(old, true);
         });
     }
 

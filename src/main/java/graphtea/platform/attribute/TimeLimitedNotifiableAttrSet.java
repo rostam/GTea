@@ -6,7 +6,6 @@
 package graphtea.platform.attribute;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -24,9 +23,9 @@ import java.util.Map;
  */
 public class TimeLimitedNotifiableAttrSet<T extends AttributeSet> implements Runnable, NotifiableAttributeSet {
     private boolean started = false;
-    private long millis = 100;
+    private final long millis = 100;
     Thread thread;
-    private T inp;
+    private final T inp;
     NotifiableAttributeSetImpl as = new NotifiableAttributeSetImpl();
 
     public TimeLimitedNotifiableAttrSet(T input) {
@@ -35,7 +34,7 @@ public class TimeLimitedNotifiableAttrSet<T extends AttributeSet> implements Run
     }
 
     /**
-     * starts firinig listeners to this class
+     * starts firing listeners to this class
      */
     public void start() {
         started = true;
@@ -68,9 +67,7 @@ public class TimeLimitedNotifiableAttrSet<T extends AttributeSet> implements Run
     }
 
     private void fireChange(Map<String, Object> _new, Map<String, Object> old) {
-        Iterator<Map.Entry<String, Object>> i = old.entrySet().iterator();
-        while (i.hasNext()) {
-            Map.Entry<String, Object> e = i.next();
+        for (Map.Entry<String, Object> e : old.entrySet()) {
             String key = e.getKey();
             Object value = e.getValue();
             if (value == null) {

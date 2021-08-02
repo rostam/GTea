@@ -1,11 +1,11 @@
 package graphtea.extensions.actions.art;
 
+import graphtea.extensions.AlgorithmUtils;
 import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.Vertex;
 import graphtea.plugins.graphgenerator.core.PositionGenerators;
 import graphtea.plugins.main.GraphData;
-import graphtea.plugins.main.core.AlgorithmUtils;
 import graphtea.plugins.main.extension.GraphActionExtension;
 
 /**
@@ -30,7 +30,7 @@ public class GraphArtActionExtendTree
 
         @Override
         public void action(GraphData graphData) {
-            final Vertex parent[] = new Vertex[graphData.getGraph().getVerticesCount()];
+            final Vertex[] parent = new Vertex[graphData.getGraph().getVerticesCount()];
             //consider the hole structure as a tree
             AlgorithmUtils.BFSrun(graphData.getGraph(), graphData.getGraph().getVertex(0), (v, p) -> parent[v.getId()] = p);
             for (Vertex v : graphData.select.getSelectedVertices()) {
@@ -45,7 +45,6 @@ public class GraphArtActionExtendTree
         }
 
     private void addChildren(GraphData graphData, Vertex p, Vertex v, double degree) {
-        AlgorithmUtils.getDistance(v, p);
         GPoint gv = GPoint.sub(p.getLocation(),v.getLocation());
         gv = PositionGenerators.rotate(gv, degree);
         gv = GPoint.div(gv,1.7);

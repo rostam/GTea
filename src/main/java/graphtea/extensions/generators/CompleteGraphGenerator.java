@@ -5,6 +5,7 @@
 package graphtea.extensions.generators;
 
 import graphtea.graph.graph.Edge;
+import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.platform.lang.CommandAttitude;
@@ -15,20 +16,13 @@ import graphtea.plugins.graphgenerator.core.PositionGenerators;
 import graphtea.plugins.graphgenerator.core.SimpleGeneratorInterface;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 
-import java.awt.*;
-
 /**
  * @author  azin azadi
  */
 @CommandAttitude(name = "generate_kn", abbreviation = "_g_kn", description = "Generates a complete graph with n vertices")
 public class CompleteGraphGenerator implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
-    GraphModel g;
     @Parameter(name = "n")
     public static Integer n = 3;
-
-    public void setWorkingGraph(GraphModel g) {
-        this.g = g;
-    }
 
     Vertex[] v;
 
@@ -50,7 +44,7 @@ public class CompleteGraphGenerator implements GraphGeneratorExtension, Parametr
         return ret;
     }
 
-    public Point[] getVertexPositions() {
+    public GPoint[] getVertexPositions() {
         return PositionGenerators.circle(5, 5, 100000, 100000, n);
     }
 

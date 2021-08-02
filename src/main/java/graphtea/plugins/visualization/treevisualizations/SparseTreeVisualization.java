@@ -34,9 +34,7 @@ public class SparseTreeVisualization implements VisualizationExtension {
 
     private Vertex findAppropriateRoot(GraphModel g) {
         Vertex root = g.getAVertex();
-        Iterator<Vertex> ei = g.iterator();
-        for (; ei.hasNext();) {
-            Vertex e = ei.next();
+        for (Vertex e : g) {
             root = findHigherVertex(e, root);
         }
         return root;
@@ -59,7 +57,7 @@ public class SparseTreeVisualization implements VisualizationExtension {
         for (Vertex v : currentLevel) {
             v.setMark(true);
             Iterator<Edge> em = graph.edgeIterator(v);
-            for (; em.hasNext();) {
+            while (em.hasNext()) {
                 Edge e = em.next();
                 Vertex v2 = e.source;
                 if (!v2.getMark()) {
@@ -99,7 +97,7 @@ public class SparseTreeVisualization implements VisualizationExtension {
         Vector<Vertex> newChildren = new Vector<>();
         for (Vertex v : currentLevelVertices) {
             Iterator<Edge> e = graph.edgeIterator(v);
-            for (; e.hasNext();) {
+            while (e.hasNext()) {
                 Edge ed = e.next();
                 Vertex dest = ed.source;
                 if (!visitedVertices.contains(dest)) {
@@ -152,7 +150,7 @@ public class SparseTreeVisualization implements VisualizationExtension {
     */
 
     public void setWorkingGraph(GraphModel g) {
-        this.graph = g;
+        graph = g;
     }
 
     @UserModifiableProperty(displayName = "Sparse Tree Visualization Width", obeysAncestorCategory = false

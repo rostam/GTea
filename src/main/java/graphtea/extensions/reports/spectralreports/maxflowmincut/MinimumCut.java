@@ -17,28 +17,22 @@ public class MinimumCut extends Algorithm implements GraphReportExtension{
 	GraphModel g;
 	@Override
 	public String getCategory() {
-		// TODO Auto-generated method stub
 		return "Connectivity";
 	}
 
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
 		return "Min Cut";
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Min Cut";
 	}
 	
 
-	
-	
 	@Override
 	public Object calculate(GraphModel g) {
-		g = g;
 		//AlgorithmAnimator algorithmAnimator = new AlgorithmAnimator( gd.getBlackboard());
 		//acceptEventDispatcher(algorithmAnimator);
 		//JOptionPane.showMessageDialog(null, "Minimum cut between source and sink:" + doAlgorithm());
@@ -52,7 +46,7 @@ public class MinimumCut extends Algorithm implements GraphReportExtension{
 		try{
 			dispatchEvent(gr);	
 		}
-		catch(Exception e){}
+		catch(Exception ignored){}
 
         Vertex source, sink;
 
@@ -62,7 +56,7 @@ public class MinimumCut extends Algorithm implements GraphReportExtension{
 		try{
 			dispatchEvent(sourceReq);	
 		}
-		catch(Exception e){}
+		catch(Exception ignored){}
         source = g.getVertex(sourceReq.getVertex().getId());
 		source.setColor(7);
 		source.setMark(true);
@@ -71,7 +65,7 @@ public class MinimumCut extends Algorithm implements GraphReportExtension{
 		try{
 			dispatchEvent(sinkReq);	
 		}
-		catch(Exception e){}
+		catch(Exception ignored){}
         sink = g.getVertex(sinkReq.getVertex().getId());
 		sink.setColor(3);
 		sink.setMark(true);

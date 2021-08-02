@@ -5,7 +5,7 @@
 
 package graphtea.extensions.reports.basicreports;
 
-import graphtea.extensions.reports.Utils;
+import graphtea.extensions.AlgorithmUtils;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.platform.lang.CommandAttitude;
@@ -18,15 +18,14 @@ import java.util.Vector;
  */
 
 @CommandAttitude(name = "total_num_of_stars", abbreviation = "_tnoss")
-public class TotalNumOfStars implements GraphReportExtension {
-
-    public Object calculate(GraphModel g) {
+public class TotalNumOfStars implements GraphReportExtension<Vector<String>> {
+    public Vector<String> calculate(GraphModel g) {
         Vector<String> ret = new Vector<>();
-        for(int i=0;i<Utils.getMaxDegree(g);i++) {
+        for(int i = 0; i< AlgorithmUtils.getMaxDegree(g); i++) {
             int sum = 0;
             for (Vertex v : g) {
                 int deg = g.getDegree(v);
-                sum += Utils.choose(deg, i+1).intValue();
+                sum += AlgorithmUtils.choose(deg, i+1).intValue();
             }
             if(i==0) sum /= 2;
             ret.add("NumOf(K1," + (i+1) + ") = "+sum );

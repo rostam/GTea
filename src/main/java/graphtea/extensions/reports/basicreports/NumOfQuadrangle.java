@@ -8,7 +8,6 @@ package graphtea.extensions.reports.basicreports;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.platform.lang.CommandAttitude;
-import graphtea.plugins.main.core.AlgorithmUtils;
 import graphtea.plugins.reports.extension.GraphReportExtension;
 
 /**
@@ -16,7 +15,7 @@ import graphtea.plugins.reports.extension.GraphReportExtension;
  */
 
 @CommandAttitude(name = "num_of_quadrangle", abbreviation = "_noqa")
-public class NumOfQuadrangle implements GraphReportExtension {
+public class NumOfQuadrangle implements GraphReportExtension<Integer> {
     public String getName() {
         return "number of quadrangle";
     }
@@ -25,7 +24,7 @@ public class NumOfQuadrangle implements GraphReportExtension {
         return "number of quadrangle";
     }
 
-    public Object calculate(GraphModel g) {
+    public Integer calculate(GraphModel g) {
         return getNumOfQuadrangles(g);
     }
 
@@ -35,9 +34,9 @@ public class NumOfQuadrangle implements GraphReportExtension {
     public static int getNumOfQuadrangles(GraphModel graph) {
         int quadrangles = 0;
         for (Vertex i : graph)
-            for (Vertex j : AlgorithmUtils.getNeighbors(graph, i))
-                for (Vertex k : AlgorithmUtils.getNeighbors(graph, j))
-                    for (Vertex l : AlgorithmUtils.getNeighbors(graph, k))
+            for (Vertex j : graph.directNeighbors(i))
+                for (Vertex k : graph.directNeighbors(j))
+                    for (Vertex l : graph.directNeighbors(k))
                         if (l != j &&
                                 l != i &&
                                 k != i &&

@@ -7,7 +7,7 @@ package graphtea.extensions.reports.spectralreports;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
-import graphtea.extensions.reports.Utils;
+import graphtea.extensions.AlgorithmUtils;
 import graphtea.graph.graph.GraphModel;
 import graphtea.library.util.Complex;
 import graphtea.platform.lang.CommandAttitude;
@@ -18,24 +18,14 @@ import graphtea.plugins.reports.extension.GraphReportExtension;
  */
 
 @CommandAttitude(name = "eig_values", abbreviation = "_evs")
-public class LaplacianEnergyLike implements GraphReportExtension {
-
-    double round(double value, int decimalPlace) {
-        double power_of_ten = 1;
-        while (decimalPlace-- > 0)
-            power_of_ten *= 10.0;
-        return Math.round(value * power_of_ten)
-                / power_of_ten;
-    }
-
-    public Object calculate(GraphModel g) {
-        double power = 1;
+public class LaplacianEnergyLike implements GraphReportExtension<String> {
+    public String calculate(GraphModel g) {
         try {
             Matrix B = g.getWeightedAdjacencyMatrix();
-            Matrix A = Utils.getLaplacian(B);
+            Matrix A = AlgorithmUtils.getLaplacian(B);
             EigenvalueDecomposition ed = A.eig();
-            double rv[] = ed.getRealEigenvalues();
-            double iv[] = ed.getImagEigenvalues();
+            double[] rv = ed.getRealEigenvalues();
+            double[] iv = ed.getImagEigenvalues();
             double maxrv=0;
             double minrv=1000000;
             for(double value : rv) {
@@ -45,10 +35,8 @@ public class LaplacianEnergyLike implements GraphReportExtension {
             }
             double sum = 0;
             double sum_i = 0;
-            for(int i=0;i < rv.length;i++)
-                sum += Math.sqrt(Math.abs(rv[i]));
-            for(int i=0;i < iv.length;i++)
-                sum_i +=  Math.abs(iv[i]);
+            for (double value : rv) sum += Math.sqrt(Math.abs(value));
+            for (double v : iv) sum_i += Math.abs(v);
 
             if (sum_i != 0) {
                 //here is completely false
@@ -63,12 +51,12 @@ public class LaplacianEnergyLike implements GraphReportExtension {
 //                    System.out.println(tmp);
 //                    num.plus(tmp);
 //                }
-                return "" + round(num.re(), 3) + " + "
-                        + round(num.im(), 3) + "i";
+                return "" + AlgorithmUtils.round(num.re(), 5) + " + "
+                        + AlgorithmUtils.round(num.im(), 5) + "i";
             } else {
-                return "" + round(sum, 3);
+                return "" + AlgorithmUtils.round(sum, 5);
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return null;
     }
@@ -83,6 +71,6 @@ public class LaplacianEnergyLike implements GraphReportExtension {
 
     @Override
     public String getCategory() {
-        return "Spectral";
+        return "Spectral- Energies";
     }
 }

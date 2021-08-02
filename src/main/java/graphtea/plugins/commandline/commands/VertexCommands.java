@@ -7,7 +7,6 @@ package graphtea.plugins.commandline.commands;
 
 import graphtea.graph.atributeset.GraphAttrSet;
 import graphtea.graph.graph.GPoint;
-import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.platform.core.BlackBoard;
 import graphtea.platform.core.exception.ExceptionHandler;
@@ -26,7 +25,7 @@ import java.util.Vector;
 public class VertexCommands {
 
     BlackBoard bb;
-    private GraphData datas;
+    private final GraphData datas;
 
     public VertexCommands(BlackBoard bb) {
         this.bb = bb;
@@ -77,7 +76,7 @@ public class VertexCommands {
     public void addVertex(@Parameter(name = "x positon")int x
             , @Parameter(name = "y positon")int y) {
         try {
-            AddVertex.doJob((GraphModel) bb.getData(GraphAttrSet.name), x, y);
+            AddVertex.doJob(bb.getData(GraphAttrSet.name), x, y);
         }
         catch (Exception e) {
             ExceptionHandler.catchException(e);

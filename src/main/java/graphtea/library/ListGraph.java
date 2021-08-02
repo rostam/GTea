@@ -63,7 +63,7 @@ public class ListGraph<VertexType extends BaseVertex, EdgeType extends BaseEdge<
      *
      * @param directed                 Indicated whether the graph is directed.
      * @param expectedNumberOfVertices Approximate number of vertices that will be
-     *                                 added to the graph. This paramether is optional and is available for performance
+     *                                 added to the graph. This parameter is optional and is available for performance
      *                                 reasons.
      */
     public ListGraph(boolean directed, int expectedNumberOfVertices) {
@@ -92,7 +92,7 @@ public class ListGraph<VertexType extends BaseVertex, EdgeType extends BaseEdge<
     /**
      * Constructs a graph object that stores graph data using adjacency list data structure by importing
      * graph data from a pre-existing graph. A GraphConvertor object is passed as a parameter which is
-     * reponsible for duplication/type-convertion of graph elements.
+     * responsible for duplication/type-conversion of graph elements.
      *
      * @param <ImportVertexType> The type of vertex object which the input graph contain.
      * @param <ImportEdgeType>   The type of edge object which the input graph contain.
@@ -178,7 +178,7 @@ public class ListGraph<VertexType extends BaseVertex, EdgeType extends BaseEdge<
      * @author Omid Aladini
      */
     private class EdgeIterator implements Iterator<EdgeType> {
-        private Iterator<EdgeType> edgesIterator;
+        private final Iterator<EdgeType> edgesIterator;
         private EdgeType lastEdge = null;
 
         /**
@@ -191,10 +191,8 @@ public class ListGraph<VertexType extends BaseVertex, EdgeType extends BaseEdge<
             ++edgeIterationIndex;
             ArrayList<EdgeType> edges = new ArrayList<>();
 
-            Iterator<VertexType> it = iterator();
-
-            while (it.hasNext()) {
-                Iterator<EdgeType> it2 = new EdgeIterator(it.next(), true);
+            for (VertexType vertexType : ListGraph.this) {
+                Iterator<EdgeType> it2 = new EdgeIterator(vertexType, true);
                 while (it2.hasNext()) {
                     EdgeType edge = it2.next();
                     if (edge.edgeIterationIndex == edgeIterationIndex)

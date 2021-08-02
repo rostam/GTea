@@ -6,6 +6,7 @@
 package graphtea.extensions.generators;
 
 import graphtea.graph.graph.Edge;
+import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.platform.lang.CommandAttitude;
@@ -16,8 +17,6 @@ import graphtea.plugins.graphgenerator.core.PositionGenerators;
 import graphtea.plugins.graphgenerator.core.SimpleGeneratorInterface;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 
-import java.awt.*;
-
 /**
  * @author Mohammad Ali Rostami
  * @email rostamiev@gmail.com
@@ -25,7 +24,6 @@ import java.awt.*;
 @CommandAttitude(name = "generate_gear", abbreviation = "_g_g"
         , description = "generate a n vertices gear graph")
 public class GearGenerator implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
-    private GraphModel g;
     @Parameter(name = "n")
     public static Integer n = 5;
 
@@ -37,10 +35,6 @@ public class GearGenerator implements GraphGeneratorExtension, Parametrizable, S
 
     public String getDescription() {
         return "Gear Graph";
-    }
-
-    public void setWorkingGraph(GraphModel g) {
-        this.g = g;
     }
 
     public Vertex[] getVertices() {
@@ -72,10 +66,10 @@ public class GearGenerator implements GraphGeneratorExtension, Parametrizable, S
         return ret;
     }
 
-    public Point[] getVertexPositions() {
-        Point p[] = new Point[2*n+1];
-        Point p1[] = PositionGenerators.circle(50000, 200, 200, 2*n);
-        p[0] = new Point(200, 200);
+    public GPoint[] getVertexPositions() {
+        GPoint[] p = new GPoint[2*n+1];
+        GPoint[] p1 = PositionGenerators.circle(50000, 200, 200, 2*n);
+        p[0] = new GPoint(200, 200);
         System.arraycopy(p1, 0, p, 1, 2 * n);
         return p;
     }

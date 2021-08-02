@@ -67,7 +67,7 @@ public class GCellEditor extends AbstractCellEditor implements TableCellEditor, 
         return editor.getEditorComponent(value);
     }
 
-    private static ObjectEditor oe = new ObjectEditor();
+    private static final ObjectEditor oe = new ObjectEditor();
 
     /**
      * gets an editor for the given object, the editor should be registered before,...
@@ -83,12 +83,12 @@ public class GCellEditor extends AbstractCellEditor implements TableCellEditor, 
         }
         if (editor == null) {
             //search implementing interfaces
-            Class cc[] = value.getClass().getInterfaces();
+            Class[] cc = value.getClass().getInterfaces();
             for (int i = 0; i < cc.length && editor == null; i++)
                 editor = knownEditors.get(cc[i]);
         }
         if (editor == null) {
-            //no editor was defiend for this Class
+            //no editor was defined for this Class
             //take the last chance
             try {
                 if (StaticUtils.fromString(value.getClass().getName(), value.toString()) != null) {

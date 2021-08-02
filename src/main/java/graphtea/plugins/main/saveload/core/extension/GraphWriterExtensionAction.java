@@ -25,7 +25,7 @@ import java.io.IOException;
  */
 public class GraphWriterExtensionAction extends AbstractExtensionAction {
 
-    private GraphWriterExtension ge;
+    private final GraphWriterExtension ge;
     private String prefix;
 
     public GraphWriterExtensionAction(BlackBoard bb, GraphWriterExtension ge) {
@@ -56,8 +56,8 @@ public class GraphWriterExtensionAction extends AbstractExtensionAction {
     IOException ee;
     GraphIOException gioe;
 
-    private void exportGraph() throws IOException, GraphIOException {
-        g = ((GraphModel) (blackboard.getData(GraphAttrSet.name)));
+    private void exportGraph() throws IOException {
+        g = blackboard.getData(GraphAttrSet.name);
         JFileChooser fileChooser = new JFileChooser();
         ExampleFileFilter fileFilter = new ExampleFileFilter(ge.getExtension(), ge.getName());
         fileFilter.setDescription(ge.getDescription());
@@ -81,18 +81,16 @@ public class GraphWriterExtensionAction extends AbstractExtensionAction {
                     JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 
                 GTabbedGraphPane.showNotificationMessage("Saving in the file ...", blackboard, true);
-                new Thread() {
-                    public void run() {
-                        try {
-                            ge.write(new File(ss), g);
-                        } catch (GraphIOException e) {
-                            //todo: handle exceptions
-                            gioe = e;
-                        }
-                        StatusBarMessage.setMessage(blackboard, "");
-                        GTabbedGraphPane.showTimeNotificationMessage("File Saved!", blackboard, 5000, true);
+                new Thread(() -> {
+                    try {
+                        ge.write(new File(ss), g);
+                    } catch (GraphIOException e) {
+                        //todo: handle exceptions
+                        gioe = e;
                     }
-                }.start();
+                    StatusBarMessage.setMessage(blackboard, "");
+                    GTabbedGraphPane.showTimeNotificationMessage("File Saved!", blackboard, 5000, true);
+                }).start();
 
             }
         }

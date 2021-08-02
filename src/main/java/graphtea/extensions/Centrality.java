@@ -18,7 +18,7 @@ public class Centrality {
 	int link;
 	
 	
-	public Centrality (int edge[][]) {
+	public Centrality(int edge[][]) {
 		this.edge = edge;
 		this.link = edge[0].length;
 	}

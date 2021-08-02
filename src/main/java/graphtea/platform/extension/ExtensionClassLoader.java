@@ -45,7 +45,7 @@ public class ExtensionClassLoader extends ClassLoader {
         File file = new File(dir);
         if (!file.exists())
             return;
-        File files[] = file.listFiles();
+        File[] files = file.listFiles();
         for (File f1:files){
             if (f1.getName().endsWith(".zip")){
                 unZip(f1.getAbsolutePath(), f1.getParentFile().getAbsolutePath());
@@ -63,11 +63,11 @@ public class ExtensionClassLoader extends ClassLoader {
                     else
                         name = "";
                     name = name + file1.getName().substring(0, file1.getName().length() - 6);
-                    byte data[] = new byte[(int) file1.length()];
+                    byte[] data = new byte[(int) file1.length()];
                     FileInputStream fis = new FileInputStream(file1);
                     fis.read(data);
                     classesData.put(name, data);
-                    urls.add(file1.toURL());
+                    urls.add(file1.toURI().toURL());
                 } catch (IOException e) {
                     ExceptionHandler.catchException(e);
 //                    ExceptionHandler.handleException(e);
@@ -88,7 +88,7 @@ public class ExtensionClassLoader extends ClassLoader {
         if (!classesData.containsKey(name))
             ret = getParent().loadClass(name);
         if (ret == null && !classes.containsKey(name)) {
-            byte data[] = classesData.get(name);
+            byte[] data = classesData.get(name);
             Class c = defineClass(name, data, 0, data.length);
             classes.put(name, c);
         }
@@ -102,8 +102,7 @@ public class ExtensionClassLoader extends ClassLoader {
     public Collection getClassesImplementing(Class cl) {
         Collection col = new Vector();
         for (Map.Entry<String, Class> entry1 : classes.entrySet()) {
-            Map.Entry entry = entry1;
-            Class c = (Class) entry.getValue();
+            Class c = (Class) ((Map.Entry) entry1).getValue();
             if (StaticUtils.isImplementing(c, cl))
                 col.add(c);
         }

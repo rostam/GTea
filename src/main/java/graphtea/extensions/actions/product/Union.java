@@ -1,9 +1,9 @@
 package graphtea.extensions.actions.product;
 
+import graphtea.extensions.algorithms.GraphSum;
+import graphtea.extensions.algorithms.GraphUnion;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.ui.GTabbedGraphPane;
-import graphtea.library.algorithms.goperators.GraphSum;
-import graphtea.library.algorithms.goperators.GraphUnion;
 import graphtea.platform.parameter.Parameter;
 import graphtea.platform.parameter.Parametrizable;
 import graphtea.plugins.main.GraphData;
@@ -32,10 +32,10 @@ public class Union implements GraphActionExtension, Parametrizable {
     @Override
     public void action(GraphData graphData) {
         GTabbedGraphPane gtp = graphData.getBlackboard().getData(GTabbedGraphPane.NAME);
-        GraphSum prod = new GraphSum();
+        GraphSum prod = new GraphSum(graphData.getBlackboard());
         GraphModel g1 = gtp.getGraphs().get(fG);
         GraphModel g2 = gtp.getGraphs().get(sG);
-        GraphModel g= (GraphModel) GraphUnion.union(g1, g2);
+        GraphModel g= GraphUnion.union(g1, g2);
         GraphSum.setUnionLabel(g1,g2,g);
         graphData.core.showGraph(g);
     }

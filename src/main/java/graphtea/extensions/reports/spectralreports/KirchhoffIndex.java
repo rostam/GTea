@@ -7,7 +7,7 @@ package graphtea.extensions.reports.spectralreports;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
-import graphtea.extensions.reports.Utils;
+import graphtea.extensions.AlgorithmUtils;
 import graphtea.graph.graph.GraphModel;
 import graphtea.library.util.Complex;
 import graphtea.platform.lang.CommandAttitude;
@@ -18,7 +18,7 @@ import graphtea.plugins.reports.extension.GraphReportExtension;
  */
 
 @CommandAttitude(name = "eig_values", abbreviation = "_evs")
-public class KirchhoffIndex implements GraphReportExtension {
+public class KirchhoffIndex implements GraphReportExtension<String> {
 
     double round(double value, int decimalPlace) {
         double power_of_ten = 1;
@@ -28,14 +28,13 @@ public class KirchhoffIndex implements GraphReportExtension {
                 / power_of_ten;
     }
 
-    public Object calculate(GraphModel g) {
-        double power = 1;
+    public String calculate(GraphModel g) {
         try {
             Matrix B = g.getWeightedAdjacencyMatrix();
-            Matrix A = Utils.getLaplacian(B);
+            Matrix A = AlgorithmUtils.getLaplacian(B);
             EigenvalueDecomposition ed = A.eig();
-            double rv[] = ed.getRealEigenvalues();
-            double iv[] = ed.getImagEigenvalues();
+            double[] rv = ed.getRealEigenvalues();
+            double[] iv = ed.getImagEigenvalues();
             double maxrv=0;
             double minrv=1000000;
             for(double value : rv) {
@@ -45,13 +44,12 @@ public class KirchhoffIndex implements GraphReportExtension {
             }
             double sum = 0;
             double sum_i = 0;
-            for(int i=0;i < rv.length;i++)
-                if(Math.abs(round(rv[i],6)) != 0) {
-                    sum += 1 / Math.abs(rv[i]);
+            for (double value : rv)
+                if (Math.abs(round(value, 6)) != 0) {
+                    sum += 1 / Math.abs(value);
                 }
             sum *= g.numOfVertices();
-            for(int i=0;i < iv.length;i++)
-                sum_i +=  Math.abs(iv[i]);
+            for (double v : iv) sum_i += Math.abs(v);
 
             if (sum_i != 0) {
                 //here is completely false
@@ -66,12 +64,12 @@ public class KirchhoffIndex implements GraphReportExtension {
 //                    System.out.println(tmp);
 //                    num.plus(tmp);
 //                }
-                return "" + round(num.re(), 3) + " + "
-                        + round(num.im(), 3) + "i";
+                return "" + round(num.re(), 5) + " + "
+                        + round(num.im(), 5) + "i";
             } else {
-                return "" + round(sum, 3);
+                return "" + round(sum, 5);
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return null;
     }
@@ -86,6 +84,6 @@ public class KirchhoffIndex implements GraphReportExtension {
 
     @Override
     public String getCategory() {
-        return "Spectral";
+        return "Spectral- Energies";
     }
 }

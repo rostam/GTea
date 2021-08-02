@@ -9,7 +9,6 @@ import graphtea.graph.graph.GraphModel;
 import graphtea.graph.ui.GHTMLPageComponent;
 import graphtea.platform.Application;
 import graphtea.platform.core.BlackBoard;
-import graphtea.platform.core.Listener;
 import graphtea.platform.core.exception.ExceptionHandler;
 import graphtea.platform.extension.ExtensionLoader;
 import graphtea.platform.plugin.PluginInterface;
@@ -42,11 +41,7 @@ public class Init implements PluginInterface {
             ExtensionLoader.registerUnknownExtensionLoader(new BSHExtensionLoader(shell));
 
             GHTMLPageComponent.registerHyperLinkHandler("BSH", new ShellHyperlinkHandler(shell));
-            blackboard.addListener(Application.POST_INIT_EVENT, new Listener() {
-                public void keyChanged(String key, Object value) {
-                    postInit();
-                }
-            });
+            blackboard.addListener(Application.POST_INIT_EVENT, (key, value) -> postInit());
 
         } catch (IOException e) {
             ExceptionHandler.catchException(e);

@@ -48,8 +48,8 @@ public class BaseEdge<VertexType extends BaseVertex>
     }
 
 
-    public BaseEdge getCopy(VertexType v1, VertexType v2) {
-        return new BaseEdge(v1, v2, prop);
+    public BaseEdge<VertexType> getCopy(VertexType v1, VertexType v2) {
+        return new BaseEdge<VertexType>(v1, v2, prop);
     }
 
     /**
@@ -137,12 +137,7 @@ public class BaseEdge<VertexType extends BaseVertex>
      *         1 if this object is greater than the supplied object.
      */
     public int compareTo(BaseEdge<VertexType> o) {
-        if (o.prop.weight == prop.weight)
-            return 0;
+        return Integer.compare(prop.weight, o.prop.weight);
 
-        if (o.prop.weight > prop.weight)
-            return -1;
-
-        return 1;
     }
 }

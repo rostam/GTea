@@ -14,7 +14,6 @@ import graphtea.ui.components.utils.GAttrFrame;
 import javax.swing.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,12 +43,12 @@ public class ParameterShower implements AttributeListener {
                     name = name.substring(3);
                     Method getter = null;
                     try {
-                        getter = o.getClass().getMethod("get" + name, new Class[0]);
+                        getter = o.getClass().getMethod("get" + name);
                     } catch (Exception e) {
 //                    ExceptionHandler.catchException(e);  //To change body of catch statement use File | Settings | File Templates.
                     }
                     if (getter != null) {
-                        p.put(name, getter.invoke(o, (Object[]) new Class[0]));
+                        p.put(name, getter.invoke(o, new Class[0]));
                     }
                 }
 
@@ -127,7 +126,7 @@ public class ParameterShower implements AttributeListener {
         if (AttributeSet.class.isAssignableFrom(f.getType())) {
             if (f.get(o) instanceof AttributeSet) {
                 AttributeSet as = (AttributeSet) f.get(o);
-                for (Map.Entry<String, Object> x : ((Set<Map.Entry>) as.getAttrs().entrySet())) {
+                for (Map.Entry<String, Object> x : ((Set<Map.Entry<String, Object>>) as.getAttrs().entrySet())) {
                     String nam = "atrset." + f.getName() + "." + x.getKey();
                     p.put(nam, x.getValue());
                     p.getView().setDisplayName(nam, x.getKey());
@@ -140,8 +139,6 @@ public class ParameterShower implements AttributeListener {
             p.getView().setDescription(f.getName(), desc);
         }
     }
-
-    HashMap<String, String> names = new HashMap<>();
 
     public void attributeUpdated(String name, Object oldVal, Object newVal) {
         try {

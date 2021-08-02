@@ -38,7 +38,7 @@ import java.util.Vector;
 /**
  * the base class for creating extension handlers
  * the implementing class will have a menu assigned to it automatically the name of the menu will be
- * from the constructors parametr(sp) and the will also listen to UI.getUIEvent(sp.getName())
+ * from the constructors parameter(sp) and the will also listen to UI.getUIEvent(sp.getName())
  *
  * @author azin azadi
  */
@@ -77,7 +77,7 @@ public abstract class AbstractExtensionAction<t extends Extension> extends Abstr
             menuItem = createMenuItem(name, actionId, bb);
             parentMenu = getParentMenu();
             if (parentMenu.getText().equalsIgnoreCase("reports")) {
-                GraphReportExtension<t> temp = (GraphReportExtension<t>) sp;
+                GraphReportExtension temp = (GraphReportExtension) sp;
                 if (temp.getCategory() != null) {
                     if(!temp.getCategory().contains("-")) {
                         JMenu categoryMenu;
@@ -111,6 +111,10 @@ public abstract class AbstractExtensionAction<t extends Extension> extends Abstr
                         GMenuBar.insert(parentMenu, categoryMenu, getMenuPlace());
                         GMenuBar.insert(categoryMenu, subsub, getMenuPlace());
                         GMenuBar.insert(subsub, menuItem, getMenuPlace());
+//                        if(temp.getCategory().contains("OurWork")) {
+//                            ourW.add(categoryMenu);
+//                            categoryMenu.setVisible(false);
+//                        }
                     }
                 } else
                     GMenuBar.insert(parentMenu, menuItem, getMenuPlace());
@@ -199,8 +203,8 @@ public abstract class AbstractExtensionAction<t extends Extension> extends Abstr
     }
 
     /**
-     * determines wheter to insert an extra button at the right side of mene item,
-     * normally this is true whenever the target extension implements Parametrizable (have some parameters)
+     * determines whether to insert an extra button at the right side of menu item,
+     * normally this is true whenever the target extension implements Parameterizable (have some parameters)
      * on this mode on pressing the button a dialog for setting the parameters will be shown, and then
      * it will be executed, if the user clicks the menu item directly the extension will be
      * performed without asking of parameters.
@@ -215,7 +219,7 @@ public abstract class AbstractExtensionAction<t extends Extension> extends Abstr
      * @see graphtea.plugins.algorithmanimator.extension.AlgorithmExtensionAction
      */
     protected boolean isInsertExtraButtonToMenuItem() {
-        return false; //target instanceof Parametrizable; we dont want this button for now. just go with the simple interface
+        return false; //target instanceof Parameterizable; we don't want this button for now. just go with the simple interface
     }
 
     /**
@@ -294,11 +298,11 @@ public abstract class AbstractExtensionAction<t extends Extension> extends Abstr
     }
 
     /**
-     * first checks if o instanceof Parametrizable if so, shows an
+     * first checks if o instanceof Parameterizable if so, shows an
      * editor for it's Parameters.
      *
      * @param o The object
-     * @return true if o isn't an instance of Parametrizable or the user cancells the editing
+     * @return true if o isn't an instance of Parameterizable or the user cancels the editing
      */
     public boolean testAndSetParameters(Object o) {
         if (o instanceof Parametrizable) {
@@ -310,7 +314,7 @@ public abstract class AbstractExtensionAction<t extends Extension> extends Abstr
     }
 
     /**
-     * removes all UI Components that are created for the extension (menues, ...)
+     * removes all UI Components that are created for the extension (menus, ...)
      */
     public void removeCreatedUIComponents() {
         if (parentMenu != null && menuItem != null) {

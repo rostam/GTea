@@ -5,6 +5,7 @@
 package graphtea.extensions.generators;
 
 import graphtea.graph.graph.Edge;
+import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.platform.lang.CommandAttitude;
@@ -15,18 +16,11 @@ import graphtea.plugins.graphgenerator.core.PositionGenerators;
 import graphtea.plugins.graphgenerator.core.SimpleGeneratorInterface;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 
-import java.awt.*;
-
 @CommandAttitude(name = "generate_sn", abbreviation = "_g_sn")
 public class StarGenerator implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
     @Parameter(name = "S(N) Generator's N")
     public static Integer n = 10;
-    GraphModel g;
     Vertex[] v;
-
-    public void setWorkingGraph(GraphModel g) {
-        this.g = g;
-    }
 
     public Vertex[] getVertices() {
         Vertex[] ret = new Vertex[n];
@@ -44,11 +38,11 @@ public class StarGenerator implements GraphGeneratorExtension, Parametrizable, S
         return ret;
     }
 
-    public Point[] getVertexPositions() {
-        Point[] ret = new Point[n];
-        Point[] points = PositionGenerators.circle(5, 5, 10000, 10000, n - 1);
+    public GPoint[] getVertexPositions() {
+        GPoint[] ret = new GPoint[n];
+        GPoint[] points = PositionGenerators.circle(5, 5, 10000, 10000, n - 1);
         System.arraycopy(points, 0, ret, 1, n - 1);
-        ret[0] = new Point(10000 / 2, 10000 / 2);
+        ret[0] = new GPoint(10000 / 2, 10000 / 2);
         return ret;
     }
 

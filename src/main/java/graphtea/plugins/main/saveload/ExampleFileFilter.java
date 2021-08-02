@@ -19,9 +19,9 @@ import java.util.Hashtable;
  * all files except for those type extensions that it knows about.
  * <p/>
  * Extensions are of the type ".foo", which is typically found on
- * Windows and Unix boxes, but not on Macinthosh. Case is ignored.
+ * Windows and Unix boxes, but not on Macintosh. Case is ignored.
  * <p/>
- * Example - create a new filter that filerts out all files
+ * Example - create a new filter that filters out all files
  * but gif and jpg image files:
  * <p/>
  * JFileChooser chooser = new JFileChooser();
@@ -35,10 +35,10 @@ import java.util.Hashtable;
  */
 public class ExampleFileFilter extends FileFilter {
 
-    private static String TYPE_UNKNOWN = "Type Unknown";
-    private static String HIDDEN_FILE = "Hidden File";
+    private static final String TYPE_UNKNOWN = "Type Unknown";
+    private static final String HIDDEN_FILE = "Hidden File";
 
-    private Hashtable filters = null;
+    private Hashtable<String, FileFilter> filters;
     private String description = null;
     private String fullDescription = null;
     private boolean useExtensionsInDescription = true;
@@ -50,7 +50,7 @@ public class ExampleFileFilter extends FileFilter {
      * @see #addExtension
      */
     public ExampleFileFilter() {
-        this.filters = new Hashtable();
+        this.filters = new Hashtable<>();
     }
 
     /**
@@ -123,9 +123,7 @@ public class ExampleFileFilter extends FileFilter {
                 return true;
             }
             String extension = SaveLoadPluginMethods.getExtension(f);
-            if (extension != null && filters.get(SaveLoadPluginMethods.getExtension(f)) != null) {
-                return true;
-            }
+            return extension != null && filters.get(SaveLoadPluginMethods.getExtension(f)) != null;
         }
         return false;
     }
@@ -144,7 +142,7 @@ public class ExampleFileFilter extends FileFilter {
      */
     public void addExtension(String extension) {
         if (filters == null) {
-            filters = new Hashtable(5);
+            filters = new Hashtable<>(5);
         }
         filters.put(extension.toLowerCase(), this);
         fullDescription = null;
@@ -155,9 +153,9 @@ public class ExampleFileFilter extends FileFilter {
      * Returns the human readable defaultValue of this filter. For
      * example: "JPEG and GIF Image Files (*.jpg, *.gif)"
      *
-     * @see setDescription
-     * @see setExtensionListInDescription
-     * @see isExtensionListInDescription
+     * @see this.setDescription
+     * @see this.setExtensionListInDescription
+     * @see this.isExtensionListInDescription
      * @see FileFilter#getDescription
      */
     public String getDescription() {
@@ -165,11 +163,11 @@ public class ExampleFileFilter extends FileFilter {
             if (description == null || isExtensionListInDescription()) {
                 fullDescription = description == null ? "(" : description + " (";
                 // build the defaultValue from the extension list
-                Enumeration extensions = filters.keys();
+                Enumeration<String> extensions = filters.keys();
                 if (extensions != null) {
-                    fullDescription += "." + (String) extensions.nextElement();
+                    fullDescription += "." + extensions.nextElement();
                     while (extensions.hasMoreElements()) {
-                        fullDescription += ", ." + (String) extensions.nextElement();
+                        fullDescription += ", ." + extensions.nextElement();
                     }
                 }
                 fullDescription += ")";
@@ -184,9 +182,9 @@ public class ExampleFileFilter extends FileFilter {
      * Sets the human readable defaultValue of this filter. For
      * example: filter.setDescription("Gif and JPG Images");
      *
-     * @see setDescription
-     * @see setExtensionListInDescription
-     * @see isExtensionListInDescription
+     * @see this.setDescription
+     * @see this.setExtensionListInDescription
+     * @see this.isExtensionListInDescription
      */
     public void setDescription(String description) {
         this.description = description;
@@ -197,12 +195,12 @@ public class ExampleFileFilter extends FileFilter {
      * Determines whether the extension list (.jpg, .gif, etc) should
      * show up in the human readable defaultValue.
      * <p/>
-     * Only relevent if a defaultValue was provided in the constructor
+     * Only relevant if a defaultValue was provided in the constructor
      * or using setDescription();
      *
-     * @see getDescription
-     * @see setDescription
-     * @see isExtensionListInDescription
+     * @see this.getDescription
+     * @see this.setDescription
+     * @see this.isExtensionListInDescription
      */
     public void setExtensionListInDescription(boolean b) {
         useExtensionsInDescription = b;
@@ -213,12 +211,12 @@ public class ExampleFileFilter extends FileFilter {
      * Returns whether the extension list (.jpg, .gif, etc) should
      * show up in the human readable defaultValue.
      * <p/>
-     * Only relevent if a defaultValue was provided in the constructor
+     * Only relevant if a defaultValue was provided in the constructor
      * or using setDescription();
      *
-     * @see getDescription
-     * @see setDescription
-     * @see setExtensionListInDescription
+     * @see this.getDescription
+     * @see this.setDescription
+     * @see this.setExtensionListInDescription
      */
     public boolean isExtensionListInDescription() {
         return useExtensionsInDescription;

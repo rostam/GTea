@@ -6,14 +6,17 @@ import graphtea.graph.graph.Edge;
 import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
-import graphtea.platform.StaticUtils;
 import graphtea.platform.lang.CommandAttitude;
 import graphtea.platform.parameter.Parameter;
 import graphtea.platform.parameter.Parametrizable;
 import graphtea.plugins.graphgenerator.core.PositionGenerators;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 
-import java.awt.*;
+/**
+ * Author: Ali Rostami
+ *
+ * https://mathworld.wolfram.com/BananaTree.html
+ */
 
 @CommandAttitude(name = "generate_banana_tree", abbreviation = "_g_banana", description = "generates a Banana graph")
 public class BananaTreeGenerator implements GraphGeneratorExtension, Parametrizable {
@@ -21,13 +24,14 @@ public class BananaTreeGenerator implements GraphGeneratorExtension, Parametriza
     //the depth should be positive, and also if it is very large the
     //generated graph is too large to generate.
     @Parameter(description = "N")
-    public int n = 4;
+    public static int n = 4;
     @Parameter(description = "K")
-    public int k = 4;      //num of each star vertices
+    public static int k = 4;      //num of each star vertices
 
 
     public String checkParameters() {
-        if( n<0 || k<0 )return " Both k & n must be positive!";
+        if( n<0 || k<0 )
+            return "Both k & n must be positive!";
         else
             return null;    //the parameters are well defined.
     }
@@ -52,12 +56,12 @@ public class BananaTreeGenerator implements GraphGeneratorExtension, Parametriza
         root.setLocation(new GPoint(0, 0));
         Vertex curv;
         //generating edges and setting positions
-        Point[] fR = PositionGenerators.circle(3000, 0, 0, n);
+        GPoint[] fR = PositionGenerators.circle(3000, 0, 0, n);
         Vertex[] firstDepth = new Vertex[n];
 
         //generating first level vertices
         for (int i = 0; i < n; i++) {
-            Point center = fR[i];
+            GPoint center = fR[i];
             curv = new Vertex();
             setloc(curv, center);
             firstDepth[i] = curv;
@@ -67,11 +71,10 @@ public class BananaTreeGenerator implements GraphGeneratorExtension, Parametriza
 
         //generating second level vertices
         for (int i = 0; i < n; i++) {
-            Point center = fR[i];
+            GPoint center = fR[i];
             Vertex centerv = firstDepth[i];
 
-            Point[] sR;
-            sR = PositionGenerators.circle(1000, center.x, center.y, k);
+            GPoint[] sR = PositionGenerators.circle(1000, center.x, center.y, k);
             for (int j = 0; j < k; j++) {
                 if(j == (i + k/2)%n) continue;
                 curv = new Vertex();
@@ -83,15 +86,8 @@ public class BananaTreeGenerator implements GraphGeneratorExtension, Parametriza
         return g;
     }
 
-    private static void setloc(Vertex vv, Point gp) {
+    private static void setloc(Vertex vv, GPoint gp) {
         vv.setLocation(new GPoint(gp.x, gp.y));
-    }
-
-
-    public static void main(String[] args) {
-        graphtea.platform.Application.main(args);
-        StaticUtils.loadSingleExtension(BananaTreeGenerator.class);
-
     }
 
     @Override

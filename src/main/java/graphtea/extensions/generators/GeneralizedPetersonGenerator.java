@@ -6,6 +6,7 @@
 package graphtea.extensions.generators;
 
 import graphtea.graph.graph.Edge;
+import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.platform.lang.CommandAttitude;
@@ -16,17 +17,13 @@ import graphtea.plugins.graphgenerator.core.PositionGenerators;
 import graphtea.plugins.graphgenerator.core.SimpleGeneratorInterface;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 
-import java.awt.*;
-
 /**
  * @author Mohammad Ali Rostami
- * @email mamliam@gmail.com
+ * @email rostamiev@gmail.com
  */
 
 @CommandAttitude(name = "generate_generalized_peterson", abbreviation = "_g_p", description = "generalized peterson")
 public class GeneralizedPetersonGenerator implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
-    private GraphModel g;
-
     @Parameter(name = "n")
     public static Integer n = 5;
 
@@ -40,10 +37,6 @@ public class GeneralizedPetersonGenerator implements GraphGeneratorExtension, Pa
 
     public String getDescription() {
         return "Generalized Peterson";
-    }
-
-    public void setWorkingGraph(GraphModel g) {
-        this.g = g;
     }
 
     public Vertex[] getVertices() {
@@ -71,10 +64,10 @@ public class GeneralizedPetersonGenerator implements GraphGeneratorExtension, Pa
         return ret;
     }
 
-    public Point[] getVertexPositions() {
-        Point[] p = new Point[2 * n];
-        Point[] p1 = PositionGenerators.circle(300, 200, 200, n);
-        Point[] p2 = PositionGenerators.circle(600, 200, 200, n);
+    public GPoint[] getVertexPositions() {
+        GPoint[] p = new GPoint[2 * n];
+        GPoint[] p1 = PositionGenerators.circle(300, 200, 200, n);
+        GPoint[] p2 = PositionGenerators.circle(600, 200, 200, n);
         for (int i = 0; i < n; i++) {
             p[i] = p2[i];
             p[i + n] = p1[i];

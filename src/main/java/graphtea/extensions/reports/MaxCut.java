@@ -15,7 +15,7 @@ import java.util.Random;
  */
 
 @CommandAttitude(name = "maxium_Cut", abbreviation = "max_Cut")
-public class MaxCut implements GraphReportExtension {
+public class MaxCut implements GraphReportExtension<Integer> {
     public String getName() {
         return "Maximum Cut";
     }
@@ -24,15 +24,13 @@ public class MaxCut implements GraphReportExtension {
         return "Axproximate Maximum Cut In An Undirected Graph";
     }
 
-    public Object calculate(GraphModel g) {
+    public Integer calculate(GraphModel g) {
         return getMaxCut(g);
     }
 
-
-
     private int getMaxCut(GraphModel graph){
          permution(graph);
-         Vertex v[]=graph.getVertexArray();
+         Vertex[] v =graph.getVertexArray();
          for(int i=0;i<graph.getVerticesCount();i++)
          {
          if(getVertexInnerWeight(graph,v[i])>getVertexOuterWeight(graph,v[i]))
@@ -45,7 +43,7 @@ public class MaxCut implements GraphReportExtension {
 
 
         private int getCutWeight(GraphModel graph){
-            Vertex v[]=graph.getVertexArray();
+            Vertex[] v =graph.getVertexArray();
             int SumCutWeight=0;
             for(int i=0;i<graph.getVerticesCount();i++)
                 {
@@ -57,7 +55,7 @@ public class MaxCut implements GraphReportExtension {
 
         private void permution(GraphModel graph){
          int VertexCount=graph.getVerticesCount();
-         Vertex v[]=graph.getVertexArray();
+         Vertex[] v =graph.getVertexArray();
          Random rnd=new Random();
          for(int i=0;i<VertexCount;i++) {
             if(rnd.nextBoolean())

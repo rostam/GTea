@@ -23,15 +23,15 @@ public class AttributeSetView {
     HashMap<String, Boolean> editable = new HashMap<>();
     HashMap<String, GBasicCellEditor> editors = new HashMap<>();
     final int dlen = 8;
-    HashMap[] descriptions = new HashMap[dlen];
+    HashMap<String,String>[] descriptions = new HashMap[dlen];
     private AttributeSet a = new AttributeSetImpl();
 
     static int dname = 2, desc = 3, cat = 4, index = 5, visible = 6, valid = 7, EDITOR = 8;
-    private HashMap<String, GBasicCellRenderer> renderers = new HashMap<>();
+    private final HashMap<String, GBasicCellRenderer> renderers = new HashMap<>();
 
     public AttributeSetView() {
         for (int i = 0; i < dlen; i++) {
-            descriptions[i] = new HashMap();
+            descriptions[i] = new HashMap<>();
         }
     }
 
@@ -140,7 +140,7 @@ public class AttributeSetView {
      * set the index of the attribute, the lower index attributes are put before, in the getNames()
      */
     public void setIndex(String name, int atrIndex) {
-        //store indices in a seperate Map from string to int.
+        //store indices in a separate Map from string to int.
         indices.put(name, atrIndex);
 //        set(index, name, index + "");
     }

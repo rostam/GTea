@@ -18,17 +18,19 @@ public class JFontChooser extends JComponent {
     public static int OK_OPTION = 0;
     public static int CANCEL_OPTION = 1;
 
-    private JList fontList, sizeList;
-    private JCheckBox cbBold, cbItalic;
-    private JTextArea txtSample;
+    private final JList<String> fontList;
+    private final JList<String> sizeList;
+    private final JCheckBox cbBold;
+    private final JCheckBox cbItalic;
+    private final JTextArea txtSample;
 
-    private String[] sizes = new String[]
+    private final String[] sizes = new String[]
             {"2", "4", "6", "8", "10", "12", "13", "14", "16", "18", "20", "22", "24", "30", "36", "48", "72"};
 
     public JFontChooser() {
         // create all components
 
-        fontList = new JList(GraphicsEnvironment.getLocalGraphicsEnvironment().
+        fontList = new JList<String>(GraphicsEnvironment.getLocalGraphicsEnvironment().
                 getAvailableFontFamilyNames()) {
             private static final long serialVersionUID = 2307765155498619149L;
 
@@ -39,7 +41,7 @@ public class JFontChooser extends JComponent {
         fontList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 
-        sizeList = new JList(sizes) {
+        sizeList = new JList<String>(sizes) {
             private static final long serialVersionUID = -2474666139561694389L;
 
             public Dimension getPreferredScrollableViewportSize() {

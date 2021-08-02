@@ -48,7 +48,7 @@ public class VertexMoveEvent extends AbstractAction {
         }
     }
 
-    //it preserves the vertex selection consistant. if the vertex was selected before move it should be after and vice versa
+    //it preserves the vertex selection consistent. if the vertex was selected before move it should be after and vice versa
     private boolean isVertexSelected;
 
     private void dragging() {
@@ -92,7 +92,7 @@ public class VertexMoveEvent extends AbstractAction {
         //store the original position
         x1 = vdd.mousePos.x;
         y1 = vdd.mousePos.y;
-        isVertexSelected = ((SubGraph) Select.getSelection(blackboard)).vertices.contains(vdd.v);
+        isVertexSelected = Select.getSelection(blackboard).vertices.contains(vdd.v);
     }
 }
 

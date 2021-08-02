@@ -19,16 +19,16 @@ import java.util.Vector;
 
 /**
  * The base class for loading extensions.
- * This class performs loading and reloading of extensions,  (from their source (.class or anyother format) files)
+ * This class performs loading and reloading of extensions,  (from their source (.class or another format) files)
  *
  * @author Azin Azadi
  */
 public class ExtensionLoader implements StorableOnExit {
-    private static HashSet<ExtensionHandler> registeredExtensionHandlers = new HashSet<>();
-    private static HashSet<UnknownExtensionLoader> registeredUnknownExtensionLoaders = new HashSet<>();
+    private static final HashSet<ExtensionHandler> registeredExtensionHandlers = new HashSet<>();
+    private static final HashSet<UnknownExtensionLoader> registeredUnknownExtensionLoaders = new HashSet<>();
     // categorises the known extensions on their type. The type (eg report, generator, ...) is identified
     // by the respective ExtensionHandler
-    public static HashMap<Class<? extends ExtensionHandler>, Vector> extensionsList = new HashMap<>();
+    public static HashMap<Class<? extends ExtensionHandler>, Vector<Extension>> extensionsList = new HashMap<>();
     // maps an extension class (eg GeneratePath), to the loaded AbstractAction
     public static HashMap<String, AbstractAction> loadedInstances = new HashMap<>();
 
@@ -65,7 +65,7 @@ public class ExtensionLoader implements StorableOnExit {
      * because here we keep list of handled extensions for further uses. everything else will
      * not be in this list.
      */
-    public static AbstractAction handleExtension(BlackBoard b, Object e) {
+    public static AbstractAction handleExtension(BlackBoard b, Extension e) {
         AbstractAction a = null;
         for (ExtensionHandler handler : registeredExtensionHandlers) {
             AbstractAction ret = handler.handle(b, e);
@@ -74,7 +74,7 @@ public class ExtensionLoader implements StorableOnExit {
                     a = ret;
                 }
                 if (!extensionsList.containsKey(handler.getClass())){
-                    extensionsList.put(handler.getClass(), new Vector());
+                    extensionsList.put(handler.getClass(), new Vector<>());
                 }
                 extensionsList.get(handler.getClass()).add(e);
                 loadedInstances.put(e.getClass().getName(), a);
@@ -90,12 +90,12 @@ public class ExtensionLoader implements StorableOnExit {
      * @param extensionClass the extension class
      * @return an object of the given extension
      */
-    public static Object loadExtension(Class extensionClass) {
-        Object ret = null;
+    public static Extension loadExtension(Class<Extension> extensionClass) {
+        Extension ret = null;
         try {
-            if (BasicExtension.class.isAssignableFrom(extensionClass)) {
-                Constructor[] cs = extensionClass.getConstructors();
-                for (Constructor c : cs) {
+            if (Extension.class.isAssignableFrom(extensionClass)) {
+                Constructor<Extension>[] cs = (Constructor<Extension>[]) extensionClass.getConstructors();
+                for (Constructor<Extension> c : cs) {
                     Class[] p = c.getParameterTypes();
                     if (p.length == 1 && p[0].equals(BlackBoard.class)) {
                         ret = extensionClass.getConstructor(BlackBoard.class).newInstance(Application.blackboard);
@@ -107,7 +107,7 @@ public class ExtensionLoader implements StorableOnExit {
                 }
             }
             if (ret != null) {
-                SETTINGS.registerSetting(ret, "Extention Options");
+                SETTINGS.registerSetting(ret, "Extension Options");
             }
             return ret;
         } catch (Exception e) {
@@ -119,7 +119,7 @@ public class ExtensionLoader implements StorableOnExit {
     }
 
     /**
-     * returns an instance of extensionClsas if the given extensionClass implements Extension, otherwise it returns null
+     * returns an instance of extensionClass if the given extensionClass implements Extension, otherwise it returns null
      *
      * @param unknownFile The given unknown extension
      */

@@ -4,7 +4,6 @@
 // Distributed under the terms of the GNU General Public License (GPL): http://www.gnu.org/licenses/
 package graphtea.plugins.algorithmanimator.core.atoms;
 
-import graphtea.graph.graph.Edge;
 import graphtea.library.event.EdgeEvent;
 import graphtea.library.event.Event;
 import graphtea.platform.core.BlackBoard;
@@ -19,13 +18,12 @@ public class EdgeMarkAnimator implements AtomAnimator<EdgeEvent> {
 
     public boolean isAnimatable(Event event) {
         if (event instanceof EdgeEvent)
-            if (((EdgeEvent) event).eventType == EdgeEvent.EventType.MARK)
-                return true;
+            return ((EdgeEvent) event).eventType == EdgeEvent.EventType.MARK;
         return false;
     }
 
     public EdgeEvent animate(EdgeEvent event, BlackBoard b) {
-        ((Edge) event.edge).setColor(1);
+        event.edge.setColor(1);
         return event;
     }
 }

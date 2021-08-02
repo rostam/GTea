@@ -42,10 +42,8 @@ public class NDMetis {
                 }
                 if(!tmp.equals("")) {
                     fw.write(tmp.substring(0,tmp.length()-1));
-                    fw.write("\n");
-                } else {
-                    fw.write("\n");
                 }
+                fw.write("\n");
             }
             fw.close();
         } catch (IOException e) {
@@ -73,8 +71,8 @@ public class NDMetis {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ProcessBuilder process=null;
 
+        ProcessBuilder process=null;
         if(System.getProperty("os.name").contains("Win")) {
             System.out.println("This option works only in linux.");
         } else {

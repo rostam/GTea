@@ -14,18 +14,17 @@ import graphtea.plugins.reports.extension.GraphReportExtension;
 
 import java.util.Vector;
 
-import static graphtea.extensions.reports.Utils.choose;
+import static graphtea.extensions.AlgorithmUtils.choose;
 
 /**
  * @author Mohammad Ali Rostami
  */
 
 @CommandAttitude(name = "num_of_stars", abbreviation = "_noss")
-public class SubTreeCounting implements GraphReportExtension {
-    public Object calculate(GraphModel g) {
+public class SubTreeCounting implements GraphReportExtension<RenderTable> {
+    public RenderTable calculate(GraphModel g) {
         RenderTable ret = new RenderTable(2);
         Vector<String> titles = new Vector<>();
-        Vector<Object> elem = new Vector<>();
 
         double maxDeg = 0;
         for(Vertex v : g) {

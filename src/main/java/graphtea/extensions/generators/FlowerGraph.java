@@ -6,6 +6,7 @@
 package graphtea.extensions.generators;
 
 import graphtea.graph.graph.Edge;
+import graphtea.graph.graph.GPoint;
 import graphtea.graph.graph.GraphModel;
 import graphtea.graph.graph.Vertex;
 import graphtea.platform.lang.CommandAttitude;
@@ -15,25 +16,14 @@ import graphtea.plugins.graphgenerator.GraphGenerator;
 import graphtea.plugins.graphgenerator.core.SimpleGeneratorInterface;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 
-import java.awt.*;
-
 /**
  * Author: Mohsen Khaki
  * 
  */
-@CommandAttitude(name = "generate_felower", abbreviation = "_g_flower", description = "generates a Helm graph of order n")
+@CommandAttitude(name = "generate_flower", abbreviation = "_g_flower", description = "generates a Helm graph of order n")
 public class FlowerGraph implements GraphGeneratorExtension, Parametrizable, SimpleGeneratorInterface {
-
 	@Parameter(name = "n")
 	public static int n = 3;
-
-
-	GraphModel g;
-
-	public void setWorkingGraph(GraphModel g)
-	{
-		this.g = g;
-	}
 
 	public String getName()
 	{
@@ -56,12 +46,10 @@ public class FlowerGraph implements GraphGeneratorExtension, Parametrizable, Sim
 		return result;
 	}
 
-	public Edge[] getEdges()
-	{
+	public Edge[] getEdges() {
 		Edge[] result =  new Edge[4*n];
         int ecnt = 0;
-		for (int i = 0; i < n; i++)
-		{
+		for (int i = 0; i < n; i++) {
 			result[ecnt] = new Edge(v[i], v[n+i]);
             ecnt++;
 			result[ecnt] = new Edge(v[n+i], v[2*n]);
@@ -75,12 +63,12 @@ public class FlowerGraph implements GraphGeneratorExtension, Parametrizable, Sim
         return result;
 	}
 
-	public Point[] getVertexPositions()
+	public GPoint[] getVertexPositions()
 	{
 		int w = 1000;
 		double mw = ((double)w)/2.0, qw = ((double)w)/4.0;
-		Point result[] = new Point[2*n+1];
-		result[2*n] = new Point(w/2, w/2);
+		GPoint[] result = new GPoint[2*n+1];
+		result[2*n] = new GPoint(w/2, w/2);
 		double ang = Math.PI*2.0/n;
 		double offset = 0.0;
 		if ((n % 2) == 0)
@@ -89,8 +77,8 @@ public class FlowerGraph implements GraphGeneratorExtension, Parametrizable, Sim
 		{
 			double angle = offset + i * ang;
             double angle2 = angle + ang/6;
-			result[i] = new Point((int)(mw + Math.sin(angle2)* mw), (int)(mw - Math.cos(angle2)* mw));
-			result[n+i] = new Point((int)(mw + Math.sin(angle)* qw), (int)(mw - Math.cos(angle)* qw));
+			result[i] = new GPoint((int)(mw + Math.sin(angle2)* mw), (int)(mw - Math.cos(angle2)* mw));
+			result[n+i] = new GPoint((int)(mw + Math.sin(angle)* qw), (int)(mw - Math.cos(angle)* qw));
 		}
 		return result;
 	}
@@ -107,17 +95,12 @@ public class FlowerGraph implements GraphGeneratorExtension, Parametrizable, Sim
 	}
 
 	/**
-	 * generates a Helm Graph with given parameters
+	 * generates a Flower Graph with given parameters
 	 */
 	public static GraphModel generateHelm(int n)
 	{
 		FlowerGraph.n = n;
 		return GraphGenerator.getGraph(false, new FlowerGraph());
-    }
-
-public static void main(String[] args) {
-        graphtea.platform.Application.main(args);
-//        StaticUtils.loadSingleExtension(graphtea.samples.extensions.HelmGraph.class);
     }
 
     @Override

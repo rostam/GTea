@@ -20,7 +20,7 @@ import java.awt.*;
  * @author azin azadi
  * @email
  */
-public abstract class GraphRectRegionSelect implements Listener, PaintHandler<AbstractGraphRenderer> {
+public abstract class GraphRectRegionSelect implements Listener, PaintHandler {
     public Rectangle getCurrentRect() {
         return rect;
     }
@@ -31,7 +31,7 @@ public abstract class GraphRectRegionSelect implements Listener, PaintHandler<Ab
     protected AbstractGraphRenderer gv;
     protected int xx;
     protected int yy;
-    private BlackBoard blackboard;
+    private final BlackBoard blackboard;
     public static boolean isSelecting = false;
 
     public GraphRectRegionSelect(BlackBoard bb) {
