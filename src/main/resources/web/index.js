@@ -1,4 +1,5 @@
-var serverAddr = "http://127.0.0.1:2342/"; //"http://0.0.0.0:2342/";
+//var serverAddr = "http://127.0.0.1:2342/";
+var serverAddr = "http://0.0.0.0:2342/";
 // var serverAddr = "http://csc.inf-ra.uni-jena.de:80/";
 var nodeId = 0;
 var cy; //cytoscape object
@@ -46,6 +47,10 @@ $.get(serverAddr + 'graphs/')
             reportsSelect.append('<option>' + d.name + '</option>');
             original_data[d.name] = {desc: d.desc, props: d.properties};
         });
+
+        reportsSelect.html(reportsSelect.find('option').sort(function(x, y) {
+            return $(x).text() > $(y).text() ? 1 : -1;
+        }));
         reportsSelect.on('change', function () {
             var report = getSelectedReport();
             var props = $('#reportProps');
@@ -332,6 +337,17 @@ function selectLoader() {
             $('#freehandformat').show();
             $('#act_name').html("free");
     }
+}
+
+function load_free(ended) {
+//if($('#parent_canvas').find("div").length == 1) {
+    $('#parent_canvas').empty();
+    $('#parent_canvas').append("<div id='canvas' class='main'>")
+    initCytoscape(undirected, serverAddr, uuid);
+    cy.elements().remove();
+    cy.layout({name: 'cose'}).run();
+//}
+ended();
 }
 
 function load_graph(type,isDraw,webgl,ended) {

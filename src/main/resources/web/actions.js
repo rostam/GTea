@@ -14,9 +14,11 @@ function do_actions() {
     startLoaderIcon();
     if (action == "Load and Draw") {
         if (act_name == 'gen') load_generator(true, false, endLoaderIcon);
+        else if(act_name == 'free') load_free(endLoaderIcon);
         else load_graph(act_name, true, false, endLoaderIcon);
     } else if (action == "Load Only") {
         if (act_name == 'gen') load_generator(false, false, endLoaderIcon);
+        else if(act_name == 'free') load_free(endLoaderIcon);
         else load_graph(act_name, false, false, endLoaderIcon);
     } else if (action == "Fit Canvas") {
         cy.fit();
@@ -27,6 +29,7 @@ function do_actions() {
         window.open(jpg64);
     } else if (action == "WebGL") {
         if (act_name == 'gen') load_generator(true, true, endLoaderIcon);
+        else if(act_name == 'free') load_free(endLoaderIcon)
         else load_graph(act_name, true, true, endLoaderIcon);
     }
 
