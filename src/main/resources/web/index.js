@@ -18,6 +18,11 @@ $.get(serverAddr + 'graphs/')
             categoriesSelect.append('<option>' + d.name + '</option>');
             original_data[d.name] = {desc: d.desc, props: d.properties};
         });
+
+        categoriesSelect.html(categoriesSelect.find('option').sort(function(x, y) {
+            return $(x).text() > $(y).text() ? 1 : -1;
+        }));
+
         categoriesSelect.on('change', function () {
             var category = getSelectedCategory();
             var keys = "", vals = "";
@@ -51,6 +56,7 @@ $.get(serverAddr + 'graphs/')
         reportsSelect.html(reportsSelect.find('option').sort(function(x, y) {
             return $(x).text() > $(y).text() ? 1 : -1;
         }));
+
         reportsSelect.on('change', function () {
             var report = getSelectedReport();
             var props = $('#reportProps');
@@ -69,11 +75,23 @@ $.get(serverAddr + 'graphs/')
             var desc = original_data[report].desc;
             $('#tooltiptextReport').html(desc);
         });
+
+        var algorithmsSelect = $('#graphAlgorithms');
+        data.algorithms.forEach(function (d) {
+            algorithmsSelect.append('<option>' + d.name + '</option>');
+            original_data[d.name] = {desc: d.desc, props: d.properties};
+        });
+
+        algorithmsSelect.html(algorithmsSelect.find('option').sort(function(x, y) {
+             return $(x).text() > $(y).text() ? 1 : -1;
+        }));
+
         var actionsSelect = $('#graphActions');
         data.actions.forEach(function (d) {
             actionsSelect.append('<option>' + d.name + '</option>');
             original_data[d.name] = {desc: d.desc, props: d.properties};
         });
+
         actionsSelect.on('change', function () {
             var action = getSelectedGraphAction();
             var props = $('#graphActionsProps');
@@ -124,6 +142,115 @@ function graphAction(){
             alert(errorThrown);
         });
 }
+
+function graphAlgorithm(status) {
+    var type = $('#graphType').find('option:selected').text();
+    jQuery.ajax({
+        url: 'http://0.0.0.0:2342/add', type: 'POST', contentType: 'application/json',
+        data: JSON.stringify({
+            "type": "algorithm",
+            "name": $('#graphAlgorithms').find('option:selected').text(),
+            "graph": $('#categories').find('option:selected').text(),
+            "uuid": uuid,
+//            "propsKeys": $('#reportPropsKeys').html(),
+//            "propsVals": $('#reportPropsVals').val(),
+            "directed": type,
+            "status": status
+        }),
+        dataType: 'json'
+    })
+    //
+    // $.get(serverAddr + 'report/'
+    //     + $('#categories').find('option:selected').text() + "--"
+    //     + $('#reports').find('option:selected').text() + "--"
+    //     + ($('#props_keys').html() + ":" + $('#props_vals').val()) + "--"
+    //     + ($('#reportPropsKeys').html() + ":" + $('#reportPropsVals').val())
+    //     + "--" + uuid)
+        .done(function (data) {
+            console.log(data);
+            var arr = data.steps;
+            if(status == 'load_algorithm') {
+              for(var stepCounter = 0; stepCounter < arr.length;stepCounter++) {
+                stepMessage = arr[stepCounter].split("+++");
+                if(stepMessage[0].indexOf('RequestVertex') != -1) {
+                    status += "rv";
+                }
+              }
+            } else {
+                var id = null;
+            function myMove(data) {
+              var stepCounter = 0;
+              clearInterval(id);
+              id = setInterval(frame, 1000);
+              function frame() {
+                if (stepCounter == arr.length - 1) {
+                  clearInterval(id);
+                } else {
+                  if(arr[stepCounter].indexOf("Step") == -1) return;
+                  stepMessage = arr[stepCounter].split("+++");
+                  tmp = stepMessage[0].replace("<br/>","").replace("Step==","");
+                  if(tmp.length > 1)
+                    $("#algResults").html($("#algResults").html()+tmp+"\n\n");
+                  var colors = stepMessage[2].split(',');
+                  var edge_colors = stepMessage[4].split(',');
+                  stepCounter++;
+                  console.log(stepCounter);
+                  for(i=0;i<colors.length-1;i++) {
+                    cy.nodes('[id = "' + i +  '"]').style('background-color', distinctColors[Object.keys(distinctColors)[colors[i]]]);
+                  }
+                  for(i=0;i<edge_colors.length-1;i++) {
+                    cy.edges('[id = "' + i +  '"]').style('color', distinctColors[Object.keys(distinctColors)[edge_colors[i]]]);
+                  }
+                }
+              }
+            }
+            myMove(data);
+            }
+//            console.log(arr);
+//            for(var i=0;i<arr.length;i++) {
+//                var colors = arr[i].split("+++")[2].split(',');
+//                console.log(colors);
+//                for(i=0;i<colors.length-1;i++) {
+//                    cy.nodes('[id = "' + i +  '"]').style('background-color', 'green');
+//                }
+        //}
+        return;
+            report_results = data;
+            if (data.titles != undefined) {
+                $('#reportResults').html(JSON.stringify(data));
+                var titles = data.titles.substr(1, data.titles.indexOf("]") - 1);
+                var tts = titles.split(",");
+                var builtHTML = "<table class='fixed_headers'><thead><tr>";
+                tts.forEach(function (t) {
+                    builtHTML += "<th>" + t + "</th>";
+                });
+                var results = JSON.parse(data.results);
+                builtHTML += "</tr></thead><tbody>";
+                results.forEach(function (row) {
+                    builtHTML += "<tr>";
+                    row.forEach(function (col) {
+                        builtHTML += "<td>" + col + "</td>";
+                    })
+                    builtHTML += "</tr>";
+                });
+                builtHTML += "</tr></tbody></table>";
+                $('#results-body').html(builtHTML);
+            } else {
+                var res = "";
+                Object.keys(data).forEach(function (t) {
+                    res+= t + ":" + JSON.stringify(data[t]) + ",";
+                });
+                res = res.substr(0,res.length-1);
+                $('#reportResults').html(res);
+                $('#results-body').html(res);
+            }
+
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        });
+}
+
 
 function Report() {
     var type = $('#graphType').find('option:selected').text();

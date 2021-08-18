@@ -148,7 +148,15 @@
             <textarea name="Text2" cols="35" rows="4" id="outputResults"></textarea>
         </div>
         <hr>
-
+        <p id="strings-graph-algorithms"></p>
+        <select id="graphAlgorithms"></select><br/>
+        <button onclick="graphAlgorithm('load_algorithm')">Load Algorithm</button>
+        <button onclick="graphAlgorithm('start')">Go</button>
+        <div class="tooltip"><i class="fa fa-info-circle" aria-hidden="true"></i>
+            <span id="tooltiptextGraphAlgorithm" class="tooltiptext">A brief description</span>
+        </div>
+        <textarea name="Text22" cols="35" rows="6" id="algResults"></textarea>
+        <hr>
         <p id="strings-graph-actions"></p>
         <select id="graphActions"></select>
         <div id="graphActionsProps"></div>

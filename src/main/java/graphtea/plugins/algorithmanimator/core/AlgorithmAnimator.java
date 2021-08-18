@@ -100,13 +100,13 @@ public class AlgorithmAnimator implements EventDispatcher, ActionListener {
         } catch (InterruptedException e) {
             System.err.println("Thread sleep has error.");
         }
-        GHTMLPageComponent html = alggui.algorithmOutputTextArea;
-
-        showMessageFor(html, event);
+//        GHTMLPageComponent html = alggui.algorithmOutputTextArea;
+//
+//        showMessageFor(html, event);
 
         Event output = animateEvent(event);
-        if (event.getMessage() != output.getMessage())
-            showMessageFor(html, output);
+//        if (event.getMessage() != output.getMessage())
+//            showMessageFor(html, output);
 
         if (oneStep && event instanceof AlgorithmStep) {
             alggui.playOneStepButton.setEnabled(true);
@@ -124,7 +124,7 @@ public class AlgorithmAnimator implements EventDispatcher, ActionListener {
 
     private void showMessageFor(GHTMLPageComponent html, Event event1) {
         if (event1 != null && event1.getMessage() != null && event1.getMessage() != "") {
-            html.appendHTML(event1.getMessage());
+//            html.appendHTML(event1.getMessage());
         }
     }
 
@@ -162,16 +162,16 @@ public class AlgorithmAnimator implements EventDispatcher, ActionListener {
      * @param algorithmName The algorithm name
      */
     public void createControlDialog(String algorithmName) {
-        JFrame f = new JFrame();
-        f.setTitle("Algorithm Runner: " + algorithmName);
-        f.setAlwaysOnTop(true);
-        alggui = new AnimatorGUI(this, blackboard);
-        //moves the carret to the end of text, see dispatch event
-//        alggui.algorithmOutputTextArea.getCaret().setDot(alggui.algorithmOutputTextArea.getText().length());
-
-        f.add(alggui.animatorFrame);
-        f.pack();
-        f.setVisible(true);
+//        JFrame f = new JFrame();
+//        f.setTitle("Algorithm Runner: " + algorithmName);
+//        f.setAlwaysOnTop(true);
+//        alggui = new AnimatorGUI(this, blackboard);
+//        //moves the carret to the end of text, see dispatch event
+////        alggui.algorithmOutputTextArea.getCaret().setDot(alggui.algorithmOutputTextArea.getText().length());
+//
+//        f.add(alggui.animatorFrame);
+//        f.pack();
+//        f.setVisible(true);
     }
 
 }

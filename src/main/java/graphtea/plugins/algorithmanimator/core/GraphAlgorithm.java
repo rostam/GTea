@@ -14,7 +14,7 @@ import graphtea.plugins.main.GraphData;
 public class GraphAlgorithm extends Algorithm {
 
     protected BlackBoard blackBoard;
-    protected GraphData graphData;
+    public GraphData graphData;
 
     public GraphAlgorithm(BlackBoard blackBoard){
         this.blackBoard = blackBoard;

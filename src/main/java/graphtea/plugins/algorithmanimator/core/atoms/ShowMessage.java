@@ -20,9 +20,9 @@ public class ShowMessage implements AtomAnimator<MessageEvent> {
     }
 
     public MessageEvent animate(MessageEvent event, BlackBoard b) {
-        if (event.isNotification)
-            GTabbedGraphPane.showTimeNotificationMessage(event.getMessage(), b, event.durationShowTime, true);
-        else GTabbedGraphPane.setMessage(event.getMessage(), b, true);
+//        if (event.isNotification)
+//            GTabbedGraphPane.showTimeNotificationMessage(event.getMessage(), b, event.durationShowTime, true);
+//        else GTabbedGraphPane.setMessage(event.getMessage(), b, true);
         return event;
     }
 }

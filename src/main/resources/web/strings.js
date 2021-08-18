@@ -27,6 +27,7 @@ var strings = {
     adjMat: "The adjacency matrix:",
     save: "Save the graph:",
     graphActions: "Apply an operator on the graph:",
+    graphAlgorithms: "Interactively running an algorithm on the graph:",
     freehand: "Freehand graph drawing by mouse."
 };
 
@@ -39,6 +40,7 @@ $("#strings-report").html(strings.report);
 $("#strings-adjMatformat").html(strings.adjMat);
 $("#strings-save").html(strings.save);
 $("#strings-graph-actions").html(strings.graphActions);
+$("#strings-graph-algorithms").html(strings.graphAlgorithms);
 $("#strings-elformat").html(strings.elist);
 //
 // strings.intro+= "<div class=\"tooltip\"><i class=\"fa fa-info-circle\" aria-hidden=\"true\"></i>\n" +

@@ -39,7 +39,7 @@ public class GraphUtils {
      * @see graphtea.graph.ui.GTabbedGraphPane#setMessage(String,graphtea.platform.core.BlackBoard,boolean)
      */
     public static void setMessage(String message, BlackBoard b, boolean formatIt) {
-        GTabbedGraphPane.setMessage(message, b, formatIt);
+//        GTabbedGraphPane.setMessage(message, b, formatIt);
     }
 
     /**

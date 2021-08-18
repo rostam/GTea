@@ -1,5 +1,6 @@
 package server;
 
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class JSONExtensionHandler {
@@ -11,6 +12,8 @@ public class JSONExtensionHandler {
     private final String propsKeys;
     private final String propsVals;
     private final String directed;
+    private final String status;
+    private final ArrayList<String> steps;
     private static final AtomicLong counter = new AtomicLong(100);
 
     private JSONExtensionHandler(JSONExtensionHandlerBuilder builder){
@@ -22,6 +25,8 @@ public class JSONExtensionHandler {
         this.propsKeys = builder.propsKeys;
         this.propsVals = builder.propsVals;
         this.directed = builder.directed;
+        this.status = builder.status;
+        this.steps = builder.steps;
     }
 
     public JSONExtensionHandler(){
@@ -34,10 +39,13 @@ public class JSONExtensionHandler {
         this.propsKeys = cust.getpropsKeys();
         this.propsVals = cust.getpropsVals();
         this.directed = cust.getDirected();
+        this.status = cust.getStatus();
+        this.steps = cust.getSteps();
     }
 
     public JSONExtensionHandler(long id, String type, String name,
-                    String graph, String uuid, String propsKeys, String propsVals, String directed){
+                                String graph, String uuid, String propsKeys, String propsVals,
+                                String directed, String status, ArrayList<String> steps) {
         JSONExtensionHandler cust = new JSONExtensionHandler.JSONExtensionHandlerBuilder().id()
                 .type(type)
                 .name(name)
@@ -46,6 +54,8 @@ public class JSONExtensionHandler {
                 .propsKeys(propsKeys)
                 .propsVals(propsVals)
                 .directed(directed)
+                .status(status)
+                .steps(steps)
                 .build();
         this.id = cust.getId();
         this.type = cust.gettype();
@@ -55,6 +65,8 @@ public class JSONExtensionHandler {
         this.propsKeys = cust.getpropsKeys();
         this.propsVals = cust.getpropsVals();
         this.directed = cust.getDirected();
+        this.status = status;
+        this.steps = steps;
     }
 
     public long getId(){
@@ -89,16 +101,22 @@ public class JSONExtensionHandler {
         return this.directed;
     }
 
+    public String getStatus() {return this.status;}
+
+    public ArrayList<String> getSteps() {return this.steps;}
+
     @Override
     public String toString(){
         return "ID: " + id
                 + " Type: " + type
                 + " Name: " + name + "\n"
-                + "graph: " + graph + "\n"
-                + "uuid: " + uuid
-                + " propsKeys: " + propsKeys
-                + " propsVals: " + propsVals
-                + " Directed:" + directed;
+                + " graph: " + graph + "\n"
+                + " uuid: " + uuid + "\n"
+                + " propsKeys: " + propsKeys + "\n"
+                + " propsVals: " + propsVals + "\n"
+                + " Directed:" + directed + "\n"
+                + " status:" + status + "\n"
+                + " steps:" + steps;
     }
 
     public static class JSONExtensionHandlerBuilder{
@@ -110,6 +128,8 @@ public class JSONExtensionHandler {
         private String propsKeys = "";
         private String propsVals = "";
         private String directed = "";
+        private String status = "";
+        private ArrayList<String> steps = new ArrayList<>();
 
         public JSONExtensionHandlerBuilder id(){
             this.id = JSONExtensionHandler.counter.getAndIncrement();
@@ -153,6 +173,16 @@ public class JSONExtensionHandler {
 
         public JSONExtensionHandlerBuilder directed(String directed) {
             this.directed = directed;
+            return this;
+        }
+
+        public JSONExtensionHandlerBuilder status(String status) {
+            this.status = status;
+            return this;
+        }
+
+        public JSONExtensionHandlerBuilder steps(ArrayList<String> steps) {
+            this.steps = steps;
             return this;
         }
 

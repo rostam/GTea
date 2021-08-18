@@ -5,7 +5,14 @@ import graphtea.extensions.G6Format;
 import graphtea.extensions.RandomTree;
 import graphtea.extensions.io.LatexWriter;
 import graphtea.extensions.io.SaveGraph;
+import graphtea.graph.atributeset.GraphAttrSet;
 import graphtea.graph.graph.*;
+import graphtea.library.event.Event;
+import graphtea.library.event.EventDispatcher;
+import graphtea.library.event.VertexRequest;
+import graphtea.platform.core.BlackBoard;
+import graphtea.plugins.algorithmanimator.core.GraphAlgorithm;
+import graphtea.plugins.algorithmanimator.extension.AlgorithmExtension;
 import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
 import graphtea.plugins.main.extension.GraphActionExtension;
 import graphtea.plugins.main.saveload.core.GraphIOException;
@@ -23,6 +30,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Vector;
@@ -416,20 +424,22 @@ public class RequestHandler {
         return Response.ok(jsonObject.toString()).header("Access-Control-Allow-Origin", "*").build();
     }
 
-
+    static int algorithmParametersCount = 0;
+    static String status = "";
+    static ArrayList<String> al = new ArrayList<>();
     @POST
     @Path("/add")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response extensionHandler(JSONExtensionHandler customer){
-        System.out.println(customer);
-        String sessionID = customer.getuuid();
-        String[] props = {customer.getpropsKeys(), customer.getpropsVals()};
-        String type = customer.getDirected();
+    public Response extensionHandler(JSONExtensionHandler graphRequest){
+        System.out.println(graphRequest);
+        String sessionID = graphRequest.getuuid();
+        String[] props = {graphRequest.getpropsKeys(), graphRequest.getpropsVals()};
+        String type = graphRequest.getDirected();
         handleSession(sessionID);
-        switch (customer.gettype()) {
+        switch (graphRequest.gettype()) {
             case "gen":
-                Helpers.sessionToGraph.put(sessionID, generateGraph(props,customer.getgraph()));
+                Helpers.sessionToGraph.put(sessionID, generateGraph(props,graphRequest.getgraph()));
                 if(type.equals("directed")){
                     Helpers.sessionToGraph.get(sessionID).setDirected(true);
                 } else if (type.equals("undirected")){
@@ -444,7 +454,7 @@ public class RequestHandler {
                 break;
             case "report":
                 if(Helpers.sessionToGraph.containsKey(sessionID)) {
-                    GraphReportExtension gre = Helpers.getInstanceOfExtension(customer.getname());
+                    GraphReportExtension gre = Helpers.getInstanceOfExtension(graphRequest.getname());
                     String[] propsNameSplitted = props[0].split(",");
                     String[] propsValueSplitted = props[1].split(",");
                     if(propsNameSplitted.equals(""))
@@ -463,6 +473,60 @@ public class RequestHandler {
                     return Response.ok(jsonObject.toString()).header("Access-Control-Allow-Origin", "*").build();
                 }
                 break;
+            case "algorithm":
+                System.out.println(graphRequest.getStatus());
+                if(Helpers.sessionToGraph.containsKey(sessionID)) {
+                     AlgorithmExtension alg = Helpers.getInstanceOfAlgorithmExtension(graphRequest.getname());
+                     ((GraphAlgorithm)alg).graphData.getBlackboard().setData(GraphAttrSet.name, Helpers.sessionToGraph.get(sessionID));
+                     int[] a = new int[2];
+                     a[0] = 0;
+                     a[1] = 3;
+
+
+                     alg.acceptEventDispatcher(ae -> {
+                         String tmp = "";
+                         if(ae.getClass().getName().contains("VertexRequest")) {
+                             if(graphRequest.getStatus() ==  "load_algorithm") {
+                                 status += "VertexReques==" + ae.getMessage();
+                             } else {
+                                 ((VertexRequest) ae).setVertex(Helpers.sessionToGraph.get(sessionID).getVertex(a[algorithmParametersCount++]));
+                             }
+                         } else if(ae.getClass().getName().contains("AlgorithmStep")) {
+                             if(graphRequest.getStatus() ==  "load_algorithm") {return ae;}
+                             tmp += "Step==" + ae.getMessage() + "+++";
+                             for(Vertex v : Helpers.sessionToGraph.get(sessionID)) {
+                                 tmp += v.getMark() + ",";
+                             }
+                             tmp+="+++";
+                             for(Vertex v : Helpers.sessionToGraph.get(sessionID)) {
+                                 tmp += v.getColor() + ",";
+                             }
+                             tmp+="+++";
+                             for(Edge e : Helpers.sessionToGraph.get(sessionID).getEdges()) {
+                                 tmp += e.getMark() + ",";
+                             }
+                             tmp+="+++";
+                             for(Edge e : Helpers.sessionToGraph.get(sessionID).getEdges()) {
+                                 tmp += e.getColor() + ",";
+                             }
+                         }
+                         if(tmp != "") al.add(tmp);
+                         return ae;
+                     });
+                    alg.doAlgorithm();
+                    algorithmParametersCount = 0;
+//                    System.out.println(status);
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("status",status);
+                        jsonObject.put("steps" , al);
+                        al = new ArrayList<>();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return Response.ok(jsonObject.toString()).header("Access-Control-Allow-Origin", "*").build();
+                }
+
         }
         return Response.ok("{}").header("Access-Control-Allow-Origin", "*").build();
     }
@@ -481,6 +545,7 @@ public class RequestHandler {
             jsonObject.put("graphs", Helpers.getExtensions("graphtea.extensions.generators", GraphGeneratorExtension.class));
             jsonObject.put("reports",Helpers.getExtensions("graphtea.extensions.reports", GraphReportExtension.class));
             jsonObject.put("actions",Helpers.getExtensions("graphtea.extensions.actions", GraphActionExtension.class));
+            jsonObject.put("algorithms",Helpers.getExtensions("graphtea.extensions.algorithms", AlgorithmExtension.class));
         } catch (JSONException e) {
             e.printStackTrace();
         }
