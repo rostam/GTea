@@ -31,6 +31,23 @@ function do_actions() {
         if (act_name == 'gen') load_generator(true, true, endLoaderIcon);
         else if(act_name == 'free') load_free(endLoaderIcon)
         else load_graph(act_name, true, true, endLoaderIcon);
+    } else if (action == "3D Force Directed") {
+        console.log("3D Force Directed");
+            // Random tree
+            const N = 300;
+            const gData = {
+              nodes: [...Array(N).keys()].map(i => ({ id: i })),
+              links: [...Array(N).keys()]
+                .filter(id => id)
+                .map(id => ({
+                  source: id,
+                  target: Math.round(Math.random() * (id-1))
+                }))
+            };
+
+            const Graph = ForceGraph3D()
+              (document.getElementById('canvas'))
+                .graphData(gData);
     }
 
     // trigger the graph creation event on the document node
