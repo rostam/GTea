@@ -319,7 +319,7 @@ function Report() {
         });
 }
 
-function load_generator(isDraw,webgl,ended) {
+function load_generator(isDraw,webgl,ended,threed) {
     var lay = $('#layouts').find('option:selected').text();
     var type = $('#graphType').find('option:selected').text();
     if (lay == "Botanical Tree") {
@@ -341,7 +341,8 @@ function load_generator(isDraw,webgl,ended) {
     })
         .done(function (data) {
             if (isDraw) {
-                if (!webgl) {
+                console.log(webgl + " very well  " + threed);
+                if (!webgl && !threed) {
                     $('#parent_canvas').empty();
                     $('#parent_canvas').append("<div id='canvas' class='main'>")
                     initCytoscape(undirected, serverAddr, uuid);
@@ -355,9 +356,21 @@ function load_generator(isDraw,webgl,ended) {
                     setVertexIds();
                     applyLayout();
                     ended();
-                } else {
+                } else if(!threed) {
                     viva_action(data);
                     ended();
+                } else {
+
+                    const gData = {
+                      nodes: data.nodes.map(i => ({ id: i.data.id })),
+                      links: data.edges.map(i => ({ source: i.data.source, target:i.data.target} ))
+                    };
+
+                    const Graph = ForceGraph3D()
+                      (document.getElementById('canvas'))
+                        .graphData(gData);
+                    ended();
+
                 }
             }
         }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -477,7 +490,7 @@ function load_free(ended) {
 ended();
 }
 
-function load_graph(type,isDraw,webgl,ended) {
+function load_graph(type,isDraw,webgl,ended,threed) {
     var str = $('#' + type + 'string').val().replace(/\n/g, "-");
     var isDirected = $('#graphType').find('option:selected').text();
     var adjMatType = $('#adjmat-type').find('option:selected').val();
@@ -496,7 +509,7 @@ function load_graph(type,isDraw,webgl,ended) {
     server(serverAddr + 'loadGraph' + '/' + type + "--"
         + str + "--" + isDirected + "--" + uuid, function (data) {
         if (isDraw) {
-            if(!webgl) {
+            if(!webgl && !threed) {
                 // cy = cytoscape({
                 //     container: document.getElementById('canvas'),
                 //     style: [ // the stylesheet for the graph
@@ -519,9 +532,20 @@ function load_graph(type,isDraw,webgl,ended) {
                 cy.add(edges);
                 cy.layout({name: 'cose'}).run();
                 ended();
-            } else {
+            } else if (!threed) {
                 viva_action(data);
                 ended();
+            } else {
+               const gData = {
+                  nodes: data.nodes.map(i => ({ id: i.data.id })),
+                  links: data.edges.map(i => ({ source: i.data.source, target:i.data.target} ))
+                };
+
+                const Graph = ForceGraph3D()
+                  (document.getElementById('canvas'))
+                    .graphData(gData);
+                ended();
+
             }
         }
     });
