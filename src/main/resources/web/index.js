@@ -13,18 +13,41 @@ var original_data = {};
 $.get(serverAddr + 'graphs/')
     .done(function (data) {
         original_data = data;
-        var categoriesSelect = $('#categories');
+
+        var categoriesSelect = $('#categories1');
+        var generatorSelect = $('#gens');
+
+        var category_generators = {};
         data.graphs.forEach(function (d) {
-            categoriesSelect.append('<option>' + d.name + '</option>');
+            if(category_generators[d.category] == undefined) {
+                category_generators[d.category] = [];
+                category_generators[d.category].push(d.name);
+            } else {
+                category_generators[d.category].push(d.name);
+            }
             original_data[d.name] = {desc: d.desc, props: d.properties};
         });
 
-        categoriesSelect.html(categoriesSelect.find('option').sort(function(x, y) {
-            return $(x).text() > $(y).text() ? 1 : -1;
-        }));
+        Object.keys(category_generators).forEach(function (d) {
+            categoriesSelect.append('<option>' + d + '</option>');
+//            category_generators[d].forEach(function(cg) {
+//                generatorSelect.append('<option>' + cg + '</option>');
+//            });
+        });
 
         categoriesSelect.on('change', function () {
-            var category = getSelectedCategory();
+            var category = getSelectedCategory1();
+            generatorSelect.empty();
+            category_generators[category].forEach(function(cg) {
+                 generatorSelect.append('<option>' + cg + '</option>');
+            });
+            generatorSelect.html(generatorSelect.find('option').sort(function(x, y) {
+                return $(x).text() > $(y).text() ? 1 : -1;
+            }));
+        });
+
+        generatorSelect.on('change', function () {
+            var category = getSelectedGenerator();
             var keys = "", vals = "";
             original_data[category].props.forEach(function (d) {
                 var propNamesTypes = d.split(":");
@@ -48,14 +71,36 @@ $.get(serverAddr + 'graphs/')
         });
 
         var reportsSelect = $('#reports');
+        var reportCategories = $('#reportCategories');
+
+        var category_reports = {};
         data.reports.forEach(function (d) {
-            reportsSelect.append('<option>' + d.name + '</option>');
+            if(category_reports[d.category] == undefined) {
+                category_reports[d.category] = [];
+                category_reports[d.category].push(d.name);
+            } else {
+                category_reports[d.category].push(d.name);
+            }
             original_data[d.name] = {desc: d.desc, props: d.properties};
         });
 
-        reportsSelect.html(reportsSelect.find('option').sort(function(x, y) {
-            return $(x).text() > $(y).text() ? 1 : -1;
-        }));
+        Object.keys(category_reports).forEach(function (d) {
+            reportCategories.append('<option>' + d + '</option>');
+//            category_generators[d].forEach(function(cg) {
+//                generatorSelect.append('<option>' + cg + '</option>');
+//            });
+        });
+
+        console.log(category_reports);
+        reportCategories.on('change', function () {
+            reportsSelect.empty();
+            category_reports[getSelectedReportCategory()].forEach(function (d) {
+                reportsSelect.append('<option>' + d + '</option>');
+            });
+            reportsSelect.html(reportsSelect.find('option').sort(function(x, y) {
+                return $(x).text() > $(y).text() ? 1 : -1;
+            }));
+        });
 
         reportsSelect.on('change', function () {
             var report = getSelectedReport();
@@ -150,7 +195,7 @@ function graphAlgorithm(status) {
         data: JSON.stringify({
             "type": "algorithm",
             "name": $('#graphAlgorithms').find('option:selected').text(),
-            "graph": $('#categories').find('option:selected').text(),
+            "graph": $('#gens').find('option:selected').text(),
             "uuid": uuid,
 //            "propsKeys": $('#reportPropsKeys').html(),
 //            "propsVals": $('#reportPropsVals').val(),
@@ -267,7 +312,7 @@ function Report() {
         data: JSON.stringify({
             "type": "report",
             "name": $('#reports').find('option:selected').text(),
-            "graph": $('#categories').find('option:selected').text(),
+            "graph": $('#gens').find('option:selected').text(),
             "uuid": uuid,
             "propsKeys": $('#reportPropsKeys').html(),
             "propsVals": $('#reportPropsVals').val(),
@@ -330,8 +375,8 @@ function load_generator(isDraw,webgl,ended,threed) {
         url: 'http://0.0.0.0:2342/add', type: 'POST', contentType: 'application/json',
         data: JSON.stringify({
             "type": "gen",
-            "name": $('#categories').find('option:selected').text(),
-            "graph": $('#categories').find('option:selected').text(),
+            "name": $('#gens').find('option:selected').text(),
+            "graph": $('#gens').find('option:selected').text(),
             "uuid": uuid,
             "propsKeys": $('#props_keys').html(),
             "propsVals": $('#props_vals').val(),
@@ -370,6 +415,8 @@ function load_generator(isDraw,webgl,ended,threed) {
                       (document.getElementById('canvas'))
                         .graphData(gData);
                     ended();
+                    let { nodes, links } = Graph.graphData();
+                    console.log(nodes );
 
                 }
             }
@@ -386,9 +433,16 @@ function load_generator(isDraw,webgl,ended,threed) {
     // })
 }
 
+function getSelectedReportCategory() {
+    return $('#reportCategories').find('option:selected').text();
+}
 
-function getSelectedCategory() {
-    return $('#categories').find('option:selected').text();
+function getSelectedCategory1() {
+    return $('#categories1').find('option:selected').text();
+}
+
+function getSelectedGenerator() {
+    return $('#gens').find('option:selected').text();
 }
 
 function getSelectedReport() {

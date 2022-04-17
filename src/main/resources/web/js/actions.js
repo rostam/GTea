@@ -6,7 +6,7 @@ function DoActions() {
     var action = $('#action').find('option:selected').text();
     var loadingEle = document.getElementById("loading");
     loadingEle.style.visibility = 'visible';
-    var categoryName = getSelectedCategory();
+    var categoryName = getSelectedGenerator();
     var databaseName = categoryName + "-" + getSelectedDatabase();
 
     $('#prop-table').remove();

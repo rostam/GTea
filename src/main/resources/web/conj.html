@@ -66,7 +66,7 @@ This set of graphs can be computed in two ways:
                 original_data[d.name] = {desc: d.desc, props: d.properties};
             });
             categoriesSelect.on('change', function () {
-                var category = getSelectedCategory();
+                var category = getSelectedGenerator();
                 var keys = "", vals = "";
                 original_data[category].props.forEach(function (d) {
                     var propNamesTypes = d.split(":");
@@ -96,7 +96,7 @@ This set of graphs can be computed in two ways:
         });
 
 
-    function getSelectedCategory() {
+    function getSelectedGenerator() {
         return $('#generators').find('option:selected').text();
     }
 </script>

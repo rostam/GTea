@@ -4,6 +4,8 @@ import graphtea.graph.graph.GraphModel;
 import graphtea.platform.core.BlackBoard;
 import graphtea.platform.extension.Extension;
 import graphtea.plugins.algorithmanimator.extension.AlgorithmExtension;
+import graphtea.plugins.graphgenerator.core.extension.GraphGeneratorExtension;
+import graphtea.plugins.reports.extension.GraphReportExtension;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -61,9 +63,14 @@ public class Helpers {
             String classSimpleName = c.getSimpleName();
             try {
                 jo.put("name",classSimpleName);
-
                 if(c.getSuperclass().getName().contains("GraphAlgorithm")) {
                     jo.put("desc", c.getDeclaredConstructor(BlackBoard.class).newInstance(new BlackBoard()).getDescription());
+                } else if(c.getName().contains("generators")) {
+                    jo.put("category", ((GraphGeneratorExtension)c.getDeclaredConstructor().newInstance()).getCategory());
+                    jo.put("desc", c.getDeclaredConstructor().newInstance().getDescription());
+                } else if(c.getName().contains("reports")) {
+                    jo.put("category", ((GraphReportExtension)c.getDeclaredConstructor().newInstance()).getCategory());
+                    jo.put("desc", c.getDeclaredConstructor().newInstance().getDescription());
                 } else {
                     jo.put("desc", c.getDeclaredConstructor().newInstance().getDescription());
                 }

@@ -46,7 +46,10 @@
         <!--<button onclick="selectLoader()">Select</button>-->
         <div id="generators" class="loaders">
             <p id="strings-generator"></p>
-            <select id="categories">
+            Category: <select id="categories1">
+                <option>Select</option>
+            </select><br/>
+            Generator: <select id="gens">
                 <option>Select</option>
             </select>
             <div class="tooltip"><i class="fa fa-info-circle" aria-hidden="true"></i>
@@ -125,7 +128,8 @@
         <div style="visibility: hidden" id="act_name">gen</div>
         <hr>
         <p id="strings-report"></p>
-        <select id="reports"></select>
+        Category: <select id="reportCategories"></select><br/>
+        Report: <select id="reports"></select>
         <div id="reportProps"></div>
         <button onclick="Report()">Report</button>
         <div class="tooltip"><i class="fa fa-info-circle" aria-hidden="true"></i>
