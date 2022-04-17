@@ -415,8 +415,49 @@ function load_generator(isDraw,webgl,ended,threed) {
                       (document.getElementById('canvas'))
                         .graphData(gData);
                     ended();
+                    Graph.onEngineStop(function(){
                     let { nodes, links } = Graph.graphData();
-                    console.log(nodes );
+                    str = "distance between edge nodes:\n";
+                    console.log(links);
+                    links.forEach(function(e) {
+                        var src = e.source.id;
+                        var tgt = e.target.id;
+                        var n1 = nodes[src];
+                        var n2 = nodes[tgt];
+                        dist = Math.sqrt(
+                             Math.pow(n1.x-n2.x,2) +
+                             Math.pow(n1.y-n2.y,2) +
+                             Math.pow(n1.z-n2.z,2)
+                        );
+                        str += (dist +"").substr(0,6) + ", ";
+                    });
+
+                    var min_dist = 10000;
+                    nodes.forEach(function(n1) {
+                      nodes.forEach(function(n2) {
+                        if(n1.id > n2.id) {
+                          dist = Math.sqrt(
+                            Math.pow(n1.x-n2.x,2) +
+                            Math.pow(n1.y-n2.y,2) +
+                            Math.pow(n1.z-n2.z,2)
+                          );
+                          if(min_dist > dist)
+                            min_dist = dist;
+                        }
+                      });
+                    });
+                    str += "\nminimum distance between all nodes:\n" + min_dist;
+                    str += "\ncoordinates:\n";
+                    nodes.forEach(function(n) {
+                        sx = (n.x + "").substr(0,6);
+                        sy = (n.y + "").substr(0,6);
+                        sz = (n.z + "").substr(0,6);
+                        str += sx + ", " + sy + ", " + sz + "\n";
+                    });
+                    $("#vis_inf").html(str)
+                    });
+
+//                    console.log(nodes );
 
                 }
             }
