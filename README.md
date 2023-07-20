@@ -1,15 +1,25 @@
 # GTea
-GTea is an online version of GraphTea (www.graphtheorysoftware.com/).
-GraphTea is an open source software, 
-crafted for high quality standards and released under GPL license. 
-You can find more details about the source code and issue tracket on Github.
-It is a perfect tool for Students, Teachers, Researchers, Game Developers and much more. 
 
-The idea is to have a Java server which recieves the requests from server and pass them to GraphTea model.
-The results, which can be a graph or any number or string, are packed into a JSON and are sent back to JS client.
-The JS client, which is written completely new, handle the recieved JSON based on the selected actions.
+Welcome to the GTea repository! GTea is the online version of GraphTea, an open-source software designed for high-quality standards and released under the GPL license. It serves as a perfect tool for students, teachers, researchers, game developers, and many more.
 
-There are several publications using GTea which can be found in my website (https://rostam.github.io/). 
+GraphTea is available at [www.graphtheorysoftware.com](http://www.graphtheorysoftware.com/). For more details about the source code and issue tracker, please visit our [GitHub page](https://github.com/rostam/GTea).
 
-Is it temporarily hosted under http://csc.inf-ra.uni-jena.de/server/index.html.
+## Architecture
 
+GTea operates on a Java server, which receives requests from the server and passes them to the GraphTea model. The results, which can be a graph, number, or string, are packed into a JSON and sent back to the JavaScript (JS) client. The JS client, which has been completely rewritten, handles the received JSON based on the selected actions.
+
+## Publications
+
+Several publications have utilized GTea, which can be found on my [website](https://rostam.github.io/).
+
+## Hosting
+
+GTea is temporarily hosted at [http://csc.inf-ra.uni-jena.de/server/index.html](http://csc.inf-ra.uni-jena.de/server/index.html).
+
+## Contributing
+
+Contributions are always welcome! If you have any suggestions or want to contribute to the code, feel free to open an issue or submit a pull request.
+
+## License
+
+GTea is open-source and released under the [GPL License](LICENSE).
